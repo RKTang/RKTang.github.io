@@ -1,9 +1,10 @@
-let slideIndex = [1, 2];
-let slideId = ["mySlides1", "mySlides2", "mySlides3"];
+let slideIndex = [1, 1];
+let slideId = ["mySlides1", "mySlides2", "mySlides3", "mySlides4"];
 
 showSlides(1, 0);
 showSlides(1, 1);
 showSlides(1, 2);
+showSlides(1, 3);
 
 function plusSlides(n, no) {
   showSlides(slideIndex[no] += n, no);
@@ -27,6 +28,7 @@ function showSlides(n, no) {
   if (x[slideIndex[no] - 1]) {
     x[slideIndex[no] - 1].style.display = "block";
     if (x[slideIndex[no] - 1].tagName === "VIDEO") {
+      x[slideIndex[no] - 1].style.display = "block";
       x[slideIndex[no] - 1].play(); // Auto-play the video
     }
   }
