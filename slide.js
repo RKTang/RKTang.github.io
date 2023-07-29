@@ -20,10 +20,10 @@ function showSlides(n, no) {
       x[i].pause(); // Pause all videos
     }
   }
-  if (x[slideIndex[no] - 1].tagName === "VIDEO") {
-    x[slideIndex[no] - 1].style.display = "block";
-    x[slideIndex[no] - 1].play(); // Auto-play the video
+  if (x[slideIndex[no]].tagName === "VIDEO") {
+    x[slideIndex[no]].style.display = "block";
+    x[slideIndex[no]].play(); // Auto-play the video
   } else {
-    x[slideIndex[no] - 1].style.display = "block";
+    x[slideIndex[no]].style.display = "block";
   }
 }
