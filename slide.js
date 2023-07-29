@@ -16,11 +16,11 @@ function showSlides(n, no) {
   if (n < 1) { slideIndex[no] = x.length; }
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
-    if (x[i].tagName === "video") {
+    if (x[i].id === "Video") {
       x[i].pause(); // Pause all videos
     }
   }
-  if (x[slideIndex[no] - 1 ].tagName === "video") {
+  if (x[slideIndex[no] - 1 ].id === "Video") {
     x[slideIndex[no] - 1 ].style.display = "block";
     x[slideIndex[no] - 1 ].play(); // Auto-play the video
   } else {
