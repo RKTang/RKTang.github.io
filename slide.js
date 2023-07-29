@@ -24,8 +24,8 @@ function showSlides(n, no) {
   }
   if (x[slideIndex[no] - 1]) {
     x[slideIndex[no] - 1].style.display = "block";
-    if (x[slideIndex[no] - 1].querySelector("video")) {
-      const videoElement = x[slideIndex[no] - 1].querySelector("video");
+    if (x[slideIndex[no] - 1].querySelector('video')) {
+      const videoElement = x[slideIndex[no] - 1].querySelector('video');
       videoElement.style.display = "block";
       videoElement.play(); // Auto-play the video
     }
