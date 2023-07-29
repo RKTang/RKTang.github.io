@@ -21,9 +21,6 @@ function showSlides(n, no) {
   if (n < 1) { slideIndex[no] = x.length; }
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
-    if (x[i].tagName === "VIDEO") {
-      x[i].pause(); // Pause all videos
-    }
   }
   if (x[slideIndex[no] - 1]) {
     x[slideIndex[no] - 1].style.display = "block";
