@@ -16,14 +16,14 @@ function showSlides(n, no) {
   if (n < 1) { slideIndex[no] = x.length; }
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
-    if (x[i].tagName === "VIDEO") {
+    if (x[i].tagName === "video") {
       x[i].pause(); // Pause all videos
     }
   }
-  if (x[slideIndex[no]].tagName === "VIDEO") {
-    x[slideIndex[no]].style.display = "block";
-    x[slideIndex[no]].play(); // Auto-play the video
+  if (x[slideIndex[no] - 1 ].tagName === "video") {
+    x[slideIndex[no] - 1 ].style.display = "block";
+    x[slideIndex[no] - 1 ].play(); // Auto-play the video
   } else {
-    x[slideIndex[no]].style.display = "block";
+    x[slideIndex[no] - 1 ].style.display = "block";
   }
 }
