@@ -21,12 +21,21 @@ function showSlides(n, no) {
   if (n < 1) { slideIndex[no] = x.length; }
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
+    if (x[i].querySelector("video")) {
+      const videoElement = x[i].querySelector("video");
+      videoElement.pause(); // Pause all videos
+    }
   }
   if (x[slideIndex[no] - 1]) {
     x[slideIndex[no] - 1].style.display = "block";
-    if (x[slideIndex[no] - 1].tagName === "VIDEO") {
-      x[slideIndex[no] - 1].style.display = "block";
-      x[slideIndex[no] - 1].play(); // Auto-play the video
+    if (x[slideIndex[no] - 1].querySelector("video")) {
+      const videoElement = x[slideIndex[no] - 1].querySelector("video");
+      videoElement.style.display = "block";
+      videoElement.play(); // Auto-play the video
     }
   }
 }
+
+
+
+
