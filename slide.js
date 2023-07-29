@@ -17,12 +17,12 @@ function showSlides(n, no) {
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
     if (x[i].tagName === "VIDEO") {
-      x[i].pause(); // Pause all videos
+      x[i].play(); // Pause all videos
     }
   }
   if (x[slideIndex[no] - 1].tagName === "VIDEO") {
     x[slideIndex[no] - 1].style.display = "block";
-    x[slideIndex[no] - 1].play(); // Auto-play the video
+    x[slideIndex[no] - 1].pause(); // Auto-play the video
   } else {
     x[slideIndex[no] - 1].style.display = "block";
   }
