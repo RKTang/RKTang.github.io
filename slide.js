@@ -1,37 +1,37 @@
-let slideIndex = [1, 1];
-let slideId = ["mySlides1", "mySlides2", "mySlides3", "mySlides4"];
-
-showSlides(1, 0);
-showSlides(1, 1);
-showSlides(1, 2);
-showSlides(1, 3);
-
-function plusSlides(n, no) {
-  showSlides(slideIndex[no] += n, no);
-}
-
-function showSlides(n, no) {
-  let i;
-  let x = document.getElementsByClassName(slideId[no]);
-  if (x.length === 0) {
-    console.error("No elements found with class name: " + slideId[no]);
-    return;
-  }
-  if (n > x.length) { slideIndex[no] = 1; }
-  if (n < 1) { slideIndex[no] = x.length; }
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";
-  }
-  if (x[slideIndex[no] - 1]) {
-    x[slideIndex[no] - 1].style.display = "block";
-    if (x[slideIndex[no] - 1].querySelector('video')) {
-      const videoElement = x[slideIndex[no] - 1].querySelector('video');
-      videoElement.style.display = "block";
-      videoElement.play(); // Auto-play the video
-    }
-  }
-}
-
-
-
-
+var slideIndex = 1;
+                var z = document.getElementsByClassName("slideshow");
+                for (i = 0; i < z.length; i++) {
+                    //set custom data attribute to first current image index
+                    z[i].setAttribute("data-currentslide", 1);
+                    showDivs(z[i].getAttribute("data-currentslide"), i);
+                }
+                function plusDivs(n, j) {
+                    //get custom data attribute value of current image index to slideshow class index j
+                    slideIndex = parseInt(z[j].getAttribute("data-currentslide"));
+                    showDivs(slideIndex += n, j);
+                }
+                function currentDiv(n, j) {
+                    showDivs(slideIndex = n, j); /* showDivs Not showSlides*/
+                }
+                function showDivs(n, j) {
+                    var i;
+                    var z = document.getElementsByClassName("slideshow")[j];
+                    var x = z.getElementsByClassName("mySlides");
+                    var dots = z.getElementsByClassName("dot");
+                    if (n > x.length) {
+                        slideIndex = 1
+                    }
+                    if (n < 1) {
+                        slideIndex = x.length;
+                    }
+                    //set custom data attribute to current image index
+                    z.setAttribute("data-currentslide", slideIndex);
+                    for (i = 0; i < x.length; i++) {
+                        x[i].style.display = "none";
+                    }
+                    for (i = 0; i < dots.length; i++) {
+                        dots[i].className = dots[i].className.replace(" active", "");
+                    }
+                    x[slideIndex - 1].style.display = "block";
+                    dots[slideIndex - 1].className += " active";
+                }
