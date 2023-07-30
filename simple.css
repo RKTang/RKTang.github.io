@@ -703,6 +703,8 @@ sub {
   border-radius: 0 3px 3px 0;
 }
 
+
+
 /* Position the "next button" to the right */
 .next {
   right: 0;
@@ -747,7 +749,7 @@ sub {
 }
 
 .active, .dot:hover {
-  background-color: #f44336;
+  background-color: #717171;
 }
 
 /* Fading animation */
