@@ -784,9 +784,10 @@ sub {
   z-index: 99;
   cursor: pointer;
   padding: 10px;
-  background-color: #f44336;
+  background-color: #f4433600;
   border: none;
   border-radius: 50%;
+  width: 48px;
 }
 
 #scrollToTopBtn img {
