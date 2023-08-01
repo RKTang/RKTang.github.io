@@ -816,3 +816,23 @@ sub {
   width: 30px; /* Adjust the width and height to fit your image */
   height: 30px;
 }
+
+/* -------------------------------------- Wrap Section ---------------------------------- */
+
+.image-with-text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.image-with-text img {
+    flex: 0 0 300px; /* Adjust the width of the image as needed */
+    margin: 10px; /* Adjust the margin to control spacing */
+    shape-outside: circle(50%); /* You can use a specific shape or 'circle()' for a circular shape */
+    float: left; /* Float the image to the left */
+    margin-right: 10px; /* Adjust the right margin to create space between image and text */
+}
+
+.image-with-text p {
+    flex: 1; /* Allow the text to take the remaining available width */
+}
