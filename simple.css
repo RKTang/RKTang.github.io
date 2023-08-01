@@ -821,7 +821,7 @@ sub {
 
 .image-with-text {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .image-with-text img {
