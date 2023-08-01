@@ -820,19 +820,17 @@ sub {
 /* -------------------------------------- Wrap Section ---------------------------------- */
 
 .image-with-text {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+  display: flex;
+  align-items: flex-start;
 }
 
 .image-with-text img {
-    flex: 0 0 300px; /* Adjust the width of the image as needed */
-    margin: 10px; /* Adjust the margin to control spacing */
-    shape-outside: circle(50%); /* You can use a specific shape or 'circle()' for a circular shape */
-    float: left; /* Float the image to the left */
-    margin-right: 10px; /* Adjust the right margin to create space between image and text */
+  flex: 0 0 300px; /* Adjust the width of the image as needed */
+  margin-right: 20px; /* Adjust the right margin to create space between image and text */
+  shape-outside: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* Creates a rectangular shape for wrapping */
+  float: left; /* Float the image to the left */
 }
 
 .image-with-text p {
-    flex: 1; /* Allow the text to take the remaining available width */
+  flex: 1; /* Allow the text to take the remaining available width */
 }
