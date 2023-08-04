@@ -149,22 +149,70 @@ h3 {
   line-height: 1.1;
 }
 
-/* Reduce header size on mobile */
 @media only screen and (max-width: 720px) {
-  h1 {
-    font-size: 2.5rem;
+  body {
+    font-size: 1rem;
+    line-height: 1.4;
+    grid-template-columns: 1fr min(35rem, 90%) 1fr;
   }
 
-  h2 {
-    font-size: 2.1rem;
+  body > header h1 {
+    font-size: 2.2rem;
+    margin: 1rem auto 0.5rem auto;
   }
 
-  h3 {
-    font-size: 1.75rem;
+  body > header p {
+    max-width: 100%;
+    margin: 1rem auto;
   }
 
-  h4 {
-    font-size: 1.25rem;
+  header > nav ul,
+  header > nav ol {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  header > nav a {
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    line-height: 1;
+  }
+
+  aside {
+    width: 100%;
+    margin-inline-start: 0;
+    float: none;
+  }
+
+  .image-with-text img {
+    flex: 0 0 100%;
+    margin-right: 0;
+    shape-outside: none;
+    float: none;
+  }
+
+  .prev, .next {
+    top: 45%;
+    font-size: 14px;
+    padding: 12px;
+    margin-top: -20px;
+  }
+
+  .text {
+    font-size: 12px;
+  }
+
+  #scrollToTopBtn {
+    padding: 12px;
+    width: 80px;
+  }
+  
+  #scrollToTopBtn img {
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -285,15 +333,7 @@ header > nav a[aria-current="page"] {
   cursor: pointer;
 }
 
-/* Reduce nav side on mobile */
-@media only screen and (max-width: 720px) {
-  header > nav a {
-    border: none;
-    padding: 0;
-    text-decoration: underline;
-    line-height: 1;
-  }
-}
+
 
 /* Consolidate box styling */
 aside, details, pre, progress {
@@ -314,14 +354,7 @@ aside {
   float: left;
 }
 
-/* Make aside full-width on mobile */
-@media only screen and (max-width: 720px) {
-  aside {
-    width: 100%;
-    float: none;
-    margin-inline-start: 0;
-  }
-}
+
 
 article, fieldset, dialog {
   border: 1px solid var(--border);
@@ -492,14 +525,7 @@ input[type="radio"]:checked::after {
   font-size: 32px;
 }
 
-/* Makes input fields wider on smaller screens */
-@media only screen and (max-width: 720px) {
-  textarea,
-  select,
-  input {
-    width: 100%;
-  }
-}
+
 
 /* Set a height for color input */
 input[type="color"] {
@@ -646,12 +672,7 @@ dialog::backdrop {
   opacity: 0.8;
 }
 
-@media only screen and (max-width: 720px) {
-  dialog {
-    max-width: 100%;
-    margin: auto 1em;
-  }
-}
+
 
 /* Superscript & Subscript */
 /* Prevent scripts from affecting line-height. */
@@ -767,11 +788,6 @@ sub {
 @keyframes fade {
   from {opacity: .4}
   to {opacity: 1}
-}
-
-/* On smaller screens, decrease text size */
-@media only screen and (max-width: 300px) {
-  .prev, .next,.text {font-size: 11px}
 }
 
 /* -------------------------------------- Scroll to Top Section ---------------------------------- */
