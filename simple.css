@@ -850,3 +850,35 @@ sub {
 .image-with-text p {
   flex: 1; /* Allow the text to take the remaining available width */
 }
+
+/* -------------------------------------- iframe Wrap Section ---------------------------------- */
+
+
+#wrap {
+  width: 750px;
+  height: 1500px;
+  padding: 0;
+  overflow: hidden;
+}
+
+#scaled-frame {
+  width: 1000px;
+  height: 2000px;
+  border: 0px;
+}
+
+#scaled-frame {
+  zoom: 0.75;
+  transform: scale(0.75);
+  transform-origin: 0 0;
+  transform: scale(0.75);
+  transform-origin: 0 0;
+  transform: scale(0.75);
+  transform-origin: 0 0;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  #scaled-frame {
+    zoom: 1;
+  }
+}
