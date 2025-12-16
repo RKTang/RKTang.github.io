@@ -215,12 +215,43 @@
             margin-top: 1rem;
         }
 
+        /* --- FIXES FOR VISIBILITY --- */
+
+        /* 1. Make the "Top" button Blue with White text */
+        #scrollToTopBtn {
+            background-color: var(--accent) !important;
+            color: #ffffff !important;
+            border: 2px solid white; 
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 2. Make Slideshow Captions readable with a background box */
+        .text {
+            color: #ffffff !important;       
+            background-color: rgba(0, 0, 0, 0.7); 
+            padding: 8px 12px;               
+            border-radius: 4px;              
+            bottom: 20px;                    
+            text-shadow: none;               
+            width: auto;                     
+            display: inline-block;           
+            left: 50%;
+            transform: translateX(-50%);     
+        }
+
+        /* 3. Force Details Box to be White with Dark Text */
         details {
-            margin-top: 1rem;
-            background-color: #ffffff !important; /* Force white background */
-            color: #333333 !important;           /* Force dark text */
-            padding: 10px;                       /* Add some internal spacing */
-            border-radius: 5px;                  /* smooth corners */
+            background-color: #ffffff !important;
+            color: #333333 !important;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Force all text inside the details box to be dark grey */
+        details p, details ul, details li, details strong {
+            color: #333333 !important;
         }
         
         footer {
@@ -253,17 +284,23 @@
             </header>
             <article>
                 <p>
-                    Hello! I'm Richard Tang, and I'm a Manufacturing Engineering student at UBC. My background is a little different because I started as a technician, not a designer. Working on an assembly line taught me that a CAD model is useless if you can't actually build it. That experience changed how I approach engineering. Whether I'm managing supply chains at MDA Space or fabricating rocket parts, I focus on the practical reality of how things get made.
+                    I'm a Manufacturing Engineering student at UBC. My background is a little different because I started as a technician, not a designer.
+                </p>
+                <p>
+                    Working on an assembly line taught me that a CAD model is useless if you can't actually build it. That experience changed how I approach engineering. 
+                    Whether I'm managing supply chains at MDA Space or fabricating rocket parts, I focus on the practical reality of how things get made.
                 </p>
                 
-                <p style="margin-top: 1.5rem; margin-bottom: 0.5rem;"><strong>Technical Competencies:</strong></p>
+                <p style="margin-top: 1.5rem; margin-bottom: 0.5rem;"><strong>Skills:</strong></p>
                 <div>
                     <span class="skill-tag">SolidWorks</span>
                     <span class="skill-tag">Siemens NX</span>
                     <span class="skill-tag">Fusion 360</span>
-                    <span class="skill-tag">MATLAB</span>
+                    <span class="skill-tag">ANSYS (FEA)</span>
+                    <span class="skill-tag">CNC Machining</span>
                     <span class="skill-tag">5S Methodology</span>
                     <span class="skill-tag">MRP Systems</span>
+                    <span class="skill-tag">MATLAB</span>
                     <span class="skill-tag">Unity/C#</span>
                 </div>
             </article>
@@ -281,6 +318,42 @@
                     <p class="date">May 2024 - Aug 2025</p>
                 </div>
                 
+                <div id="wrapper">
+                    <div class="slideshow"> 
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/Podcast-MDA-banner-1920x600-1.png" width="100%" alt="Canadarm2 and Dextre">
+                                <div class="numbertext">1 / 4</div>
+                                <div class="text">Canadarm2 and Dextre</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/MDA_3.png" width="100%" alt="MDA Space Brampton">
+                                <div class="numbertext">2 / 4</div>
+                                <div class="text">MDA Space Brampton</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/canadarm3-canadas-smart-robotic-system-for-the-lunar-gateway.webp" width="100%" alt="Canadarm3">
+                                <div class="numbertext">3 / 4</div>
+                                <div class="text">Canadarm3</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/PXL_20241106_141848654.jpg" width="100%" alt="Skymaker Prototype">
+                                <div class="numbertext">4 / 4</div>
+                                <div class="text">Skymaker Prototype</div>
+                            </div>
+                            <a class="prev" onclick="plusDivs(-1, 0)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 0)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 0)"></span>
+                            <span class="dot" onclick="currentDiv(2, 0)"></span>
+                            <span class="dot" onclick="currentDiv(3, 0)"></span>
+                            <span class="dot" onclick="currentDiv(4, 0)"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="stat-card-container">
                     <div class="stat-card">
                         <span class="stat-label">Process Improvement</span>
@@ -337,11 +410,15 @@
                                 <div class="numbertext">3 / 3</div>
                                 <div class="text">Process Line Descriptions</div>
                             </div>
-                            <a class="prev" onclick="plusDivs(-1, 0)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 0)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 1)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 1)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 0)"></span><span class="dot" onclick="currentDiv(2, 0)"></span><span class="dot" onclick="currentDiv(3, 0)"></span></div>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 1)"></span>
+                            <span class="dot" onclick="currentDiv(2, 1)"></span>
+                            <span class="dot" onclick="currentDiv(3, 1)"></span>
+                        </div>
                     </div>
                 </div>
                 
@@ -382,11 +459,11 @@
                             <div class="mySlides"><img src="Asset/IMG_1302.JPG" width="100%"><div class="numbertext">5 / 7</div></div>
                             <div class="mySlides"><img src="Asset/IMG_1304.JPG" width="100%"><div class="numbertext">6 / 7</div></div>
                             <div class="mySlides"><img src="Asset/IMG_1343.JPG" width="100%"><div class="numbertext">7 / 7</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 1)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 1)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 2)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 2)">&#10095;</a>
                             </div>
                             <br>
-                            <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 1)"></span><span class="dot" onclick="currentDiv(2, 1)"></span><span class="dot" onclick="currentDiv(3, 1)"></span><span class="dot" onclick="currentDiv(4, 1)"></span><span class="dot" onclick="currentDiv(5, 1)"></span><span class="dot" onclick="currentDiv(6, 1)"></span><span class="dot" onclick="currentDiv(7, 1)"></span></div>
+                            <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 2)"></span><span class="dot" onclick="currentDiv(2, 2)"></span><span class="dot" onclick="currentDiv(3, 2)"></span><span class="dot" onclick="currentDiv(4, 2)"></span><span class="dot" onclick="currentDiv(5, 2)"></span><span class="dot" onclick="currentDiv(6, 2)"></span><span class="dot" onclick="currentDiv(7, 2)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -421,11 +498,11 @@
                             <div class="mySlides"><img src="Asset/Wheel 3D Print.jpg" width="100%"><div class="numbertext">8 / 10</div><div class="text">Wheel 3D Print</div></div>
                             <div class="mySlides"><img src="Asset/RC Car Thermoforming.jpg" width="100%"><div class="numbertext">9 / 10</div><div class="text">Thermoforming</div></div>
                             <div class="mySlides"><img src="Asset/RC Car Heat Analysis.png" width="100%"><div class="numbertext">10 / 10</div><div class="text">Heat Analysis of Motor</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 2)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 2)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 3)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 3)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 2)"></span><span class="dot" onclick="currentDiv(2, 2)"></span><span class="dot" onclick="currentDiv(3, 2)"></span><span class="dot" onclick="currentDiv(4, 2)"></span><span class="dot" onclick="currentDiv(5, 2)"></span><span class="dot" onclick="currentDiv(6, 2)"></span><span class="dot" onclick="currentDiv(7, 2)"></span><span class="dot" onclick="currentDiv(8, 2)"></span><span class="dot" onclick="currentDiv(9, 2)"></span><span class="dot" onclick="currentDiv(10, 2)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 3)"></span><span class="dot" onclick="currentDiv(2, 3)"></span><span class="dot" onclick="currentDiv(3, 3)"></span><span class="dot" onclick="currentDiv(4, 3)"></span><span class="dot" onclick="currentDiv(5, 3)"></span><span class="dot" onclick="currentDiv(6, 3)"></span><span class="dot" onclick="currentDiv(7, 3)"></span><span class="dot" onclick="currentDiv(8, 3)"></span><span class="dot" onclick="currentDiv(9, 3)"></span><span class="dot" onclick="currentDiv(10, 3)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -450,11 +527,11 @@
                                 <div class="mySlides"><img src="Asset/Screenshot 2023-07-29 212722.jpg" width="100%"><div class="numbertext">6 / 8</div><div class="text">Presentation</div></div>
                                 <div class="mySlides"><img src="Asset/Screenshot 2023-08-03 005933.jpg" width="100%"><div class="numbertext">7 / 8</div><div class="text">Figma Wire frame for App</div></div>
                                 <div class="mySlides"><img src="Asset/IMG_2945.jpg" width="100%"><div class="numbertext">8 / 8</div><div class="text">Team Photo</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 3)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 3)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 4)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 4)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 3)"></span><span class="dot" onclick="currentDiv(2, 3)"></span><span class="dot" onclick="currentDiv(3, 3)"></span><span class="dot" onclick="currentDiv(4, 3)"></span><span class="dot" onclick="currentDiv(5, 3)"></span><span class="dot" onclick="currentDiv(6, 3)"></span><span class="dot" onclick="currentDiv(7, 3)"></span><span class="dot" onclick="currentDiv(8, 3)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 4)"></span><span class="dot" onclick="currentDiv(2, 4)"></span><span class="dot" onclick="currentDiv(3, 4)"></span><span class="dot" onclick="currentDiv(4, 4)"></span><span class="dot" onclick="currentDiv(5, 4)"></span><span class="dot" onclick="currentDiv(6, 4)"></span><span class="dot" onclick="currentDiv(7, 4)"></span><span class="dot" onclick="currentDiv(8, 4)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -478,11 +555,11 @@
                             <div class="mySlides"><img src="Asset/325020424_541963054657412_2220710117138790717_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">Underside</div></div>
                             <div class="mySlides"><img src="Asset/325211024_892323165552225_8414979510067406734_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Post Processing</div></div>
                             <div class="mySlides"><img src="Asset/322779581_702182148018563_6618183657453898901_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">In Use</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 4)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 4)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 4)"></span><span class="dot" onclick="currentDiv(2, 4)"></span><span class="dot" onclick="currentDiv(3, 4)"></span><span class="dot" onclick="currentDiv(4, 4)"></span><span class="dot" onclick="currentDiv(5, 4)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 5)"></span><span class="dot" onclick="currentDiv(2, 5)"></span><span class="dot" onclick="currentDiv(3, 5)"></span><span class="dot" onclick="currentDiv(4, 5)"></span><span class="dot" onclick="currentDiv(5, 5)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -504,11 +581,11 @@
                             <div class="mySlides"><img src="Asset/326814349_548129457263452_1295491445531893620_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">3D Printing</div></div>
                             <div class="mySlides"><img src="Asset/322657566_1050700309666528_4748723159243016704_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Semi-finished 3D model</div></div>
                             <div class="mySlides"><img src="Asset/322661332_1300532087183658_8962088131499657860_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">Post Processing</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 5)"></span><span class="dot" onclick="currentDiv(2, 5)"></span><span class="dot" onclick="currentDiv(3, 5)"></span><span class="dot" onclick="currentDiv(4, 5)"></span><span class="dot" onclick="currentDiv(5, 5)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span><span class="dot" onclick="currentDiv(5, 6)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -531,11 +608,11 @@
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineDungeon.mp4" type="video/mp4"></video><div class="numbertext">2 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineStore.mp4" type="video/mp4"></video><div class="numbertext">3 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineTitle.mp4" type="video/mp4"></video><div class="numbertext">4 / 4</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span><span class="dot" onclick="currentDiv(4, 7)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -557,11 +634,11 @@
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/DonutClickerVideo.mp4" type="video/mp4"></video><div class="numbertext">1 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161614.jpg" width="100%"><div class="numbertext">2 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161646.jpg" width="100%"><div class="numbertext">3 / 3</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -588,11 +665,11 @@
                             <div class="mySlides"><img src="Asset/avatar-gen11b89387c3ad5f3009f2fbafb0a2e1ff.jpg" width="100%"><div class="numbertext">5 / 7</div><div class="text">AI Generated Persona</div></div>
                             <div class="mySlides"><img src="Asset/aCAsxgn9.jpg" width="100%"><div class="numbertext">6 / 7</div><div class="text">AI Persona Alt</div></div>
                             <div class="mySlides"><img src="Asset/logo.png" width="100%"><div class="numbertext">7 / 7</div><div class="text">AI Logo</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 9)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 9)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span><span class="dot" onclick="currentDiv(4, 8)"></span><span class="dot" onclick="currentDiv(5, 8)"></span><span class="dot" onclick="currentDiv(6, 8)"></span><span class="dot" onclick="currentDiv(7, 8)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 9)"></span><span class="dot" onclick="currentDiv(2, 9)"></span><span class="dot" onclick="currentDiv(3, 9)"></span><span class="dot" onclick="currentDiv(4, 9)"></span><span class="dot" onclick="currentDiv(5, 9)"></span><span class="dot" onclick="currentDiv(6, 9)"></span><span class="dot" onclick="currentDiv(7, 9)"></span></div>
                     </div>
                 </div>
                 <div style="margin-top:10px;">
