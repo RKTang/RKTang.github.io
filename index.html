@@ -2,994 +2,764 @@
 <html lang="en">
 
 <head>
-    <!-- Un-Minified version -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="Asset/hologram(2).ico">
+    <title>Richard Tang | Manufacturing Engineering Student</title>
+    
     <link rel="stylesheet" href="simple.css">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" type="image/x-icon" href="Asset/hologram(2).ico">
-	<title>Richard Tang | Manufacturing Engineering Student</title>
+
+    <style>
+        :root {
+            --accent: #2c3e50;       /* Professional Dark Blue */
+            --accent-light: #34495e; /* Lighter Blue for hover states */
+            --bg-color: #f4f7f6;     /* Light Gray background for contrast */
+            --card-bg: #ffffff;      /* White cards */
+            --text-color: #333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Header Navigation Styling */
+        body > header {
+            background-color: var(--accent);
+            color: white;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            text-align: center;
+        }
+        
+        body > header h1 {
+            color: white;
+            margin-bottom: 0.2rem;
+            font-size: 2.5rem;
+        }
+
+        .header-subtitle {
+            color: #cbd5e0;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        nav ul {
+            padding: 0;
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        nav ul li a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        nav ul li a:hover {
+            background-color: white;
+            color: var(--accent);
+            border-color: white;
+        }
+
+        /* Card Styling */
+        section article {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e1e1e1;
+        }
+
+        section article:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Typography Updates */
+        h1, h2, h3 {
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .job-header {
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-weight: bold;
+            color: var(--accent-light);
+            margin: 0.2rem 0;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Skill Badges */
+        .skill-tag {
+            display: inline-block;
+            background-color: #e3e8ee;
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 6px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            border: 1px solid #cfd9e0;
+        }
+
+        /* Stat Cards for Impact */
+        .stat-card-container {
+            display: flex; 
+            gap: 1rem; 
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: #f8f9fa; 
+            border-left: 5px solid var(--accent); 
+            padding: 12px 20px; 
+            border-radius: 4px; 
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .stat-label {
+            display: block; 
+            font-size: 0.85rem; 
+            color: #666; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: var(--accent); 
+            font-size: 1.2rem; 
+            font-weight: bold;
+        }
+
+        /* Button and Link Styling */
+        button, summary, .download-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        button:hover, summary:hover, .download-btn:hover {
+            background-color: var(--accent-light);
+            color: white;
+        }
+
+        a {
+            color: var(--accent);
+        }
+
+        /* Slideshow Containers */
+        .slideshow {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 1.5rem 0;
+            background: #eee;
+        }
+
+        /* Details & Lists */
+        details ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        details ul li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        details ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* Visibility Fixes */
+        #scrollToTopBtn {
+            background-color: var(--accent) !important;
+            color: #ffffff !important;
+            border: 2px solid white; 
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .text {
+            color: #ffffff !important;       
+            background-color: rgba(0, 0, 0, 0.7); 
+            padding: 8px 12px;               
+            border-radius: 4px;              
+            bottom: 20px;                    
+            text-shadow: none;               
+            width: auto;                     
+            display: inline-block;           
+            left: 50%;
+            transform: translateX(-50%);     
+        }
+
+        details {
+            margin-top: 1rem;
+            background-color: #ffffff !important;
+            color: #333333 !important;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        details p, details ul, details li, details strong {
+            color: #333333 !important;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body id="top">
-	<header>
-		<h1>Richard Tang's Portfolio</h1>
-		<nav>
-			<ul>
-				<li><a href="#about">About</a></li>
-				<li><a href="#work">Work Experience</a></li>
-				<li><a href="#projects">Projects</a></li>
-				<li><a href="#resume">Resume</a></li>
-			</ul>
-		</nav>
-	</header>
-	<main>
-		<!-- ======= About Section ======= --> 
-		<section id="about">
-			<header>
-				<h1>About</h1>
-			</header>
-			<article>
-					<p>
-						Hello! I'm Richard Tang, a passionate and driven individual with a keen interest in 
-						engineering and technology. I am currently pursuing a Bachelor of Applied Science in
-						Manufacturing Engineering at the University of British Columbia. In my spare time, I 
-						enjoy exploring new technologies, attending workshops, and engaging in creative 
-						problem-solving. I am highly motivated, detail-oriented, and thrive in collaborative 
-						environments. You can reach me at rtang400@gmail.com. Thank you for taking the time 
-						to learn about me, and I look forward to connecting with you!
-					</p>
-			</article>
-			</div>
-		</section>
-		<!-- End About Section -->
-		<!-- ======= Work Experience Section ======= --> 
-		<section id="work">
-			<header>
-				<h1>Work Experience</h1>
-			</header>
-				<article>
-					<header>
-						<h2>SAPA Technologies Ltd.,</h2>
-						</header>
-						<!-- Slideshow container -->
-						<div id="wrapper">
-							<div class="slideshow">	
-								<div class="display-container">
-									<!-- Slide 1 -->
-									<div class="mySlides">
-										<img src="Asset/product-1-1024x607.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">1 / 3</div>
-										<!-- Caption text -->
-										<div class="text">Flexible LED lightsheet</div>
-									</div>
-							
-									<!-- Slide 2 -->
-									<div class="mySlides">
-										<img src="Asset/6366458534540160004209.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">2 / 3</div>
-										<!-- Caption text -->
-										<div class="text">SMT PCB Assembly Process Line</div>
-									</div>
-									
-									<!-- Slide 3 -->
-									<div class="mySlides">
-										<img src="Asset/difference-between-SMT-and-SMD.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">3 / 3</div>
-										<!-- Caption text -->
-										<div class="text">Process Line Descriptions</div>
-									</div>
-									
-									<a class="prev" onclick="plusDivs(-1, 0)">&#10094;</a>
-									<a class="next" onclick="plusDivs(1, 0)">&#10095;</a>
-									<!-- Extra plusDivs parameter refers to first (0) slideshow (start from 0) -->
-								</div>
-								<br>
-								<div style="text-align:center">
-									<span class="dot" onclick="currentDiv(1, 0)"></span>
-									<span class="dot" onclick="currentDiv(2, 0)"></span>
-									<span class="dot" onclick="currentDiv(3, 0)"></span>
-						
-								</div>
-							</div>
-							<hr>
-						</div>
-						<details>
-							<summary>Expand for details</summary>
-							<p>SAPA Technologies Ltd. is a electronics manufacturing company located in Burnaby, BC, 
-								where I had the privilege of working as a Technician. At SAPA Technologies, 
-								the focus is on small scale OEM, with a special emphasis on 
-								Surface-Mount Technology (SMT).</p>
+    <header>
+        <h1>Richard Tang</h1>
+        <p class="header-subtitle">Manufacturing Engineering Student</p>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#work">Experience</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="https://linkedin.com/in/richardktang/" target="_blank">LinkedIn</a></li>
+                <li><a href="#resume">Resume</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="about">
+            <header>
+                <h1>About</h1>
+            </header>
+            <article>
+                <p>
+                    I'm a Manufacturing Engineering student at UBC. My background is a little different because I started as a technician, not a designer.
+                </p>
+                <p>
+                    Working on an assembly line taught me that a CAD model is useless if you can't actually build it. That experience changed how I approach engineering. 
+                    Whether I'm managing supply chains at MDA Space or fabricating rocket parts, I focus on the practical reality of how things get made.
+                </p>
+                
+                <p style="margin-top: 1.5rem; margin-bottom: 0.5rem;"><strong>Skills:</strong></p>
+                <div>
+                    <span class="skill-tag">SolidWorks</span>
+                    <span class="skill-tag">Siemens NX</span>
+                    <span class="skill-tag">Fusion 360</span>
+                    <span class="skill-tag">ANSYS (FEA)</span>
+                    <span class="skill-tag">CNC Machining</span>
+                    <span class="skill-tag">5S Methodology</span>
+                    <span class="skill-tag">MRP Systems</span>
+                    <span class="skill-tag">MATLAB</span>
+                    <span class="skill-tag">Unity/C#</span>
+                </div>
+            </article>
+        </section>
 
-								<p>
-								Surface-Mount Technology, or SMT, is a pivotal aspect of modern electronics manufacturing. 
-								It involves mounting electronic components directly onto the surface of printed circuit 
-								boards (PCBs), as opposed to the traditional method of inserting components through 
-								holes in the board. This innovative approach offers several advantages, 
-								including a reduction in component size, improved manufacturing speed, 
-								and enhanced overall efficiency.
-								</p> 
-								
-								<p>
-								During my time at SAPA Technologies, I actively engaged with SMT processes, 
-								playing a crucial role in verifying product arrivals, managing component intake, 
-								and ensuring that the assembly process of flexible LED light sheets operated smoothly. 
-								This included the task of soldering through-hole components onto PCBs, 
-								using software testing equipment to maintain the quality and consistency of LED light sheets
-								</p>
-						</details>
-			</article>
-		</section>
-		
-		<!-- End Work Experience Section -->
-		<!-- ======= Projects Section ======= --> 
-		<section id="projects">
-			<header>
-				<h1>Projects</h1>
-			</header>
-			<article>
-				<header>
-					<h2>3D Printing</h2>
-					<hr>
-					<h3>Compact Laptop Stand</h3>
-					</header>
-					<!-- Slideshow container -->
-					<div id="wrapper">
-						<div class="slideshow">
-							<div class="display-container">
-								<!-- Slide 1 -->
-								<div class="mySlides">
-									<img src="Asset/Screenshot 2023-07-28 180322.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">1 / 5</div>
-									<!-- Caption text -->
-									<div class="text">SOLIDWORKS file</div>
-								</div>
-						
-								<!-- Slide 2 -->
-								<div class="mySlides">
-									<img src="Asset/322660095_1355592195275970_3902139605217253319_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">2 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Semi-finished 3D model</div>
-								</div>
-								
-								<!-- Slide 3 -->
-								<div class="mySlides">
-									<img src="Asset/325020424_541963054657412_2220710117138790717_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">3 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Underside</div>
-								</div>
-								
-								<!-- Slide 4 -->
-								<div class="mySlides">
-									<img src="Asset/325211024_892323165552225_8414979510067406734_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">4 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Post Processing</div>
-								</div>
+        <section id="work">
+            <header>
+                <h1>Work Experience</h1>
+            </header>
+            
+            <article>
+                <div class="job-header">
+                    <h2>MDA Space</h2>
+                    <p class="subtitle">Manufacturing Engineering Student | Brampton, ON</p>
+                    <p class="date">May 2024 - Aug 2025</p>
+                </div>
+                
+                <div id="wrapper">
+                    <div class="slideshow"> 
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/Podcast-MDA-banner-1920x600-1.png" width="100%" alt="Canadarm2 and Dextre">
+                                <div class="numbertext">1 / 4</div>
+                                <div class="text">Canadarm2 and Dextre</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/MDA_3.png" width="100%" alt="MDA Space Brampton">
+                                <div class="numbertext">2 / 4</div>
+                                <div class="text">MDA Space Brampton</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/canadarm3-canadas-smart-robotic-system-for-the-lunar-gateway.webp" width="100%" alt="Canadarm3">
+                                <div class="numbertext">3 / 4</div>
+                                <div class="text">Canadarm3</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/PXL_20241106_141848654.jpg" width="100%" alt="Skymaker Prototype">
+                                <div class="numbertext">4 / 4</div>
+                                <div class="text">Skymaker Prototype</div>
+                            </div>
+                            <a class="prev" onclick="plusDivs(-1, 0)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 0)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 0)"></span>
+                            <span class="dot" onclick="currentDiv(2, 0)"></span>
+                            <span class="dot" onclick="currentDiv(3, 0)"></span>
+                            <span class="dot" onclick="currentDiv(4, 0)"></span>
+                        </div>
+                    </div>
+                </div>
 
-								<!-- Slide 5 -->
-								<div class="mySlides">
-									<img src="Asset/322779581_702182148018563_6618183657453898901_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">5 / 5</div>
-									<!-- Caption text -->
-									<div class="text">In Use</div>
-								</div>
+                <div class="stat-card-container">
+                    <div class="stat-card">
+                        <span class="stat-label">Process Improvement</span>
+                        <div class="stat-value">$450K Savings</div>
+                        <span style="font-size: 0.8rem; color: #666;">Annualized via CI initiatives</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">System Development</span>
+                        <div class="stat-value">Status Tool</div>
+                        <span style="font-size: 0.8rem; color: #666;">Internal Procurement Tracker</span>
+                    </div>
+                </div>
 
-								<a class="prev" onclick="plusDivs(-1, 1)">&#10094;</a>
-								<a class="next" onclick="plusDivs(1, 1)">&#10095;</a>
-								<!-- Extra plusDivs parameter refers to first (0) slideshow (start from 0) -->
-							</div>
-							<br>
-							<div style="text-align:center">
-								<span class="dot" onclick="currentDiv(1, 1)"></span>
-								<span class="dot" onclick="currentDiv(2, 1)"></span>
-								<span class="dot" onclick="currentDiv(3, 1)"></span>
-								<span class="dot" onclick="currentDiv(4, 1)"></span>
-								<span class="dot" onclick="currentDiv(5, 1)"></span>
+                <details open>
+                    <summary>What I actually did</summary>
+                    <p>
+                        At MDA Space, I realized that good engineering design doesn't matter if you can't get the parts on time. 
+                        A huge chunk of my work was just untangling the procurement cycle. The team didn't have enough 
+                        visibility on material status, so I built an internal tracking tool to fix that. 
+						It pulled data from multiple ERP systems and gave engineers a real-time view of where their parts were in the supply chain.
+                    </p>
+                    <p>
+                        I also spent a lot of time on the floor improving the machine shop and labs. We implemented 5S, 
+                        created standardized work instructions, and optimized tool layouts. 
+                        By standardizing the workspace and cutting out non-value-added steps, we saved the company about 
+                        $450k annually. It taught me that the best improvements usually come from just 
+                        listening to the people doing the work.
+                    </p>
+                </details>
+            </article>
 
-							</div>
-						</div>
-						<hr>
-					</div>
-					<details>
-						<summary>Expand for details</summary>
+            <article>
+                <div class="job-header">
+                    <h2>SAPA Technologies Ltd.</h2>
+                    <p class="subtitle">Technician | Vancouver, BC</p>
+                    <p class="date">June 2021 - Aug 2021</p>
+                </div>
 
-						<p>
-						During my second year, I created a 3D printed laptop stand to address the challenges 
-						I faced with my 2-in-1 laptop. The stand not only elevated the screen to eliminate 
-						glare from overhead lights while writing but also improved ergonomic typing. 
-						</p>
+                <div id="wrapper">
+                    <div class="slideshow"> 
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/product-1-1024x607.jpg" width="100%" alt="Flexible LED lightsheet">
+                                <div class="numbertext">1 / 3</div>
+                                <div class="text">Flexible LED lightsheet</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/6366458534540160004209.jpg" width="100%" alt="SMT PCB Assembly">
+                                <div class="numbertext">2 / 3</div>
+                                <div class="text">SMT PCB Assembly Process Line</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/difference-between-SMT-and-SMD.jpg" width="100%" alt="Process Line">
+                                <div class="numbertext">3 / 3</div>
+                                <div class="text">Process Line Descriptions</div>
+                            </div>
+                            <a class="prev" onclick="plusDivs(-1, 1)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 1)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 1)"></span>
+                            <span class="dot" onclick="currentDiv(2, 1)"></span>
+                            <span class="dot" onclick="currentDiv(3, 1)"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <details>
+                    <summary>What I actually did</summary>
+                    <p>
+                        This was my first real look at mass production. It’s very different from school projects where you make one prototype and hope it works. 
+                        Here, we were pushing out over 1,000 units a week.
+                    </p>
+                    <p>
+                        I did a lot of the grunt work—QA testing using software and hand-soldering components onto PCBs. 
+                        It was repetitive, but it forced me to be disciplined. 
+                        It gave me a solid appreciation for how hard it is to maintain consistency in electronics manufacturing.
+                    </p>
+                </details>
+            </article>
+        </section>
+        
+        <section id="projects">
+            <header>
+                <h1>Projects</h1>
+            </header>
 
-						<p>
-						A notable feature of this stand is its exceptional ability to dissipate heat 
-						efficiently. The innovative design raises the laptop, promoting better airflow 
-						beneath it. This enhanced ventilation significantly lowers the laptop's 
-						temperature, resulting in improved performance and increased durability.
-						</p>
+            <h2 style="margin-top: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Engineering Design & Manufacturing</h2>
+            
+            <article>
+                <header>
+                    <h3>UBC Rocket</h3>
+                    <p class="subtitle">Composite Pressure Vessel | Filament Winder Design</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                            <div class="display-container">
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-08-01 022618.jpg" width="100%"><div class="numbertext">1 / 7</div><div class="text">Filament Winder CAD</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1073.JPG" width="100%"><div class="numbertext">2 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1262.JPG" width="100%"><div class="numbertext">3 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1265.JPG" width="100%"><div class="numbertext">4 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1302.JPG" width="100%"><div class="numbertext">5 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1304.JPG" width="100%"><div class="numbertext">6 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1343.JPG" width="100%"><div class="numbertext">7 / 7</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 2)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 2)">&#10095;</a>
+                            </div>
+                            <br>
+                            <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 2)"></span><span class="dot" onclick="currentDiv(2, 2)"></span><span class="dot" onclick="currentDiv(3, 2)"></span><span class="dot" onclick="currentDiv(4, 2)"></span><span class="dot" onclick="currentDiv(5, 2)"></span><span class="dot" onclick="currentDiv(6, 2)"></span><span class="dot" onclick="currentDiv(7, 2)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>
+                        I'm working on the fuel tanks (pressure vessels) for our liquid-propellant rocket. 
+                        We need these tanks to be extremely light but strong enough to hold fuel under massive pressure.
+                    </p>
+                    <p>
+                        The main issue was that wrapping carbon fiber by hand is too inconsistent. To fix that, 
+                        I designed a custom filament winder. It's basically a machine that automates the layup process to ensure perfect tension and layering. 
+                        I also wrote the SOPs for the manufacturing process. It’s been a great way to learn about composite manufacturing outside of a textbook.
+                    </p>
+                </details>
+            </article>
 
-					</details>
-					<header>
-						<h3>Utility Blade Holder</h3>
-					</header>
-					<div id="wrapper">
-						<div class="slideshow">
-							<div class="display-container">
-								<!-- Slide 1 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_2296.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">1 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Post Processing</div>
-								</div>
-						
-								<!-- Slide 2 -->
-								<div class="mySlides">
-									<img src="Asset/327090955_635711781891756_7028126820235525957_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">2 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Ultimaker Cura File</div>
-								</div>
-								
-								<!-- Slide 3 -->
-								<div class="mySlides">
-									<img src="Asset/326814349_548129457263452_1295491445531893620_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">3 / 5</div>
-									<!-- Caption text -->
-									<div class="text">3D Printing</div>
-								</div>
-								
-								<!-- Slide 4 -->
-								<div class="mySlides">
-									<img src="Asset/322657566_1050700309666528_4748723159243016704_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">4 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Semi-finished 3D model</div>
-								</div>
+            <article>
+                <header>
+                    <h3>MANU 330 RC Car</h3>
+                    <p class="subtitle">Design for Manufacturing (Injection Molding & Thermoforming)</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><img src="Asset/IMG_5741.jpg" width="100%"><div class="numbertext">1 / 10</div><div class="text">RC Car Prototype</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Concept.png" width="100%"><div class="numbertext">2 / 10</div><div class="text">RC Car Concept</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/2023_aston_martin_db11_v8_main.mp4" type="video/mp4"></video><div class="numbertext">3 / 10</div><div class="text">RC Car Animation</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/RC Car Injection Moulding.mp4" type="video/mp4"></video><div class="numbertext">4 / 10</div><div class="text">Injection Moulding Simulations</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Injection Moulding 3D Print.png" width="100%"><div class="numbertext">5 / 10</div><div class="text">Injection Moulding Parts</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/CAM_Simulation_Cropped_400.mp4" type="video/mp4"></video><div class="numbertext">6 / 10</div><div class="text">CAM of Wheel</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/RC Car Wheel Simulation.mp4" type="video/mp4"></video><div class="numbertext">7 / 10</div><div class="text">Wheel Simulations</div></div>
+                            <div class="mySlides"><img src="Asset/Wheel 3D Print.jpg" width="100%"><div class="numbertext">8 / 10</div><div class="text">Wheel 3D Print</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Thermoforming.jpg" width="100%"><div class="numbertext">9 / 10</div><div class="text">Thermoforming</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Heat Analysis.png" width="100%"><div class="numbertext">10 / 10</div><div class="text">Heat Analysis of Motor</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 3)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 3)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 3)"></span><span class="dot" onclick="currentDiv(2, 3)"></span><span class="dot" onclick="currentDiv(3, 3)"></span><span class="dot" onclick="currentDiv(4, 3)"></span><span class="dot" onclick="currentDiv(5, 3)"></span><span class="dot" onclick="currentDiv(6, 3)"></span><span class="dot" onclick="currentDiv(7, 3)"></span><span class="dot" onclick="currentDiv(8, 3)"></span><span class="dot" onclick="currentDiv(9, 3)"></span><span class="dot" onclick="currentDiv(10, 3)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>Designed components and manufacturing processes for an annual production run of 20,000 units of an RC car. Covered aluminum wheels, thermoformed shell body, and composite chassis.</p>
+                </details>
+            </article>
 
-								<!-- Slide 5 -->
-								<div class="mySlides">
-									<img src="Asset/322661332_1300532087183658_8962088131499657860_n.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">5 / 5</div>
-									<!-- Caption text -->
-									<div class="text">Post Processing</div>
-								</div>
+            <article>
+                <header>
+                    <h3>InnoVent</h3>
+                    <p class="subtitle">S.A.M.I Vertical Farm</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                                <div class="mySlides"><img src="Asset/image (2).jpg" width="100%"><div class="numbertext">1 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><img src="Asset/image.jpg" width="100%"><div class="numbertext">2 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><img src="Asset/image (1).jpg" width="100%"><div class="numbertext">3 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/Innovent Prototype.mp4" type="video/mp4"></video><div class="numbertext">4 / 8</div></div>
+                                <div class="mySlides"><img src="Asset/IMG_1475.JPG" width="100%"><div class="numbertext">5 / 8</div><div class="text">Physical Prototype</div></div>
+                                <div class="mySlides"><img src="Asset/Screenshot 2023-07-29 212722.jpg" width="100%"><div class="numbertext">6 / 8</div><div class="text">Presentation</div></div>
+                                <div class="mySlides"><img src="Asset/Screenshot 2023-08-03 005933.jpg" width="100%"><div class="numbertext">7 / 8</div><div class="text">Figma Wire frame for App</div></div>
+                                <div class="mySlides"><img src="Asset/IMG_2945.jpg" width="100%"><div class="numbertext">8 / 8</div><div class="text">Team Photo</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 4)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 4)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 4)"></span><span class="dot" onclick="currentDiv(2, 4)"></span><span class="dot" onclick="currentDiv(3, 4)"></span><span class="dot" onclick="currentDiv(4, 4)"></span><span class="dot" onclick="currentDiv(5, 4)"></span><span class="dot" onclick="currentDiv(6, 4)"></span><span class="dot" onclick="currentDiv(7, 4)"></span><span class="dot" onclick="currentDiv(8, 4)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>Led a multidisciplinary team to build a "Semi-Autonomous Modular Indoor" farm prototype using Arduino. Integrated hardware sensors with a mobile app UI created in Figma.</p>
+                </details>
+            </article>
 
-								<a class="prev" onclick="plusDivs(-1, 2)">&#10094;</a>
-								<a class="next" onclick="plusDivs(1, 2)">&#10095;</a>
-								<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-							</div>
-							<br>
-							<div style="text-align:center">
-								<span class="dot" onclick="currentDiv(1, 2)"></span>
-								<span class="dot" onclick="currentDiv(2, 2)"></span>
-								<span class="dot" onclick="currentDiv(3, 2)"></span>
-								<span class="dot" onclick="currentDiv(4, 2)"></span>
-								<span class="dot" onclick="currentDiv(5, 2)"></span>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<details>
-						<summary>Expand for details</summary>
-							<p>
-							In my second year, I enrolled in a class that delved into the 
-							realm of 3D printing. This educational journey aligned perfectly 
-							with my involvement in UBC Rocket. Identifying the necessity 
-							for a tool that could adeptly manage various tasks such as opening 
-							boxes, deburring PVC conduits, and cleaning epoxy residues, I 
-							decided to fabricate a practical utility blade holder sourced 
-							from Thingiverse. 
-							</p>	
+            <h2 style="margin-top: 3rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Rapid Prototyping & CAD</h2>
 
-							<p>
-							This undertaking not only served as my start 
-							into the world of 3D printing but also an ingenious 
-							solution to address multiple tasks conveniently and efficiently.
-							</p>
-					</details>
-					<header>
-						<p></p>
-						<h2>Game Development</h2>
-						<hr>
-						<h3>Everline</h3>
-						<hr>
-					</header>
-					<div id="wrapper">
-						<div class="slideshow">
-							<div class="display-container">
-								<!-- Slide 1 -->
-								<div class="mySlides">
-									<video style="width:100%" autoplay muted loop>
-										<source src="Asset/Everline_video.mp4" type="video/mp4">
-										Your browser does not support the video tag.
-										</video>
-									<!-- Number text -->
-									<div class="numbertext">1 / 4</div>
-								</div>
-								
-								<!-- Slide 2 -->
-								<div class="mySlides">
-									<video style="width:100%" autoplay muted loop>
-										<source src="Asset/EverlineDungeon.mp4" type="video/mp4">
-										Your browser does not support the video tag.
-										</video>
-									<!-- Number text -->
-									<div class="numbertext">2 / 4</div>
-								</div>
-						
-								<!-- Slide 3 -->
-								<div class="mySlides">
-									<video style="width:100%" autoplay muted loop>
-										<source src="Asset/EverlineStore.mp4" type="video/mp4">
-										Your browser does not support the video tag.
-										</video>
-									<!-- Number text -->
-									<div class="numbertext">3 / 4</div>
-								</div>
-						
-								<!-- Slide 4 -->
-								<div class="mySlides">
-									<video style="width:100%" autoplay muted loop>
-										<source src="Asset/EverlineTitle.mp4" type="video/mp4">
-										Your browser does not support the video tag.
-										</video>
-									<!-- Number text -->
-									<div class="numbertext">4 / 4</div>
-								</div>
-									
-								<a class="prev" onclick="plusDivs(-1, 3)">&#10094;</a>
-								<a class="next" onclick="plusDivs(1, 3)">&#10095;</a>
-								<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-							</div>
-							<br>
-							<div style="text-align:center">
-								<span class="dot" onclick="currentDiv(1, 3)"></span>
-								<span class="dot" onclick="currentDiv(2, 3)"></span>
-								<span class="dot" onclick="currentDiv(3, 3)"></span>
-								<span class="dot" onclick="currentDiv(4, 3)"></span>
+            <article>
+                <header>
+                    <h3>3D Sea Level Rise Visualization</h3>
+                    <p class="subtitle">Automated GIS to STL Workflow (MANU 453)</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_Print.png" width="100%" alt="3D printed topography map with detachable sea-level rise insert">
+                                <div class="numbertext">1 / 4</div>
+                                <div class="text">Final Prototype</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_CAD.png" width="100%" alt="SolidWorks assembly of generated terrain and water volume">
+                                <div class="numbertext">2 / 4</div>
+                                <div class="text">Automated CAD Assembly</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_Slicer.png" width="100%" alt="Slicer toolpath analysis for multi-color FDM printing">
+                                <div class="numbertext">3 / 4</div>
+                                <div class="text">Slicer & DfAM Optimization</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/FullScript.jpg" width="100%" alt="Flowchart showing the Python script pipeline from user input to STL generation">
+                                <div class="numbertext">4 / 4</div>
+                                <div class="text">Automated Script Workflow</div>
+                            </div>
+                            
+                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 5)"></span>
+                            <span class="dot" onclick="currentDiv(2, 5)"></span>
+                            <span class="dot" onclick="currentDiv(3, 5)"></span>
+                            <span class="dot" onclick="currentDiv(4, 5)"></span>
+                        </div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>
+                        For my Additive Manufacturing Design project, our team built a workflow to visualize climate change data physically. 
+                        The goal was to take abstract data and turn it into a tangible 3D model that anyone could hold.
+                    </p>
+                    <p>
+                        My role focused on the software pipeline and fabrication. We automated the process of grabbing Digital Elevation Model (DEM) data 
+                        from NASA/Google APIs, processing the heightmaps in Blender to remove noise, and generating printable STL files.
+                    </p>
+                    <p>
+                        A key technical challenge was designing the "water" inserts. I developed a method to generate a separate, boolean-subtracted 
+                        volume for the ocean that perfectly mated with the terrain mesh. This allowed us to print the terrain in green and the water 
+                        in blue using filament swaps, creating a clear, educational visualization of how rising sea levels impact specific coastal cities.
+                    </p>
+                </details>
+            </article>
 
-							</div>
-						</div>
-						<hr>
-					</div>
-					<details>
-						<summary>Expand for details</summary>
-						<p>
-						During the summer break after second year, I wanted to put my C# programming skills 
-						from university to the test. That's when the idea to create "Everline" 
-						took shape. It wasn't just about refining my programming abilities; 
-						it was also an avenue for me to unleash my creativity.
-						</p>
-						<p>
-						I had programmed the game in a span of three weeks, followed 
-						by a dedicated week of playtesting to ensure the gameplay was polished and engaging. 	
-						The process of building "Everline" was both a challenge and a joy. It gave me 
-						the chance to apply what I had learned in a practical context and pushed 
-						me to explore new dimensions of game development. 
-						</p>
+            <article>
+                <header>
+                    <h3>Compact Laptop Stand</h3>
+                    <p class="subtitle">Functional 3D Printing</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-07-28 180322.jpg" width="100%"><div class="numbertext">1 / 5</div><div class="text">SOLIDWORKS file</div></div>
+                            <div class="mySlides"><img src="Asset/322660095_1355592195275970_3902139605217253319_n.jpg" width="100%"><div class="numbertext">2 / 5</div><div class="text">Semi-finished 3D model</div></div>
+                            <div class="mySlides"><img src="Asset/325020424_541963054657412_2220710117138790717_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">Underside</div></div>
+                            <div class="mySlides"><img src="Asset/325211024_892323165552225_8414979510067406734_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Post Processing</div></div>
+                            <div class="mySlides"><img src="Asset/322779581_702182148018563_6618183657453898901_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">In Use</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span><span class="dot" onclick="currentDiv(5, 6)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>Designed a custom laptop stand to improve ergonomics and thermal dissipation. The innovative design raises the laptop, promoting better airflow and significantly lowering operating temperatures.</p>
+                </details>
+            </article>
 
-					</details>
-						<br>
-						
-						<iframe frameborder="0" src="https://itch.io/embed/2186093?bg_color=422835&amp;fg_color=ffffff
-						&amp;link_color=b16389&amp;border_color=333333" width="208" height="167">
-						<a href="https://rktang.itch.io/everline">Everline by RKTang</a> </iframe>
+            <article>
+                <header>
+                    <h3>Utility Blade Holder</h3>
+                    <p class="subtitle">Shop Tool Design</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><img src="Asset/IMG_2296.jpg" width="100%"><div class="numbertext">1 / 5</div><div class="text">Post Processing</div></div>
+                            <div class="mySlides"><img src="Asset/327090955_635711781891756_7028126820235525957_n.jpg" width="100%"><div class="numbertext">2 / 5</div><div class="text">Ultimaker Cura File</div></div>
+                            <div class="mySlides"><img src="Asset/326814349_548129457263452_1295491445531893620_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">3D Printing</div></div>
+                            <div class="mySlides"><img src="Asset/322657566_1050700309666528_4748723159243016704_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Semi-finished 3D model</div></div>
+                            <div class="mySlides"><img src="Asset/322661332_1300532087183658_8962088131499657860_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">Post Processing</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span><span class="dot" onclick="currentDiv(4, 7)"></span><span class="dot" onclick="currentDiv(5, 7)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>Developed a practical 3D printed utility blade holder to assist with shop tasks such as opening boxes and deburring materials.</p>
+                </details>
+            </article>
 
-					<header>
-						<h3>Donut Clicker</h3>
-					</header>
-					<div id="wrapper">
-						<div class="slideshow">
-							<div class="display-container">
-								<!-- Slide 1 -->
-								<div class="mySlides">
-									<video style="width:100%" autoplay muted loop>
-										<source src="Asset/DonutClickerVideo.mp4" type="video/mp4">
-										Your browser does not support the video tag.
-										</video>
-									<!-- Number text -->
-									<div class="numbertext">1 / 3</div>
-								</div>
-								<!-- Slide 2 -->
-								<div class="mySlides">
-									<img src="Asset/Screenshot 2023-07-30 161614.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">2 / 3</div>
-								</div>
-								<!-- Slide 3 -->
-								<div class="mySlides">
-									<img src="Asset/Screenshot 2023-07-30 161646.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">3 / 3</div>
-								</div>
-								
-								<a class="prev" onclick="plusDivs(-1, 4)">&#10094;</a>
-								<a class="next" onclick="plusDivs(1, 4)">&#10095;</a>
-								<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-							</div>
-							<br>
-							<div style="text-align:center">
-								<span class="dot" onclick="currentDiv(1, 4)"></span>
-								<span class="dot" onclick="currentDiv(2, 4)"></span>
-								<span class="dot" onclick="currentDiv(3, 4)"></span>
+            <h2 style="margin-top: 3rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Software & Game Development</h2>
 
-							</div>
-						</div>
-						<hr>
-					</div>
-					<details>
-						<summary>Expand for details</summary>
-						<p>
-						"Donut Clicker" holds a special place as a passion project that emerged during 
-						my first year. At that time, I was deeply enjoyed games that featured 
-						the intriguing incremental mechanics, such as unlocking progressively more powerful upgrades.
-						</p>
-						<p>
-						Inspired by these experiences, the desire to craft my own incremental game grew within me. 
-						I was determined to create a game that captured the essence of progression and discovery that 
-						had enthralled me in other titles. To bring my vision to life, I collaborated with a friend 
-						who lent their artistic talents to the project.
-						</p>
-						<p>
-						"Donut Clicker" became a manifestation of my creativity and enthusiasm. It allowed me to 
-						explore game design, programming, and collaboration while channeling my love for incremental gameplay.
-						</p>
-					</details>
-						<br>
-						<iframe frameborder="0" src="https://itch.io/embed/1351630?bg_color=ffffff&amp;fg_color=222222&amp;
-						link_color=fa5c5c&amp;border_color=cccccc" width="208" height="167">
-						<a href="https://rktang.itch.io/donut-clicker">Donut Clicker by RKTang</a></iframe>
+            <article>
+                <header>
+                    <h3>Everline</h3>
+                    <p class="subtitle">Unity | C#</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/Everline_video.mp4" type="video/mp4"></video><div class="numbertext">1 / 4</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineDungeon.mp4" type="video/mp4"></video><div class="numbertext">2 / 4</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineStore.mp4" type="video/mp4"></video><div class="numbertext">3 / 4</div></div>
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineTitle.mp4" type="video/mp4"></video><div class="numbertext">4 / 4</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span><span class="dot" onclick="currentDiv(4, 8)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>Developed a 2D platformer using Unity and C#. Published the final build to itch.io, achieving 3,000+ unique player downloads.</p>
+                </details>
+                <div style="margin-top:1rem;">
+                    <iframe frameborder="0" src="https://itch.io/embed/2186093?bg_color=422835&amp;fg_color=ffffff&amp;link_color=b16389&amp;border_color=333333" width="208" height="167"><a href="https://rktang.itch.io/everline">Everline by RKTang</a></iframe>
+                </div>
+            </article>
 
-						<header>
-							<p></p>
-							<h2>Other</h2>
-							<hr>
-							<h3>UBC Rocket</h3>
-							<hr>
-						</header>
-						<div id="wrapper">
-							<div class="slideshow">
-								<div class="display-container">
-									<!-- Slide 1 -->
-								<div class="mySlides">
-									<img src="Asset/Screenshot 2023-08-01 022618.jpg" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">1 / 7</div>
-									<!-- Caption text -->
-									<div class="text">SOLIDWORKS File of Carbon Fiber Filament Winder</div>
-								</div>
-						
-								<!-- Slide 2 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1073.JPG" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">2 / 7</div>
-									<!-- Caption text -->
-									<div class="text">Water Jet Cutter</div>
-								</div>
-								
-								<!-- Slide 3 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1262.JPG" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">3 / 7</div>
-									<!-- Caption text -->
-									<div class="text">Water Jet Cutter</div>
-								</div>
-								
-								<!-- Slide 4 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1265.JPG" width="100%"> 
-									<!-- Number text --> 
-									<div class="numbertext">4 / 7</div>
-									<!-- Caption text -->
-									<div class="text">Semi Processed Parts</div>
-								</div>
+            <article>
+                <header>
+                    <h3>Donut Clicker</h3>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/DonutClickerVideo.mp4" type="video/mp4"></video><div class="numbertext">1 / 3</div></div>
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161614.jpg" width="100%"><div class="numbertext">2 / 3</div></div>
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161646.jpg" width="100%"><div class="numbertext">3 / 3</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 9)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 9)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 9)"></span><span class="dot" onclick="currentDiv(2, 9)"></span><span class="dot" onclick="currentDiv(3, 9)"></span></div>
+                    </div>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>A passion project exploring incremental game mechanics. Collaborated with a digital artist to design custom assets and implemented game logic in C#.</p>
+                </details>
+                <div style="margin-top:1rem;">
+                    <iframe frameborder="0" src="https://itch.io/embed/1351630?bg_color=ffffff&amp;fg_color=222222&amp;link_color=fa5c5c&amp;border_color=cccccc" width="208" height="167"><a href="https://rktang.itch.io/donut-clicker">Donut Clicker by RKTang</a></iframe>
+                </div>
+            </article>
 
-								<!-- Slide 5 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1302.JPG" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">5 / 7</div>
-									<!-- Caption text -->
-									<div class="text">T-slot Extrusions</div>
-								</div>
+            <article>
+                <header>
+                    <h3>Generative AI Web Development</h3>
+                    <p class="subtitle">Prompt Engineering & AI Tools</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-12-29 at 00-41-33 Blackburn Bracelets.png" width="100%"><div class="numbertext">1 / 7</div><div class="text">Website</div></div>
+                            <div class="mySlides"><img src="Asset/MoonLight4.jpg" width="100%"><div class="numbertext">2 / 7</div><div class="text">AI Generated Product</div></div>
+                            <div class="mySlides"><img src="Asset/GalaxyDust3.jpg" width="100%"><div class="numbertext">3 / 7</div><div class="text">AI Generated Product</div></div>
+                            <div class="mySlides"><img src="Asset/GalaxyDust4.jpg" width="100%"><div class="numbertext">4 / 7</div><div class="text">AI Generated Product</div></div>
+                            <div class="mySlides"><img src="Asset/avatar-gen11b89387c3ad5f3009f2fbafb0a2e1ff.jpg" width="100%"><div class="numbertext">5 / 7</div><div class="text">AI Generated Persona</div></div>
+                            <div class="mySlides"><img src="Asset/aCAsxgn9.jpg" width="100%"><div class="numbertext">6 / 7</div><div class="text">AI Persona Alt</div></div>
+                            <div class="mySlides"><img src="Asset/logo.png" width="100%"><div class="numbertext">7 / 7</div><div class="text">AI Logo</div></div>
+                            <a class="prev" onclick="plusDivs(-1, 10)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 10)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 10)"></span><span class="dot" onclick="currentDiv(2, 10)"></span><span class="dot" onclick="currentDiv(3, 10)"></span><span class="dot" onclick="currentDiv(4, 10)"></span><span class="dot" onclick="currentDiv(5, 10)"></span><span class="dot" onclick="currentDiv(6, 10)"></span><span class="dot" onclick="currentDiv(7, 10)"></span></div>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <p>Check the experiment <a href="https://blackburnbracelets.github.io/" target="_blank">here</a>.</p>
+                </div>
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>
+                        This project was an experiment to test the capabilities of Generative AI in full-stack web development and branding.
+                    </p>
+                    <ul>
+                        <li><strong>Code Generation:</strong> HTML, JS, and CSS were generated using ChatGPT 3.5 prompts.</li>
+                        <li><strong>Asset Generation:</strong> Product imagery and logos were created using Bing AI and LogoAI.</li>
+                        <li><strong>Persona Generation:</strong> "Fake" profiles were generated using neural network tools (thispersondoesnotexist.com).</li>
+                    </ul>
+                </details>
+            </article>
 
-								<!-- Slide 6 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1304.JPG" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">6 / 7</div>
-									<!-- Caption text -->
-									<div class="text">Assembly</div>
-								</div>
-
-								<!-- Slide 7 -->
-								<div class="mySlides">
-									<img src="Asset/IMG_1343.JPG" width="100%">
-									<!-- Number text -->
-									<div class="numbertext">7 / 7</div>
-									<!-- Caption text -->
-									<div class="text">Part Assembly of Main Gantry</div>
-								</div>
-										
-									<a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
-									<a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
-									<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-								</div>
-								<br>
-								<div style="text-align:center">
-									<span class="dot" onclick="currentDiv(1, 5)"></span>
-									<span class="dot" onclick="currentDiv(2, 5)"></span>
-									<span class="dot" onclick="currentDiv(3, 5)"></span>
-									<span class="dot" onclick="currentDiv(4, 5)"></span>
-									<span class="dot" onclick="currentDiv(5, 5)"></span>
-									<span class="dot" onclick="currentDiv(6, 5)"></span>
-									<span class="dot" onclick="currentDiv(7, 5)"></span>
-
-								</div>
-							</div>
-							<hr>
-						</div>
-						<details>
-							<summary>Expand for details</summary>
-							<p>
-							I am a member of the Whistler-Blackcomb Project, specifically 
-							contributing as a subteam member for the Composite Pressure Vessel division. 
-							Our current objective involves an ambitious mission: to make history as the 
-							first Canadian student-led team to successfully design, construct, and 
-							launch a liquid propellant rocket beyond the von Kármán Line, marking the boundary of space.
-							</p>	
-						
-							<p>
-							My involvement with the UBC Rocket project transcended the realms of 
-							academia, offering an immersive learning journey. A standout experience 
-							was my contribution to developing a filament winder, a  device
-							that demanded precision engineering and adept problem-solving. This hands-on 
-							challenge not only expanded my skill set but also improved my ability 
-							to creatively adapt and innovate, even in high-pressure situations. Through my 
-							engagement with this project, I've garnered practical insights that extend far 
-							beyond theoretical knowledge, empowering me to thrive in real-world engineering 
-							complexities.
-							</p>
-								
-						</details>
-
-						<header>
-							<p></p>
-							<h3>InnoVent</h3>
-							<hr>
-						</header>
-						<div id="wrapper">
-							<div class="slideshow">
-								<div class="display-container">
-									<!-- Slide 1 -->
-									<div class="mySlides">
-										<img src="Asset/image (2).jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">1 / 8</div>
-										<!-- Caption text -->
-										<div class="text">SOLIDWORKS File</div>
-									</div>
-
-									<!-- Slide 2 -->
-									<div class="mySlides">
-										<img src="Asset/image.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">2 / 8</div>
-										<!-- Caption text -->
-										<div class="text">SOLIDWORKS File</div>
-									</div>
-	
-									<!-- Slide 3 -->
-									<div class="mySlides">
-										<img src="Asset/image (1).jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">3 / 8</div>
-										<!-- Caption text -->
-										<div class="text">SOLIDWORKS File</div>
-									</div>
-
-									<!-- Slide 4 -->
-									<div class="mySlides">
-										<video style="width:100%" autoplay muted loop>
-											<source src="Asset/Innovent Prototype.mp4" type="video/mp4">
-											Your browser does not support the video tag.
-											</video>
-										<!-- Number text -->
-										<div class="numbertext">4 / 8</div>
-									</div>
-									
-									<!-- Slide 5 -->
-									<div class="mySlides">
-										<img src="Asset/IMG_1475.JPG" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">5 / 8</div>
-										<!-- Caption text -->
-										<div class="text">Physical Prototype</div>
-									</div>
-
-									<!-- Slide 6 -->
-									<div class="mySlides">
-										<img src="Asset/Screenshot 2023-07-29 212722.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">6 / 8</div>
-										<!-- Caption text -->
-										<div class="text">Presentation</div>
-									</div>
-									
-									<!-- Slide 7 -->
-									<div class="mySlides">
-										<img src="Asset/Screenshot 2023-08-03 005933.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">7 / 8</div>
-										<!-- Caption text -->
-										<div class="text">Figma Wire frame for App</div>
-									</div>
-
-									<!-- Slide 8 -->
-									<div class="mySlides">
-										<img src="Asset/IMG_2945.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">8 / 8</div>
-										<!-- Caption text -->
-										<div class="text">Team Photo</div>
-									</div>
-										
-									<a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
-									<a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
-									<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-								</div>
-								<br>
-								<div style="text-align:center">
-									<span class="dot" onclick="currentDiv(1, 6)"></span>
-									<span class="dot" onclick="currentDiv(2, 6)"></span>
-									<span class="dot" onclick="currentDiv(3, 6)"></span>
-									<span class="dot" onclick="currentDiv(4, 6)"></span>
-									<span class="dot" onclick="currentDiv(5, 6)"></span>
-									<span class="dot" onclick="currentDiv(6, 6)"></span>
-									<span class="dot" onclick="currentDiv(7, 6)"></span>	
-									<span class="dot" onclick="currentDiv(8, 6)"></span>	
-								</div>
-							</div>
-							<hr>
-						</div>
-						<details>
-							<summary>Expand for details</summary>
-							<p>
-							Participating in the Biztech & IEEE InnoVent Case and Design Competition 
-							was a collaborative and innovative endeavor. Joined by other 
-							engineering and business students, our team conceptualized the "Semi Autonomous 
-							Modular Indoor Vertical Farm" (S.A.M.I farm). 
-							</p>
-							<p>
-							My responsibilities included crafting the mobile app's UI using Figma, as 
-							well as constructing a scaled-down version of the base module using an 
-							Arduino and laser-cut acrylic. The pinnacle was presenting our S.A.M.I 
-							farm to a panel of "investor" judges, in a "Shark-Tank" style.
-							</p>
-							<p>
-							InnoVent provided a unique platform for cross-disciplinary teamwork, 
-							enabling students in both engineering and business to collaborate on 
-							creating a tangible prototype and a compelling pitch.
-							</p>
-						</details>
-					
-						<header>
-							<p></p>
-							<h3>Blackburn Bracelets</h3>
-							<hr>
-						</header>
-						<div id="wrapper">
-							<div class="slideshow">
-								<div class="display-container">
-									<!-- Slide 1 -->
-									<div class="mySlides">
-										<img src="Asset/Screenshot 2023-12-29 at 00-41-33 Blackburn Bracelets.png" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">1 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Website</div>
-									</div>
-
-									<!-- Slide 2 -->
-									<div class="mySlides">
-										<img src="Asset/MoonLight4.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">2 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Bing AI 1</div>
-									</div>
-	
-									<!-- Slide 3 -->
-									<div class="mySlides">
-										<img src="Asset/GalaxyDust3.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">3 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Bing AI 2</div>
-									</div>
-
-									<!-- Slide 4 -->
-									<div class="mySlides">
-										<img src="Asset/GalaxyDust4.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">4 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Bing AI 3</div>
-									</div>
-
-									<!-- Slide 5 -->
-									<div class="mySlides">
-										<img src="Asset/avatar-gen11b89387c3ad5f3009f2fbafb0a2e1ff.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">5 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Profile Picture</div>
-									</div>
-
-									<!-- Slide 6 -->
-									<div class="mySlides">
-										<img src="Asset/aCAsxgn9.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">6 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Profile Picture Alternative</div>
-									</div>
-									
-									<!-- Slide 7 -->
-									<div class="mySlides">
-										<img src="Asset/logo.png" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">7 / 7</div>
-										<!-- Caption text -->
-										<div class="text">Logo</div>
-									</div>
-										
-									<a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
-									<a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
-									<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-								</div>
-								<br>
-								<div style="text-align:center">
-									<span class="dot" onclick="currentDiv(1, 7)"></span>
-									<span class="dot" onclick="currentDiv(2, 7)"></span>
-									<span class="dot" onclick="currentDiv(3, 7)"></span>
-									<span class="dot" onclick="currentDiv(4, 7)"></span>
-									<span class="dot" onclick="currentDiv(5, 7)"></span>
-									<span class="dot" onclick="currentDiv(6, 7)"></span>	
-									<span class="dot" onclick="currentDiv(7, 7)"></span>	
-								</div>
-							</div>
-							<hr>
-						</div>
-						<!-- Add a hyperlink to check the website out -->
-						<div>
-							<p>Check the website out <a href="https://blackburnbracelets.github.io/" target="_blank">here</a>.</p>
-						</div>
-
-						<details>
-							<summary>Expand for details</summary>
-							<p>
-							This website was entirely created by giving AI tools prompts. All product images were generated with Bing AI, 
-							the profile picture was generated using the neural network face generator,
-							<a href="https://this-person-does-not-exist.com/en" target="_blank">thispersondoesnotexist.com</a>, and the 
-							logo was generated using <a href="https://www.logoai.com/" target="_blank">LogoAI</a>. 
-							The HTML, JS, CSS was generated with ChatGPT 3.5. 
-							The purpose of this website was just to experiment with AI technology and its capabilities.
-							</p>
-							<p>
-							Creating the AI-driven website had its cool moments, but it also showed where AI struggles. Bing AI, 
-							responsible for making bead product images, had a funny issue with hands—sometimes it added extra 
-							"fingers," which was unintentional but kind of amusing.
-							</p>
-							The face generator for the profile picture had its own hiccup. A few of the attempts had trouble with 
-							the hang of hair details and colors.
-							<p>
-							ChatGPT 3.5, the language model that helped code the website, had trouble when asked 
-							to do multiple things at once. Multitasking was a bit tricky for it.
-							</p>
-							<p>
-							Despite these quirks, the website is a showcase of what AI can do. It's a reminder that
-							AI is still learning, and there's room to improve. As technology advances, these hiccups
-							will likely become less common, refining 	
-							</p>
-						</details>
-						<header>
-							<p></p>
-							<h3>MANU 330 RC Car</h3>
-							<hr>
-						</header>
-						<div id="wrapper">
-							<div class="slideshow">
-								<div class="display-container">
-									<!-- Slide 1 -->
-									<div class="mySlides">
-										<img src="Asset/MANU 330 Car Prototype.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">1 / 10</div>
-										<!-- Caption text -->
-										<div class="text">RC Car Prototype</div>
-									</div>
-
-									<!-- Slide 2 -->
-									<div class="mySlides">
-										<img src="Asset/RC Car Concept.png" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">2 / 10</div>
-										<!-- Caption text -->
-										<div class="text">RC Car Concept</div>
-									</div>
-
-									<!-- Slide 3 -->
-									<div class="mySlides">
-										<video style="width:100%" autoplay muted loop>
-											<source src="Asset/2023_aston_martin_db11_v8_main.mp4" type="video/mp4">
-											Your browser does not support the video tag.
-											</video>
-										<!-- Number text -->
-										<div class="numbertext">3 / 10</div>
-										<!-- Caption text -->
-										<div class="text">RC Car Animation</div>
-									</div>
-
-									<!-- Slide 4 -->
-									<div class="mySlides">
-										<video style="width:100%" autoplay muted loop>
-											<source src="Asset/RC Car Injection Moulding.mp4" type="video/mp4">
-											Your browser does not support the video tag.
-											</video>
-										<!-- Number text -->
-										<div class="numbertext">4 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Injection Moulding Simulations</div>
-									</div>
-
-
-									<!-- Slide 5 -->
-									<div class="mySlides">
-										<img src="Asset/RC Car Injection Moulding 3D Print.png" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">5 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Injection Moulding Parts</div>
-									</div>
-
-									<!-- Slide 6 -->
-									<div class="mySlides">
-										<video style="width:100%" autoplay muted loop>
-											<source src="Asset/CAM_Simulation_Cropped_400.mp4" type="video/mp4">
-											Your browser does not support the video tag.
-											</video>
-										<!-- Number text -->
-										<div class="numbertext">6 / 10</div>
-										<!-- Caption text -->
-										<div class="text">CAM of Wheel</div>
-									</div>
-
-									<!-- Slide 7 -->
-									<div class="mySlides">
-										<video style="width:100%" autoplay muted loop>
-											<source src="Asset/RC Car Wheel Simulation.mp4" type="video/mp4">
-											Your browser does not support the video tag.
-											</video>
-										<!-- Number text -->
-										<div class="numbertext">7 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Wheel Simulations</div>
-									</div>
-
-									<!-- Slide 8 -->
-									<div class="mySlides">
-										<img src="Asset/Wheel 3D Print.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">8 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Wheel 3D Print</div>
-									</div>
-									
-									<!-- Slide 9 -->
-									<div class="mySlides">
-										<img src="Asset/RC Car Thermoforming.jpg" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">9 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Thermoforming</div>
-									</div>
-									<!-- Slide 10 -->
-									<div class="mySlides">
-										<img src="Asset/RC Car Heat Analysis.png" width="100%">
-										<!-- Number text -->
-										<div class="numbertext">10 / 10</div>
-										<!-- Caption text -->
-										<div class="text">Heat Analysis of Motor</div>
-									</div>
-										
-									<a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
-									<a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
-									<!-- Extra plusDivs parameter refers to second (1) slideshow (start from 0) -->
-								</div>
-								<br>
-								<div style="text-align:center">
-									<span class="dot" onclick="currentDiv(1, 8)"></span>
-									<span class="dot" onclick="currentDiv(2, 8)"></span>
-									<span class="dot" onclick="currentDiv(3, 8)"></span>
-									<span class="dot" onclick="currentDiv(4, 8)"></span>
-									<span class="dot" onclick="currentDiv(5, 8)"></span>
-									<span class="dot" onclick="currentDiv(6, 8)"></span>	
-									<span class="dot" onclick="currentDiv(7, 8)"></span>										
-									<span class="dot" onclick="currentDiv(8, 8)"></span>	
-									<span class="dot" onclick="currentDiv(9, 8)"></span>	
-									<span class="dot" onclick="currentDiv(10, 8)"></span>	
-								</div>
-							</div>
-							<hr>
-						</div>
-						<details>
-							<summary>Expand for details</summary>
-							<p>
-							MANU 330 is the first of two project courses applying engineering design principles and problem-solving 
-							methods in manufacturing engineering. 
-							</p>
-							<p>
-							Its core objective is to design components and manufacturing 
-							processes for an annual production run of approximately 20,000 units of an RC car, covering aluminum wheels, 
-							thermoformed shell body, composite chassis, and the unique X-Factor. The focus is on maintaining high standards in manufacturability, 
-							durability, serviceability, and performance while optimizing costs.	
-							</p>
-							<p>
-							Throughout the course, I developed skills in customer needs analysis, manufacturing specification 
-							formulation, planning, failure analysis, and detailed design. Additionally, emphasis is placed on 
-							honing interpersonal and technical communication skills through presentations and reports.
-							</p>
-							<p>
-							The deliverable for this course is a physical prototype of what the subproject is on. Subproject #1's 
-							deliverable was a preliminary design of your components, Subproject #2
-							was the wheel and X-Factor, Subproject #3 was a thermoformed shell body, and Subproject #4 was a composite chassis.
-							</p>
-						</details>
-
-					<!-- Link to the JavaScript file -->
-					<script src="slide.js"></script>
-			</article>
-		</section>		
-		<!-- End Project Section -->
-		<!-- ======= Resume Section ======= --> 
-		<section id="resume">
-			<header>
-				<h1>Resume</h1>
-			</header>
-			<article id ="resume__download">
-				<a href="https://drive.google.com/drive/u/1/folders/1630RvOGabO5v-kKwd-RSJsPJHQmgW8gX" target="_blank" rel="noopener noreferrer">
-					<button type="Download">Download</button>
-				</a>
-				<p></p>
-				<object data="Asset/Resume_8.pdf" type="application/pdf" style="min-height:100vh;width:100%"></object>
-			</article>
-		</section>
-		 
-		<!-- End Resume Section -->
-	</main>
-	<footer>
-		<p>This website was programmed by me using <a href="https://simplecss.org">Simple.css</a> by kevquirk.</p>
-	</footer>
-	<!-- ======= Scroll to Top Section ======= --> 
-	  <button id="scrollToTopBtn" onclick="scrollToTop()">Top</button>
-	<!-- Link to the JavaScript file -->
-	<script src="scroll.js"></script>
+            <script src="slide.js"></script>
+        </section>      
+        <section id="resume">
+            <header>
+                <h1>Resume</h1>
+            </header>
+            <article id="resume__download" style="text-align:center;">
+                <p>View or download my full resume below.</p>
+                <a href="https://drive.google.com/drive/u/1/folders/1630RvOGabO5v-kKwd-RSJsPJHQmgW8gX" target="_blank" rel="noopener noreferrer">
+                    <button class="download-btn">Download PDF</button>
+                </a>
+                <br><br>
+                <object data="Asset/Resume_8.pdf" type="application/pdf" style="min-height:800px; width:100%; border-radius:8px; border:1px solid #ccc;"></object>
+            </article>
+        </section>
+        </main>
+    <footer>
+        <p>This website was programmed by me using <a href="https://simplecss.org">Simple.css</a>.</p>
+    </footer>
+    
+    <button id="scrollToTopBtn" onclick="scrollToTop()">Top</button>
+    <script src="scroll.js"></script>
 </body>
-
 </html>
