@@ -211,13 +211,7 @@
             border-bottom: none;
         }
 
-        details {
-            margin-top: 1rem;
-        }
-
-        /* --- FIXES FOR VISIBILITY --- */
-
-        /* 1. Make the "Top" button Blue with White text */
+        /* Visibility Fixes */
         #scrollToTopBtn {
             background-color: var(--accent) !important;
             color: #ffffff !important;
@@ -226,7 +220,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* 2. Make Slideshow Captions readable with a background box */
         .text {
             color: #ffffff !important;       
             background-color: rgba(0, 0, 0, 0.7); 
@@ -240,8 +233,8 @@
             transform: translateX(-50%);     
         }
 
-        /* 3. Force Details Box to be White with Dark Text */
         details {
+            margin-top: 1rem;
             background-color: #ffffff !important;
             color: #333333 !important;
             border: 1px solid #ccc;
@@ -249,7 +242,6 @@
             border-radius: 5px;
         }
 
-        /* Force all text inside the details box to be dark grey */
         details p, details ul, details li, details strong {
             color: #333333 !important;
         }
@@ -322,12 +314,12 @@
                     <div class="slideshow"> 
                         <div class="display-container">
                             <div class="mySlides">
-                                <img src="Asset/Podcast-MDA-banner-1920x600-1.png" width="100%" alt="Canadarm2 and Dextre">
+                                <img src="Asset/Podcast-MDA-banner-1920x600-1.jpg" width="100%" alt="Canadarm2 and Dextre">
                                 <div class="numbertext">1 / 4</div>
                                 <div class="text">Canadarm2 and Dextre</div>
                             </div>
                             <div class="mySlides">
-                                <img src="Asset/MDA_3.png" width="100%" alt="MDA Space Brampton">
+                                <img src="Asset/MDA_3.jpg" width="100%" alt="MDA Space Brampton">
                                 <div class="numbertext">2 / 4</div>
                                 <div class="text">MDA Space Brampton</div>
                             </div>
@@ -544,6 +536,65 @@
 
             <article>
                 <header>
+                    <h3>3D Sea Level Rise Visualization</h3>
+                    <p class="subtitle">Automated GIS to STL Workflow (MANU 453)</p>
+                </header>
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_Print.png" width="100%" alt="3D printed topography map with detachable sea-level rise insert">
+                                <div class="numbertext">1 / 4</div>
+                                <div class="text">Final Prototype</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_CAD.png" width="100%" alt="SolidWorks assembly of generated terrain and water volume">
+                                <div class="numbertext">2 / 4</div>
+                                <div class="text">Automated CAD Assembly</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/SeaLevel_Slicer.png" width="100%" alt="Slicer toolpath analysis for multi-color FDM printing">
+                                <div class="numbertext">3 / 4</div>
+                                <div class="text">Slicer & DfAM Optimization</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/FullScript.jpg" width="100%" alt="Flowchart showing the Python script pipeline from user input to STL generation">
+                                <div class="numbertext">4 / 4</div>
+                                <div class="text">Automated Script Workflow</div>
+                            </div>
+                            
+                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 5)"></span>
+                            <span class="dot" onclick="currentDiv(2, 5)"></span>
+                            <span class="dot" onclick="currentDiv(3, 5)"></span>
+                            <span class="dot" onclick="currentDiv(4, 5)"></span>
+                        </div>
+                    </div>
+                </div>
+                <details>
+                    <summary>What I actually did</summary>
+                    <p>
+                        For my Additive Manufacturing Design project, our team built a workflow to visualize climate change data physically. 
+                        The goal was to take abstract data and turn it into a tangible 3D model that anyone could hold.
+                    </p>
+                    <p>
+                        My role focused on the <strong>software pipeline and fabrication</strong>. We automated the process of grabbing Digital Elevation Model (DEM) data 
+                        from NASA/Google APIs, processing the heightmaps in Blender to remove noise, and generating printable STL files.
+                    </p>
+                    <p>
+                        A key technical challenge was designing the "water" inserts. I developed a method to generate a separate, boolean-subtracted 
+                        volume for the ocean that perfectly mated with the terrain mesh. This allowed us to print the terrain in green and the water 
+                        in blue using filament swaps, creating a clear, educational visualization of how rising sea levels impact specific coastal cities.
+                    </p>
+                </details>
+            </article>
+
+            <article>
+                <header>
                     <h3>Compact Laptop Stand</h3>
                     <p class="subtitle">Functional 3D Printing</p>
                 </header>
@@ -555,11 +606,11 @@
                             <div class="mySlides"><img src="Asset/325020424_541963054657412_2220710117138790717_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">Underside</div></div>
                             <div class="mySlides"><img src="Asset/325211024_892323165552225_8414979510067406734_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Post Processing</div></div>
                             <div class="mySlides"><img src="Asset/322779581_702182148018563_6618183657453898901_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">In Use</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 5)"></span><span class="dot" onclick="currentDiv(2, 5)"></span><span class="dot" onclick="currentDiv(3, 5)"></span><span class="dot" onclick="currentDiv(4, 5)"></span><span class="dot" onclick="currentDiv(5, 5)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span><span class="dot" onclick="currentDiv(5, 6)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -581,11 +632,11 @@
                             <div class="mySlides"><img src="Asset/326814349_548129457263452_1295491445531893620_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">3D Printing</div></div>
                             <div class="mySlides"><img src="Asset/322657566_1050700309666528_4748723159243016704_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Semi-finished 3D model</div></div>
                             <div class="mySlides"><img src="Asset/322661332_1300532087183658_8962088131499657860_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">Post Processing</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span><span class="dot" onclick="currentDiv(5, 6)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span><span class="dot" onclick="currentDiv(4, 7)"></span><span class="dot" onclick="currentDiv(5, 7)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -608,11 +659,11 @@
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineDungeon.mp4" type="video/mp4"></video><div class="numbertext">2 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineStore.mp4" type="video/mp4"></video><div class="numbertext">3 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineTitle.mp4" type="video/mp4"></video><div class="numbertext">4 / 4</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span><span class="dot" onclick="currentDiv(4, 7)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span><span class="dot" onclick="currentDiv(4, 8)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -634,11 +685,11 @@
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/DonutClickerVideo.mp4" type="video/mp4"></video><div class="numbertext">1 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161614.jpg" width="100%"><div class="numbertext">2 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161646.jpg" width="100%"><div class="numbertext">3 / 3</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 9)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 9)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 9)"></span><span class="dot" onclick="currentDiv(2, 9)"></span><span class="dot" onclick="currentDiv(3, 9)"></span></div>
                     </div>
                 </div>
                 <details>
@@ -665,11 +716,11 @@
                             <div class="mySlides"><img src="Asset/avatar-gen11b89387c3ad5f3009f2fbafb0a2e1ff.jpg" width="100%"><div class="numbertext">5 / 7</div><div class="text">AI Generated Persona</div></div>
                             <div class="mySlides"><img src="Asset/aCAsxgn9.jpg" width="100%"><div class="numbertext">6 / 7</div><div class="text">AI Persona Alt</div></div>
                             <div class="mySlides"><img src="Asset/logo.png" width="100%"><div class="numbertext">7 / 7</div><div class="text">AI Logo</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 9)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 9)">&#10095;</a>
+                            <a class="prev" onclick="plusDivs(-1, 10)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 10)">&#10095;</a>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 9)"></span><span class="dot" onclick="currentDiv(2, 9)"></span><span class="dot" onclick="currentDiv(3, 9)"></span><span class="dot" onclick="currentDiv(4, 9)"></span><span class="dot" onclick="currentDiv(5, 9)"></span><span class="dot" onclick="currentDiv(6, 9)"></span><span class="dot" onclick="currentDiv(7, 9)"></span></div>
+                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 10)"></span><span class="dot" onclick="currentDiv(2, 10)"></span><span class="dot" onclick="currentDiv(3, 10)"></span><span class="dot" onclick="currentDiv(4, 10)"></span><span class="dot" onclick="currentDiv(5, 10)"></span><span class="dot" onclick="currentDiv(6, 10)"></span><span class="dot" onclick="currentDiv(7, 10)"></span></div>
                     </div>
                 </div>
                 <div style="margin-top:10px;">
