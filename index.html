@@ -796,6 +796,61 @@
                 </div>
             </article>
 
+            <article>
+                <header>
+                    <h3>SPOOL</h3>
+                    <p class="subtitle">Kinetic Typography Engine | WebGL & JavaScript</p>
+                </header>
+                
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/spool_1.jpg" width="100%" alt="Spool Interface - Torus Mode">
+                                <div class="numbertext">1 / 2</div>
+                                <div class="text">Kinetic Text Manipulation</div>
+                            </div>
+
+                            <div class="mySlides">
+                                <video style="width:100%" autoplay muted loop>
+                                    <source src="Asset/spool_demo.mp4" type="video/mp4">
+                                </video>
+                                <div class="numbertext">2 / 2</div>
+                                <div class="text">Wireframe & Animation Demo</div>
+                            </div>
+                            
+                            <a class="prev" onclick="plusDivs(-1, 12)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 12)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 12)"></span>
+                            <span class="dot" onclick="currentDiv(2, 12)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>
+                        SPOOL is an interactive web experiment that merges typography with 3D geometry. I wanted to build a tool that allows designers to break free from 2D constraints and treat text as a physical, malleable texture.
+                    </p>
+                    <p>
+                        <strong>Tech Stack:</strong> Built using standard Web Technologies (HTML5/Canvas). The engine calculates vertex positions in real-time to wrap text strings around mathematical primitives like Tori, Spheres, and Cylinders.
+                    </p>
+                    <p>
+                        <strong>Key Features:</strong> Users can manipulate "Kinetic Modulation" parameters—applying sine-wave distortions, wobble effects, and variable font weight transformations live in the browser.
+                    </p>
+                </details>
+
+                <div style="margin-top:1.5rem; text-align:center;">
+                    <a href="https://rktang.github.io/spool/" target="_blank" style="text-decoration:none;">
+                        <button>Launch Live App</button>
+                    </a>
+                </div>
+            </article>
+
+
             <script src="slide.js"></script>
         </section>      
         <section id="resume">
