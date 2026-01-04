@@ -201,6 +201,11 @@
             list-style-type: none;
             padding-left: 0;
         }
+
+        /* Fix for washed out images */
+        .mySlides img {
+            filter: contrast(1.15) saturate(1.1);
+        }
         
         details ul li {
             padding: 0.8rem 0;
