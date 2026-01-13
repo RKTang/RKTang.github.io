@@ -858,7 +858,78 @@
                     </a>
                 </div>
             </article>
+            
+            <article>
+                <header>
+                    <h3>Construction Tycoon</h3>
+                    <p class="subtitle">HTML5 | Incremental Strategy</p>
+                </header>
+                
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/construction_cover.jpg" width="100%" alt="Construction Tycoon Title Screen">
+                                <div class="numbertext">1 / 4</div> 
+                                <div class="text">Title Screen</div>
+                            </div>
 
+                            <div class="mySlides">
+                                <img src="Asset/construction_gameplay.jpg" width="100%" alt="Main Game Interface">
+                                <div class="numbertext">2 / 4</div> 
+                                <div class="text">Game Interface</div>
+                            </div>
+
+                            <div class="mySlides">
+                                <img src="Asset/construction_prestige.jpg" width="100%" alt="Prestige System">
+                                <div class="numbertext">3 / 4</div>
+                                <div class="text">Prestige System</div>
+                            </div>
+
+                            <div class="mySlides">
+                                <video style="width:100%" autoplay muted loop>
+                                    <source src="Asset/construction_demo.mp4" type="video/mp4">
+                                </video>
+                                <div class="numbertext">4 / 4</div>
+                                <div class="text">Gameplay Demo</div>
+                            </div>
+                            
+                            <a class="prev" onclick="plusDivs(-1, 13)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 13)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 13)"></span>
+                            <span class="dot" onclick="currentDiv(2, 13)"></span>
+                            <span class="dot" onclick="currentDiv(3, 13)"></span>
+                            <span class="dot" onclick="currentDiv(4, 13)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <details>
+                    <summary>Expand for details</summary>
+                    <p>
+                        Most incremental games are just spreadsheets in disguise. I wanted to build something where you actually <em>see</em> the progress. 
+                        I programmed the logic to construct every project block-by-block in real-time—from garages to space stations. 
+                        This required balancing procedural environment generation with an exponentially scaling economy.
+                    </p>
+                    <p>
+                        <strong>Key Technical Implementations:</strong>
+                    </p>
+                    <ul>
+                        <li><strong>Procedural Generation:</strong> Designed algorithms to generate unique, noise-based environments for every level (from cityscapes to orbital space).</li>
+                        <li><strong>State Management:</strong> Built a robust logic system to handle exponential economy balancing, upgrade dependencies, and prestige resets.</li>
+                        <li><strong>UX & Polish:</strong> Implemented dynamic camera controls, bloom lighting, and particle effects to ensure high-quality user feedback.</li>
+                    </ul>
+                </details>
+
+                <div style="margin-top:1.5rem; text-align:center;">
+                    <a href="https://www.crazygames.com/game/construction-tycoon" target="_blank" style="text-decoration:none;">
+                        <button>Play on CrazyGames</button>
+                    </a>
+                </div>
+            </article>
 
             <script src="slide.js"></script>
         </section>      
