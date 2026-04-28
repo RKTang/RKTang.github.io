@@ -4,6 +4,7 @@ const modalTitle = document.getElementById("modal-title");
 const modalImage = document.getElementById("modal-image");
 const modalStory = document.getElementById("modal-story");
 const closeModalButton = document.getElementById("close-modal");
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function openPolaroid(card) {
     const fullSrc = card.dataset.fullSrc;
@@ -23,6 +24,30 @@ function openPolaroid(card) {
 }
 
 cards.forEach((card) => {
+    if (!prefersReducedMotion) {
+        card.addEventListener("pointermove", (event) => {
+            const bounds = card.getBoundingClientRect();
+            const x = event.clientX - bounds.left;
+            const y = event.clientY - bounds.top;
+            const xRatio = x / bounds.width;
+            const yRatio = y / bounds.height;
+            const tiltY = (xRatio - 0.5) * 12;
+            const tiltX = (0.5 - yRatio) * 12;
+
+            card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
+            card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
+            card.style.setProperty("--pointer-x", `${(xRatio * 100).toFixed(2)}%`);
+            card.style.setProperty("--pointer-y", `${(yRatio * 100).toFixed(2)}%`);
+        });
+
+        card.addEventListener("pointerleave", () => {
+            card.style.setProperty("--tilt-x", "0deg");
+            card.style.setProperty("--tilt-y", "0deg");
+            card.style.setProperty("--pointer-x", "14%");
+            card.style.setProperty("--pointer-y", "12%");
+        });
+    }
+
     card.addEventListener("click", () => {
         openPolaroid(card);
     });

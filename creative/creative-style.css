@@ -43,22 +43,51 @@ body {
 
 .polaroid-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.25rem;
     max-width: 1100px;
     padding: 1rem 1rem 2rem;
     margin: 0 auto 2.5rem;
+    perspective: 1100px;
 }
 
 .polaroid-card {
     appearance: none;
-    border: 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.8);
     background: #fff;
     padding: 0.75rem 0.75rem 2.15rem;
     text-align: center;
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.14);
     cursor: pointer;
-    transition: transform 160ms ease, box-shadow 160ms ease;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(0);
+    transition: transform 170ms ease, box-shadow 170ms ease;
+}
+
+.polaroid-card::before {
+    content: "";
+    position: absolute;
+    inset: 0.45rem 0.45rem 2.05rem 0.45rem;
+    border-radius: 2px;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            circle at var(--pointer-x, 14%) var(--pointer-y, 12%),
+            rgba(255, 255, 255, 0.42) 0%,
+            rgba(255, 255, 255, 0.1) 22%,
+            rgba(255, 255, 255, 0) 58%
+        ),
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.02) 35%,
+            rgba(255, 255, 255, 0) 62%
+        );
+    mix-blend-mode: screen;
+    opacity: 0.95;
+    transition: opacity 170ms ease;
 }
 
 .polaroid-card img {
@@ -66,6 +95,8 @@ body {
     aspect-ratio: 4 / 5;
     object-fit: cover;
     display: block;
+    filter: contrast(1.05) saturate(1.07) brightness(1.02);
+    transform: translateZ(28px);
 }
 
 .polaroid-caption {
@@ -78,8 +109,12 @@ body {
 
 .polaroid-card:hover,
 .polaroid-card:focus-visible {
-    transform: translateY(-4px) rotate(-0.5deg);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+}
+
+.polaroid-card:hover::before,
+.polaroid-card:focus-visible::before {
+    opacity: 1;
 }
 
 dialog {
@@ -135,13 +170,30 @@ dialog::backdrop {
     background: #34495e;
 }
 
+@media (max-width: 900px) {
+    .polaroid-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 600px) {
     .polaroid-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: 1fr;
         gap: 0.9rem;
     }
 
     .polaroid-card {
         padding: 0.6rem 0.6rem 1.7rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .polaroid-card {
+        transform: none;
+        transition: box-shadow 170ms ease;
+    }
+
+    .polaroid-card::before {
+        transition: opacity 170ms ease;
     }
 }
