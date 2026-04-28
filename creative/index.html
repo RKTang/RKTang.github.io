@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Journal | Richard Tang</title>
+    <link rel="stylesheet" href="creative-style.css">
+</head>
+<body>
+    <header class="page-header">
+        <h1>Creative Polaroid Journal</h1>
+        <p>Click any polaroid to open the full image and process story.</p>
+        <a class="home-link" href="../index.html">Back to Portfolio</a>
+    </header>
+
+    <main class="polaroid-grid" aria-label="Creative Journal Gallery">
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/stacked_preview.jpg"
+            data-alt="Stacked typography concept preview"
+            data-title="Stacked Typeface Exploration"
+            data-story="I experimented with layered typographic compositions to create depth while keeping legibility. The first pass focused on balancing white space and visual rhythm before choosing final color treatment.">
+            <img src="../Asset/stacked_preview.jpg" alt="Stacked typography concept preview">
+            <span class="polaroid-caption">Stacked Typeface Exploration</span>
+        </button>
+
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/spool_1.jpg"
+            data-alt="Spool project interface preview"
+            data-title="Spool Interface Snapshot"
+            data-story="This frame captures an early milestone of the Spool workflow. I iterated on spacing and hierarchy so users could scan state changes quickly without feeling overwhelmed by controls.">
+            <img src="../Asset/spool_1.jpg" alt="Spool project interface preview">
+            <span class="polaroid-caption">Spool Interface Snapshot</span>
+        </button>
+
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/gmail_preview_1.jpg"
+            data-alt="Gmail organizer preview with categorized inbox"
+            data-title="Gmail Organizer Study"
+            data-story="This iteration focused on reducing inbox friction. I tested several grouping patterns, then selected a card-based presentation that made category boundaries easier to parse at a glance.">
+            <img src="../Asset/gmail_preview_1.jpg" alt="Gmail organizer preview with categorized inbox">
+            <span class="polaroid-caption">Gmail Organizer Study</span>
+        </button>
+
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/SeaLevel_CAD.png"
+            data-alt="SeaLevel CAD model render"
+            data-title="SeaLevel CAD Pass"
+            data-story="I used this CAD pass to validate proportion and manufacturability. The key decision here was simplifying internal geometry to reduce print time while preserving structural stiffness.">
+            <img src="../Asset/SeaLevel_CAD.png" alt="SeaLevel CAD model render">
+            <span class="polaroid-caption">SeaLevel CAD Pass</span>
+        </button>
+
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/Wheel 3D Print.jpg"
+            data-alt="RC car wheel 3D print prototype"
+            data-title="Wheel Prototype Review"
+            data-story="This prototype helped me compare tread options under real print constraints. I documented failures from the first print, then tuned wall thickness and orientation for better durability.">
+            <img src="../Asset/Wheel 3D Print.jpg" alt="RC car wheel 3D print prototype">
+            <span class="polaroid-caption">Wheel Prototype Review</span>
+        </button>
+
+        <button class="polaroid-card" type="button"
+            data-full-src="../Asset/construction_cover.jpg"
+            data-alt="Construction game concept cover art"
+            data-title="Construction Game Cover"
+            data-story="The cover direction emphasized playful scale and progression. I tested a few visual motifs and landed on this composition because it communicated the building loop in a single frame.">
+            <img src="../Asset/construction_cover.jpg" alt="Construction game concept cover art">
+            <span class="polaroid-caption">Construction Game Cover</span>
+        </button>
+    </main>
+
+    <dialog id="polaroid-modal" aria-labelledby="modal-title">
+        <article class="modal-content">
+            <h2 id="modal-title"></h2>
+            <img id="modal-image" src="" alt="">
+            <p id="modal-story"></p>
+            <button id="close-modal" type="button">Close</button>
+        </article>
+    </dialog>
+
+    <script src="creative-script.js"></script>
+</body>
+</html>
