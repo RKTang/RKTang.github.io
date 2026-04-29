@@ -91,6 +91,7 @@ dialog {
     width: auto;
     max-width: 92vw;
     max-height: 90vh;
+    margin: auto;
     overflow: visible;
     perspective: 1200px;
     scrollbar-width: none;
