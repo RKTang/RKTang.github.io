@@ -133,7 +133,7 @@ dialog::backdrop {
     transform: translate3d(var(--card-move-x, 0px), var(--card-move-y, 0px), 0)
         rotateX(var(--card-tilt-x, 0deg))
         rotateY(calc(var(--card-tilt-y, 0deg) + var(--flip-rot, 0deg)));
-    transition: transform 140ms ease;
+    transition: transform 350ms ease;
     will-change: transform;
 }
 
@@ -142,7 +142,7 @@ dialog::backdrop {
     width: min(62vw, 500px, calc(58vh * var(--photo-ratio-num, 0.8)));
     aspect-ratio: var(--photo-ratio, 4 / 5);
     transform-style: preserve-3d;
-    transition: transform 420ms ease;
+    transition: transform 350ms ease;
 }
 
 .modal-content.is-flipped {
@@ -152,9 +152,11 @@ dialog::backdrop {
 .modal-face {
     position: absolute;
     inset: 0;
+    padding: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
+    background: #fff;
 }
 
 .modal-front {
