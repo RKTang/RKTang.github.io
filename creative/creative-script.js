@@ -4,7 +4,7 @@ const modalCard = document.getElementById("modal-card");
 const modalTitle = document.getElementById("modal-title");
 const modalImage = document.getElementById("modal-image");
 const modalStory = document.getElementById("modal-story");
-const closeModalButton = document.getElementById("close-modal");
+const closeModalXButton = document.getElementById("close-modal-x");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function openPolaroid(card) {
@@ -37,9 +37,11 @@ cards.forEach((card) => {
     });
 });
 
-closeModalButton.addEventListener("click", () => {
-    modal.close();
-});
+if (closeModalXButton) {
+    closeModalXButton.addEventListener("click", () => {
+        modal.close();
+    });
+}
 
 if (!prefersReducedMotion && modal && modalCard) {
     const updateCardTiltFromEvent = (event) => {

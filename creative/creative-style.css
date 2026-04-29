@@ -86,7 +86,7 @@ body {
 dialog {
     border: none;
     background: transparent;
-    border-radius: 12px;
+    border-radius: 0;
     padding: 0.8rem;
     width: auto;
     max-width: 92vw;
@@ -108,6 +108,26 @@ dialog[open] {
     transform: translate(-50%, -50%);
 }
 
+.modal-x-btn {
+    position: absolute;
+    top: 0.1rem;
+    right: 0.1rem;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.modal-x-btn:hover,
+.modal-x-btn:focus-visible {
+    background: rgba(0, 0, 0, 0.78);
+}
+
 dialog::-webkit-scrollbar {
     display: none;
     width: 0;
@@ -126,7 +146,7 @@ dialog::backdrop {
     width: fit-content;
     max-width: min(88vw, 760px);
     position: relative;
-    border-radius: 12px;
+    border-radius: 0;
     background: #fff;
     transform-origin: center center;
     transform-style: preserve-3d;
@@ -141,7 +161,7 @@ dialog::backdrop {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 0;
     background:
         linear-gradient(
             var(--sheen-angle, 130deg),
@@ -162,8 +182,7 @@ dialog::backdrop {
 }
 
 #modal-title {
-    margin: 0.2rem 0 0;
-    font-size: 1.3rem;
+    display: none;
 }
 
 #modal-image {
@@ -174,29 +193,13 @@ dialog::backdrop {
     object-fit: contain;
     display: block;
     margin: 0 auto;
-    border-radius: 8px;
+    border-radius: 0;
     transform: translateZ(22px);
 }
 
 #modal-story {
     margin: 0;
     color: #313131;
-}
-
-#close-modal {
-    justify-self: end;
-    border: none;
-    border-radius: 8px;
-    padding: 0.6rem 0.95rem;
-    cursor: pointer;
-    color: #fff;
-    background: #2c3e50;
-    font-weight: 600;
-}
-
-#close-modal:hover,
-#close-modal:focus-visible {
-    background: #34495e;
 }
 
 @media (max-width: 900px) {
