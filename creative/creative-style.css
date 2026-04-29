@@ -107,30 +107,6 @@ dialog[open] {
     transform: none;
 }
 
-.modal-x-btn {
-    position: fixed;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: auto;
-    height: auto;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 2rem;
-    font-weight: 300;
-    line-height: 1;
-    padding: 0.1rem 0.35rem;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.65);
-    cursor: pointer;
-    z-index: 1000;
-    display: block;
-}
-
-.modal-x-btn:hover,
-.modal-x-btn:focus-visible {
-    color: #e6e6e6;
-}
-
 dialog::-webkit-scrollbar {
     display: none;
     width: 0;
