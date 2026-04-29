@@ -79,6 +79,10 @@ if (modalFlip && modalCard) {
             return;
         }
         event.stopPropagation();
+        modalCard.style.setProperty("--card-tilt-x", "0deg");
+        modalCard.style.setProperty("--card-tilt-y", "0deg");
+        modalCard.style.setProperty("--card-move-x", "0px");
+        modalCard.style.setProperty("--card-move-y", "0px");
         modalCard.classList.toggle("is-flipped");
     });
 }
