@@ -1,25 +1,60 @@
 const cards = document.querySelectorAll(".polaroid-card");
 const modal = document.getElementById("polaroid-modal");
 const modalCard = document.getElementById("modal-card");
+const modalFlip = modalCard ? modalCard.querySelector(".modal-flip") : null;
 const modalTitle = document.getElementById("modal-title");
+const modalBackTitle = document.getElementById("modal-back-title");
 const modalImage = document.getElementById("modal-image");
 const modalStory = document.getElementById("modal-story");
+const modalLocation = document.getElementById("modal-location");
+const modalDate = document.getElementById("modal-date");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function openPolaroid(card) {
     const fullSrc = card.dataset.fullSrc;
     const story = card.dataset.story || "Story coming soon.";
+    const location = card.dataset.location || "Not set";
+    const date = card.dataset.date || "Not set";
     const alt = card.dataset.alt || "Creative project image";
     const title = card.dataset.title || "Creative Journal Entry";
+    const thumbImage = card.querySelector("img");
 
     if (!fullSrc) {
         return;
     }
 
     modalTitle.textContent = title;
+    if (modalBackTitle) {
+        modalBackTitle.textContent = title;
+    }
     modalImage.src = fullSrc;
     modalImage.alt = alt;
     modalStory.textContent = story;
+    if (modalLocation) {
+        modalLocation.textContent = `Location: ${location}`;
+    }
+    if (modalDate) {
+        modalDate.textContent = `Date: ${date}`;
+    }
+    modalCard.classList.remove("is-flipped");
+
+    if (modalFlip && thumbImage && thumbImage.naturalWidth && thumbImage.naturalHeight) {
+        modalFlip.style.setProperty("--photo-ratio", `${thumbImage.naturalWidth} / ${thumbImage.naturalHeight}`);
+    }
+
+    const applyPhotoRatio = () => {
+        if (!modalFlip || !modalImage.naturalWidth || !modalImage.naturalHeight) {
+            return;
+        }
+        modalFlip.style.setProperty("--photo-ratio", `${modalImage.naturalWidth} / ${modalImage.naturalHeight}`);
+    };
+
+    if (modalImage.complete) {
+        applyPhotoRatio();
+    } else {
+        modalImage.addEventListener("load", applyPhotoRatio, { once: true });
+    }
+
     modal.showModal();
 }
 
@@ -35,6 +70,15 @@ cards.forEach((card) => {
         }
     });
 });
+
+if (modalCard) {
+    modalCard.addEventListener("click", () => {
+        if (!modal.open) {
+            return;
+        }
+        modalCard.classList.toggle("is-flipped");
+    });
+}
 
 if (!prefersReducedMotion && modal && modalCard) {
     const updateCardTiltFromEvent = (event) => {
@@ -98,6 +142,7 @@ modal.addEventListener("click", (event) => {
 
 modal.addEventListener("close", () => {
     if (modalCard) {
+        modalCard.classList.remove("is-flipped");
         modalCard.style.setProperty("--card-tilt-x", "0deg");
         modalCard.style.setProperty("--card-tilt-y", "0deg");
         modalCard.style.setProperty("--card-move-x", "0px");

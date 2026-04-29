@@ -83,10 +83,19 @@
     <dialog id="polaroid-modal" aria-labelledby="modal-title">
         <article id="modal-card" class="modal-content">
             <h2 id="modal-title"></h2>
-            <div class="modal-photo">
-                <img id="modal-image" src="" alt="">
+            <div class="modal-flip">
+                <section class="modal-face modal-front">
+                    <div class="modal-photo">
+                        <img id="modal-image" src="" alt="">
+                    </div>
+                </section>
+                <section class="modal-face modal-back" aria-label="Photo details">
+                    <h3 id="modal-back-title"></h3>
+                    <p id="modal-story"></p>
+                    <p id="modal-location"></p>
+                    <p id="modal-date"></p>
+                </section>
             </div>
-            <p id="modal-story"></p>
         </article>
     </dialog>
 
