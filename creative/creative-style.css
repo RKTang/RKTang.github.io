@@ -88,7 +88,8 @@ dialog {
     background: transparent;
     border-radius: 12px;
     padding: 0.8rem;
-    width: min(92vw, 820px);
+    width: auto;
+    max-width: 92vw;
     max-height: 90vh;
     overflow: visible;
     perspective: 1200px;
@@ -111,6 +112,8 @@ dialog::backdrop {
     padding: 1rem 1rem 1.1rem;
     display: grid;
     gap: 0.85rem;
+    width: fit-content;
+    max-width: min(88vw, 760px);
     position: relative;
     border-radius: 12px;
     background: #fff;
@@ -153,12 +156,13 @@ dialog::backdrop {
 }
 
 #modal-image {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     max-height: 70vh;
     height: auto;
     object-fit: contain;
     display: block;
-    background: #f4f4f4;
+    margin: 0 auto;
     border-radius: 8px;
     transform: translateZ(22px);
 }
