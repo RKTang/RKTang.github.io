@@ -50,10 +50,14 @@ if (!prefersReducedMotion && modal && modalCard) {
         const yRatio = Math.min(1, Math.max(0, y / bounds.height));
         const tiltY = (xRatio - 0.5) * 12;
         const tiltX = (0.5 - yRatio) * 12;
+        const moveX = (xRatio - 0.5) * 6;
+        const moveY = (yRatio - 0.5) * 4;
         const sheenAngle = 110 + (xRatio - 0.5) * 40 - (yRatio - 0.5) * 12;
 
         modalCard.style.setProperty("--card-tilt-x", `${tiltX.toFixed(2)}deg`);
         modalCard.style.setProperty("--card-tilt-y", `${tiltY.toFixed(2)}deg`);
+        modalCard.style.setProperty("--card-move-x", `${moveX.toFixed(2)}px`);
+        modalCard.style.setProperty("--card-move-y", `${moveY.toFixed(2)}px`);
         modalCard.style.setProperty("--sheen-angle", `${sheenAngle.toFixed(2)}deg`);
         modalCard.style.setProperty("--sheen-x", `${(xRatio * 100).toFixed(2)}%`);
         modalCard.style.setProperty("--sheen-y", `${(yRatio * 100).toFixed(2)}%`);
@@ -62,6 +66,8 @@ if (!prefersReducedMotion && modal && modalCard) {
     const resetCardTilt = () => {
         modalCard.style.setProperty("--card-tilt-x", "0deg");
         modalCard.style.setProperty("--card-tilt-y", "0deg");
+        modalCard.style.setProperty("--card-move-x", "0px");
+        modalCard.style.setProperty("--card-move-y", "0px");
         modalCard.style.setProperty("--sheen-angle", "130deg");
         modalCard.style.setProperty("--sheen-x", "50%");
         modalCard.style.setProperty("--sheen-y", "50%");
@@ -99,6 +105,8 @@ modal.addEventListener("close", () => {
     if (modalCard) {
         modalCard.style.setProperty("--card-tilt-x", "0deg");
         modalCard.style.setProperty("--card-tilt-y", "0deg");
+        modalCard.style.setProperty("--card-move-x", "0px");
+        modalCard.style.setProperty("--card-move-y", "0px");
         modalCard.style.setProperty("--sheen-angle", "130deg");
         modalCard.style.setProperty("--sheen-x", "50%");
         modalCard.style.setProperty("--sheen-y", "50%");

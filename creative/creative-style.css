@@ -85,11 +85,13 @@ body {
 
 dialog {
     border: none;
+    background: transparent;
     border-radius: 12px;
-    padding: 0;
+    padding: 0.8rem;
     width: min(92vw, 820px);
     max-height: 90vh;
-    overflow: hidden;
+    overflow: visible;
+    perspective: 1200px;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -114,7 +116,8 @@ dialog::backdrop {
     background: #fff;
     transform-origin: center center;
     transform-style: preserve-3d;
-    transform: rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
+    transform: translate3d(var(--card-move-x, 0px), var(--card-move-y, 0px), 0)
+        rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
     transition: transform 140ms ease;
     will-change: transform;
 }
