@@ -155,10 +155,16 @@ dialog::backdrop {
             rgba(255, 255, 255, 0) 30%,
             rgba(255, 255, 255, 0.24) 54%,
             rgba(255, 255, 255, 0) 78%
+        ),
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) - 22deg),
+            rgba(255, 255, 255, 0) 22%,
+            rgba(255, 255, 255, 0.18) 44%,
+            rgba(255, 255, 255, 0) 66%
         );
     background-position: var(--sheen-x, 50%) var(--sheen-y, 50%);
     mix-blend-mode: screen;
-    opacity: 0.62;
+    opacity: 0.7;
 }
 
 #modal-title {
