@@ -139,9 +139,8 @@ dialog::backdrop {
 
 .modal-flip {
     position: relative;
-    width: min(62vw, 500px);
+    width: min(62vw, 500px, calc(58vh * var(--photo-ratio-num, 0.8)));
     aspect-ratio: var(--photo-ratio, 4 / 5);
-    max-height: 58vh;
     transform-style: preserve-3d;
     transition: transform 420ms ease;
 }
@@ -300,8 +299,7 @@ dialog::backdrop {
     }
 
     .modal-flip {
-        width: min(82vw, 420px);
-        max-height: 52vh;
+        width: min(82vw, 420px, calc(52vh * var(--photo-ratio-num, 0.8)));
     }
 }
 

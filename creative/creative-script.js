@@ -40,6 +40,7 @@ function openPolaroid(card) {
 
     if (modalFlip && thumbImage && thumbImage.naturalWidth && thumbImage.naturalHeight) {
         modalFlip.style.setProperty("--photo-ratio", `${thumbImage.naturalWidth} / ${thumbImage.naturalHeight}`);
+        modalFlip.style.setProperty("--photo-ratio-num", `${thumbImage.naturalWidth / thumbImage.naturalHeight}`);
     }
 
     const applyPhotoRatio = () => {
@@ -47,6 +48,7 @@ function openPolaroid(card) {
             return;
         }
         modalFlip.style.setProperty("--photo-ratio", `${modalImage.naturalWidth} / ${modalImage.naturalHeight}`);
+        modalFlip.style.setProperty("--photo-ratio-num", `${modalImage.naturalWidth / modalImage.naturalHeight}`);
     };
 
     if (modalImage.complete) {
