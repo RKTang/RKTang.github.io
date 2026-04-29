@@ -100,11 +100,12 @@ dialog {
 
 dialog[open] {
     position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
     margin: 0;
-    transform: none;
+    transform: translate(-50%, -50%);
 }
 
 dialog::-webkit-scrollbar {
