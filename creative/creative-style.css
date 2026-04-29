@@ -100,12 +100,11 @@ dialog {
 
 dialog[open] {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
+    inset: 0;
+    display: grid;
+    place-items: center;
     margin: 0;
-    transform: translate(-50%, -50%);
+    transform: none;
 }
 
 .modal-x-btn {
