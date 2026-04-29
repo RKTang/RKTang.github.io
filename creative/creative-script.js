@@ -29,7 +29,9 @@ function openPolaroid(card) {
     }
     modalImage.src = fullSrc;
     modalImage.alt = alt;
-    modalStory.textContent = story;
+    if (modalStory) {
+        modalStory.textContent = `Story: ${story}`;
+    }
     if (modalLocation) {
         modalLocation.textContent = `Location: ${location}`;
     }
