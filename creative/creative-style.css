@@ -120,7 +120,7 @@ dialog::backdrop {
 
 .modal-content {
     margin: 0;
-    padding: 1rem 1rem 4rem;
+    padding: 1rem 1rem 4.8rem;
     display: grid;
     gap: 0.85rem;
     width: fit-content;
@@ -145,20 +145,20 @@ dialog::backdrop {
     background:
         linear-gradient(
             var(--sheen-angle, 130deg),
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.5) 24%,
-            rgba(255, 255, 255, 0.08) 40%,
+            rgba(255, 255, 255, 0.32) 0%,
+            rgba(255, 255, 255, 0.72) 24%,
+            rgba(255, 255, 255, 0.16) 40%,
             rgba(255, 255, 255, 0) 62%
         ),
         linear-gradient(
             calc(var(--sheen-angle, 130deg) + 32deg),
             rgba(255, 255, 255, 0) 30%,
-            rgba(255, 255, 255, 0.14) 54%,
+            rgba(255, 255, 255, 0.24) 54%,
             rgba(255, 255, 255, 0) 78%
         );
     background-position: var(--sheen-x, 50%) var(--sheen-y, 50%);
     mix-blend-mode: screen;
-    opacity: 0.42;
+    opacity: 0.62;
 }
 
 #modal-title {
