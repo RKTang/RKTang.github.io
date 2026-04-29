@@ -48,55 +48,25 @@ body {
     max-width: 1100px;
     padding: 1rem 1rem 2rem;
     margin: 0 auto 2.5rem;
-    perspective: 1100px;
 }
 
 .polaroid-card {
     appearance: none;
-    position: relative;
-    overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.8);
     background: #fff;
     padding: 0.75rem 0.75rem 2.15rem;
     text-align: center;
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.14);
     cursor: pointer;
-    transform-style: preserve-3d;
-    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(0);
-    transition: transform 170ms ease, box-shadow 170ms ease;
-}
-
-.polaroid-card::before {
-    content: "";
-    position: absolute;
-    inset: 0.45rem 0.45rem 2.05rem 0.45rem;
-    border-radius: 2px;
-    pointer-events: none;
-    background:
-        radial-gradient(
-            circle at var(--pointer-x, 14%) var(--pointer-y, 12%),
-            rgba(255, 255, 255, 0.42) 0%,
-            rgba(255, 255, 255, 0.1) 22%,
-            rgba(255, 255, 255, 0) 58%
-        ),
-        linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.02) 35%,
-            rgba(255, 255, 255, 0) 62%
-        );
-    mix-blend-mode: screen;
-    opacity: 0.95;
-    transition: opacity 170ms ease;
+    transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
 .polaroid-card img {
     width: 100%;
     aspect-ratio: 4 / 5;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
-    filter: contrast(1.05) saturate(1.07) brightness(1.02);
-    transform: translateZ(28px);
+    background: #edf1f7;
 }
 
 .polaroid-caption {
@@ -109,12 +79,8 @@ body {
 
 .polaroid-card:hover,
 .polaroid-card:focus-visible {
+    transform: translateY(-4px);
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
-}
-
-.polaroid-card:hover::before,
-.polaroid-card:focus-visible::before {
-    opacity: 1;
 }
 
 dialog {
@@ -145,8 +111,42 @@ dialog::backdrop {
     width: 100%;
     max-height: 58vh;
     object-fit: contain;
-    border-radius: 8px;
+    display: block;
     background: #f4f4f4;
+    border-radius: 8px;
+}
+
+.modal-polaroid {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    perspective: 1100px;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--modal-tilt-x, 0deg)) rotateY(var(--modal-tilt-y, 0deg));
+    transition: transform 140ms ease;
+}
+
+.modal-polaroid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: 8px;
+    background:
+        radial-gradient(
+            circle at var(--modal-pointer-x, 18%) var(--modal-pointer-y, 16%),
+            rgba(255, 255, 255, 0.5) 0%,
+            rgba(255, 255, 255, 0.14) 24%,
+            rgba(255, 255, 255, 0) 58%
+        ),
+        linear-gradient(
+            130deg,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0.04) 36%,
+            rgba(255, 255, 255, 0) 62%
+        );
+    mix-blend-mode: screen;
+    opacity: 0.95;
 }
 
 #modal-story {
@@ -188,12 +188,7 @@ dialog::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .polaroid-card {
+    .modal-polaroid {
         transform: none;
-        transition: box-shadow 170ms ease;
-    }
-
-    .polaroid-card::before {
-        transition: opacity 170ms ease;
     }
 }

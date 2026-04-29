@@ -2,6 +2,7 @@ const cards = document.querySelectorAll(".polaroid-card");
 const modal = document.getElementById("polaroid-modal");
 const modalTitle = document.getElementById("modal-title");
 const modalImage = document.getElementById("modal-image");
+const modalPolaroid = document.getElementById("modal-polaroid");
 const modalStory = document.getElementById("modal-story");
 const closeModalButton = document.getElementById("close-modal");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -24,30 +25,6 @@ function openPolaroid(card) {
 }
 
 cards.forEach((card) => {
-    if (!prefersReducedMotion) {
-        card.addEventListener("pointermove", (event) => {
-            const bounds = card.getBoundingClientRect();
-            const x = event.clientX - bounds.left;
-            const y = event.clientY - bounds.top;
-            const xRatio = x / bounds.width;
-            const yRatio = y / bounds.height;
-            const tiltY = (xRatio - 0.5) * 12;
-            const tiltX = (0.5 - yRatio) * 12;
-
-            card.style.setProperty("--tilt-x", `${tiltX.toFixed(2)}deg`);
-            card.style.setProperty("--tilt-y", `${tiltY.toFixed(2)}deg`);
-            card.style.setProperty("--pointer-x", `${(xRatio * 100).toFixed(2)}%`);
-            card.style.setProperty("--pointer-y", `${(yRatio * 100).toFixed(2)}%`);
-        });
-
-        card.addEventListener("pointerleave", () => {
-            card.style.setProperty("--tilt-x", "0deg");
-            card.style.setProperty("--tilt-y", "0deg");
-            card.style.setProperty("--pointer-x", "14%");
-            card.style.setProperty("--pointer-y", "12%");
-        });
-    }
-
     card.addEventListener("click", () => {
         openPolaroid(card);
     });
@@ -64,6 +41,30 @@ closeModalButton.addEventListener("click", () => {
     modal.close();
 });
 
+if (!prefersReducedMotion && modalPolaroid) {
+    modalPolaroid.addEventListener("pointermove", (event) => {
+        const bounds = modalPolaroid.getBoundingClientRect();
+        const x = event.clientX - bounds.left;
+        const y = event.clientY - bounds.top;
+        const xRatio = x / bounds.width;
+        const yRatio = y / bounds.height;
+        const tiltY = (xRatio - 0.5) * 10;
+        const tiltX = (0.5 - yRatio) * 10;
+
+        modalPolaroid.style.setProperty("--modal-tilt-x", `${tiltX.toFixed(2)}deg`);
+        modalPolaroid.style.setProperty("--modal-tilt-y", `${tiltY.toFixed(2)}deg`);
+        modalPolaroid.style.setProperty("--modal-pointer-x", `${(xRatio * 100).toFixed(2)}%`);
+        modalPolaroid.style.setProperty("--modal-pointer-y", `${(yRatio * 100).toFixed(2)}%`);
+    });
+
+    modalPolaroid.addEventListener("pointerleave", () => {
+        modalPolaroid.style.setProperty("--modal-tilt-x", "0deg");
+        modalPolaroid.style.setProperty("--modal-tilt-y", "0deg");
+        modalPolaroid.style.setProperty("--modal-pointer-x", "18%");
+        modalPolaroid.style.setProperty("--modal-pointer-y", "16%");
+    });
+}
+
 modal.addEventListener("click", (event) => {
     const bounds = modal.getBoundingClientRect();
     const isInDialog =
@@ -74,5 +75,14 @@ modal.addEventListener("click", (event) => {
 
     if (!isInDialog) {
         modal.close();
+    }
+});
+
+modal.addEventListener("close", () => {
+    if (modalPolaroid) {
+        modalPolaroid.style.setProperty("--modal-tilt-x", "0deg");
+        modalPolaroid.style.setProperty("--modal-tilt-y", "0deg");
+        modalPolaroid.style.setProperty("--modal-pointer-x", "18%");
+        modalPolaroid.style.setProperty("--modal-pointer-y", "16%");
     }
 });
