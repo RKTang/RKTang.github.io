@@ -88,6 +88,8 @@ dialog {
     background: transparent;
     border-radius: 12px;
     padding: 0.8rem;
+    position: fixed;
+    inset: 0;
     width: auto;
     max-width: 92vw;
     max-height: 90vh;
