@@ -145,30 +145,54 @@ dialog::backdrop {
     background:
         linear-gradient(
             var(--sheen-angle, 130deg),
-            rgba(255, 255, 255, 0.32) 0%,
-            rgba(255, 255, 255, 0.72) 24%,
-            rgba(255, 255, 255, 0.16) 40%,
+            rgba(255, 255, 255, 0.46) 0%,
+            rgba(255, 255, 255, 0.92) 22%,
+            rgba(255, 255, 255, 0.26) 38%,
             rgba(255, 255, 255, 0) 62%
         ),
         linear-gradient(
             calc(var(--sheen-angle, 130deg) + 32deg),
             rgba(255, 255, 255, 0) 30%,
-            rgba(255, 255, 255, 0.24) 54%,
+            rgba(255, 255, 255, 0.34) 54%,
             rgba(255, 255, 255, 0) 78%
         ),
         linear-gradient(
             calc(var(--sheen-angle, 130deg) - 22deg),
             rgba(255, 255, 255, 0) 22%,
-            rgba(255, 255, 255, 0.18) 44%,
+            rgba(255, 255, 255, 0.28) 44%,
             rgba(255, 255, 255, 0) 66%
         );
     background-position: var(--sheen-x, 50%) var(--sheen-y, 50%);
     mix-blend-mode: screen;
-    opacity: 0.7;
+    opacity: 0.32;
 }
 
 #modal-title {
     display: none;
+}
+
+.modal-photo {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+    transform: translateZ(22px);
+}
+
+.modal-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) + 12deg),
+            rgba(255, 255, 255, 0) 22%,
+            rgba(255, 255, 255, 0.26) 44%,
+            rgba(255, 255, 255, 0.06) 58%,
+            rgba(255, 255, 255, 0) 74%
+        );
+    mix-blend-mode: screen;
+    opacity: 0.5;
 }
 
 #modal-image {
@@ -178,9 +202,8 @@ dialog::backdrop {
     height: auto;
     object-fit: contain;
     display: block;
-    margin: 0 auto;
     border-radius: 0;
-    transform: translateZ(22px);
+    filter: contrast(1.08) saturate(1.06) brightness(0.97);
 }
 
 #modal-story {
