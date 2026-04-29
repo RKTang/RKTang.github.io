@@ -41,36 +41,44 @@ closeModalButton.addEventListener("click", () => {
     modal.close();
 });
 
-if (!prefersReducedMotion && modalCard) {
-    modalCard.addEventListener("pointermove", (event) => {
+if (!prefersReducedMotion && modal && modalCard) {
+    const updateCardTiltFromEvent = (event) => {
         const bounds = modalCard.getBoundingClientRect();
         const x = event.clientX - bounds.left;
         const y = event.clientY - bounds.top;
-        const xRatio = x / bounds.width;
-        const yRatio = y / bounds.height;
+        const xRatio = Math.min(1, Math.max(0, x / bounds.width));
+        const yRatio = Math.min(1, Math.max(0, y / bounds.height));
         const tiltY = (xRatio - 0.5) * 12;
         const tiltX = (0.5 - yRatio) * 12;
-        const shiftX = (xRatio - 0.5) * 12;
-        const shiftY = (yRatio - 0.5) * 8;
         const sheenAngle = 110 + (xRatio - 0.5) * 40 - (yRatio - 0.5) * 12;
 
         modalCard.style.setProperty("--card-tilt-x", `${tiltX.toFixed(2)}deg`);
         modalCard.style.setProperty("--card-tilt-y", `${tiltY.toFixed(2)}deg`);
-        modalCard.style.setProperty("--card-shift-x", `${shiftX.toFixed(2)}px`);
-        modalCard.style.setProperty("--card-shift-y", `${shiftY.toFixed(2)}px`);
         modalCard.style.setProperty("--sheen-angle", `${sheenAngle.toFixed(2)}deg`);
         modalCard.style.setProperty("--sheen-x", `${(xRatio * 100).toFixed(2)}%`);
         modalCard.style.setProperty("--sheen-y", `${(yRatio * 100).toFixed(2)}%`);
-    });
+    };
 
-    modalCard.addEventListener("pointerleave", () => {
+    const resetCardTilt = () => {
         modalCard.style.setProperty("--card-tilt-x", "0deg");
         modalCard.style.setProperty("--card-tilt-y", "0deg");
-        modalCard.style.setProperty("--card-shift-x", "0px");
-        modalCard.style.setProperty("--card-shift-y", "0px");
         modalCard.style.setProperty("--sheen-angle", "130deg");
         modalCard.style.setProperty("--sheen-x", "50%");
         modalCard.style.setProperty("--sheen-y", "50%");
+    };
+
+    modal.addEventListener("pointermove", (event) => {
+        if (!modal.open) {
+            return;
+        }
+        updateCardTiltFromEvent(event);
+    });
+
+    modal.addEventListener("pointerleave", () => {
+        if (!modal.open) {
+            return;
+        }
+        resetCardTilt();
     });
 }
 
@@ -91,8 +99,6 @@ modal.addEventListener("close", () => {
     if (modalCard) {
         modalCard.style.setProperty("--card-tilt-x", "0deg");
         modalCard.style.setProperty("--card-tilt-y", "0deg");
-        modalCard.style.setProperty("--card-shift-x", "0px");
-        modalCard.style.setProperty("--card-shift-y", "0px");
         modalCard.style.setProperty("--sheen-angle", "130deg");
         modalCard.style.setProperty("--sheen-x", "50%");
         modalCard.style.setProperty("--sheen-y", "50%");

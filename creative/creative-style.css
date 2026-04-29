@@ -89,6 +89,15 @@ dialog {
     padding: 0;
     width: min(92vw, 820px);
     max-height: 90vh;
+    overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+dialog::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 dialog::backdrop {
@@ -103,9 +112,9 @@ dialog::backdrop {
     position: relative;
     border-radius: 12px;
     background: #fff;
+    transform-origin: center center;
     transform-style: preserve-3d;
-    transform: translate3d(var(--card-shift-x, 0px), var(--card-shift-y, 0px), 0)
-        rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
+    transform: rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
     transition: transform 140ms ease;
     will-change: transform;
 }
