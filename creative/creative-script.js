@@ -73,11 +73,12 @@ cards.forEach((card) => {
     });
 });
 
-if (modalCard) {
-    modalCard.addEventListener("click", () => {
+if (modalFlip && modalCard) {
+    modalFlip.addEventListener("click", (event) => {
         if (!modal.open) {
             return;
         }
+        event.stopPropagation();
         modalCard.classList.toggle("is-flipped");
     });
 }
@@ -130,14 +131,7 @@ if (!prefersReducedMotion && modal && modalCard) {
 }
 
 modal.addEventListener("click", (event) => {
-    const bounds = modal.getBoundingClientRect();
-    const isInDialog =
-        event.clientX >= bounds.left &&
-        event.clientX <= bounds.right &&
-        event.clientY >= bounds.top &&
-        event.clientY <= bounds.bottom;
-
-    if (!isInDialog) {
+    if (event.target === modal) {
         modal.close();
     }
 });
