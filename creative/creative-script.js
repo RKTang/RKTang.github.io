@@ -1,8 +1,8 @@
 const cards = document.querySelectorAll(".polaroid-card");
 const modal = document.getElementById("polaroid-modal");
+const modalCard = document.getElementById("modal-card");
 const modalTitle = document.getElementById("modal-title");
 const modalImage = document.getElementById("modal-image");
-const modalPolaroid = document.getElementById("modal-polaroid");
 const modalStory = document.getElementById("modal-story");
 const closeModalButton = document.getElementById("close-modal");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -41,27 +41,36 @@ closeModalButton.addEventListener("click", () => {
     modal.close();
 });
 
-if (!prefersReducedMotion && modalPolaroid) {
-    modalPolaroid.addEventListener("pointermove", (event) => {
-        const bounds = modalPolaroid.getBoundingClientRect();
+if (!prefersReducedMotion && modalCard) {
+    modalCard.addEventListener("pointermove", (event) => {
+        const bounds = modalCard.getBoundingClientRect();
         const x = event.clientX - bounds.left;
         const y = event.clientY - bounds.top;
         const xRatio = x / bounds.width;
         const yRatio = y / bounds.height;
-        const tiltY = (xRatio - 0.5) * 10;
-        const tiltX = (0.5 - yRatio) * 10;
+        const tiltY = (xRatio - 0.5) * 12;
+        const tiltX = (0.5 - yRatio) * 12;
+        const shiftX = (xRatio - 0.5) * 12;
+        const shiftY = (yRatio - 0.5) * 8;
+        const sheenAngle = 110 + (xRatio - 0.5) * 40 - (yRatio - 0.5) * 12;
 
-        modalPolaroid.style.setProperty("--modal-tilt-x", `${tiltX.toFixed(2)}deg`);
-        modalPolaroid.style.setProperty("--modal-tilt-y", `${tiltY.toFixed(2)}deg`);
-        modalPolaroid.style.setProperty("--modal-pointer-x", `${(xRatio * 100).toFixed(2)}%`);
-        modalPolaroid.style.setProperty("--modal-pointer-y", `${(yRatio * 100).toFixed(2)}%`);
+        modalCard.style.setProperty("--card-tilt-x", `${tiltX.toFixed(2)}deg`);
+        modalCard.style.setProperty("--card-tilt-y", `${tiltY.toFixed(2)}deg`);
+        modalCard.style.setProperty("--card-shift-x", `${shiftX.toFixed(2)}px`);
+        modalCard.style.setProperty("--card-shift-y", `${shiftY.toFixed(2)}px`);
+        modalCard.style.setProperty("--sheen-angle", `${sheenAngle.toFixed(2)}deg`);
+        modalCard.style.setProperty("--sheen-x", `${(xRatio * 100).toFixed(2)}%`);
+        modalCard.style.setProperty("--sheen-y", `${(yRatio * 100).toFixed(2)}%`);
     });
 
-    modalPolaroid.addEventListener("pointerleave", () => {
-        modalPolaroid.style.setProperty("--modal-tilt-x", "0deg");
-        modalPolaroid.style.setProperty("--modal-tilt-y", "0deg");
-        modalPolaroid.style.setProperty("--modal-pointer-x", "18%");
-        modalPolaroid.style.setProperty("--modal-pointer-y", "16%");
+    modalCard.addEventListener("pointerleave", () => {
+        modalCard.style.setProperty("--card-tilt-x", "0deg");
+        modalCard.style.setProperty("--card-tilt-y", "0deg");
+        modalCard.style.setProperty("--card-shift-x", "0px");
+        modalCard.style.setProperty("--card-shift-y", "0px");
+        modalCard.style.setProperty("--sheen-angle", "130deg");
+        modalCard.style.setProperty("--sheen-x", "50%");
+        modalCard.style.setProperty("--sheen-y", "50%");
     });
 }
 
@@ -79,10 +88,13 @@ modal.addEventListener("click", (event) => {
 });
 
 modal.addEventListener("close", () => {
-    if (modalPolaroid) {
-        modalPolaroid.style.setProperty("--modal-tilt-x", "0deg");
-        modalPolaroid.style.setProperty("--modal-tilt-y", "0deg");
-        modalPolaroid.style.setProperty("--modal-pointer-x", "18%");
-        modalPolaroid.style.setProperty("--modal-pointer-y", "16%");
+    if (modalCard) {
+        modalCard.style.setProperty("--card-tilt-x", "0deg");
+        modalCard.style.setProperty("--card-tilt-y", "0deg");
+        modalCard.style.setProperty("--card-shift-x", "0px");
+        modalCard.style.setProperty("--card-shift-y", "0px");
+        modalCard.style.setProperty("--sheen-angle", "130deg");
+        modalCard.style.setProperty("--sheen-x", "50%");
+        modalCard.style.setProperty("--sheen-y", "50%");
     }
 });

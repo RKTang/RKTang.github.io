@@ -100,6 +100,39 @@ dialog::backdrop {
     padding: 1rem 1rem 1.1rem;
     display: grid;
     gap: 0.85rem;
+    position: relative;
+    border-radius: 12px;
+    background: #fff;
+    transform-style: preserve-3d;
+    transform: translate3d(var(--card-shift-x, 0px), var(--card-shift-y, 0px), 0)
+        rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
+    transition: transform 140ms ease;
+    will-change: transform;
+}
+
+.modal-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: 12px;
+    background:
+        linear-gradient(
+            var(--sheen-angle, 130deg),
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.5) 24%,
+            rgba(255, 255, 255, 0.08) 40%,
+            rgba(255, 255, 255, 0) 62%
+        ),
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) + 32deg),
+            rgba(255, 255, 255, 0) 30%,
+            rgba(255, 255, 255, 0.14) 54%,
+            rgba(255, 255, 255, 0) 78%
+        );
+    background-position: var(--sheen-x, 50%) var(--sheen-y, 50%);
+    mix-blend-mode: screen;
+    opacity: 0.42;
 }
 
 #modal-title {
@@ -114,39 +147,7 @@ dialog::backdrop {
     display: block;
     background: #f4f4f4;
     border-radius: 8px;
-}
-
-.modal-polaroid {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    perspective: 1100px;
-    transform-style: preserve-3d;
-    transform: rotateX(var(--modal-tilt-x, 0deg)) rotateY(var(--modal-tilt-y, 0deg));
-    transition: transform 140ms ease;
-}
-
-.modal-polaroid::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: 8px;
-    background:
-        radial-gradient(
-            circle at var(--modal-pointer-x, 18%) var(--modal-pointer-y, 16%),
-            rgba(255, 255, 255, 0.5) 0%,
-            rgba(255, 255, 255, 0.14) 24%,
-            rgba(255, 255, 255, 0) 58%
-        ),
-        linear-gradient(
-            130deg,
-            rgba(255, 255, 255, 0.22) 0%,
-            rgba(255, 255, 255, 0.04) 36%,
-            rgba(255, 255, 255, 0) 62%
-        );
-    mix-blend-mode: screen;
-    opacity: 0.95;
+    transform: translateZ(22px);
 }
 
 #modal-story {
@@ -188,7 +189,7 @@ dialog::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .modal-polaroid {
+    .modal-content {
         transform: none;
     }
 }
