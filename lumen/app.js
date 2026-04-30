@@ -55,7 +55,16 @@ const dom = {
     entryGridViewer: document.getElementById("entry-grid-viewer"),
     ownerEditorSection: document.getElementById("owner-editor-section"),
     entryGridEditor: document.getElementById("entry-grid-editor"),
-    entryEditorTemplate: document.getElementById("entry-editor-template")
+    entryEditorTemplate: document.getElementById("entry-editor-template"),
+    viewerModal: document.getElementById("viewer-modal"),
+    viewerModalCard: document.getElementById("viewer-modal-card"),
+    viewerModalFlip: document.querySelector("#viewer-modal-card .modal-flip"),
+    viewerModalTitle: document.getElementById("viewer-modal-title"),
+    viewerModalBackTitle: document.getElementById("viewer-modal-back-title"),
+    viewerModalImage: document.getElementById("viewer-modal-image"),
+    viewerModalStory: document.getElementById("viewer-modal-story"),
+    viewerModalLocation: document.getElementById("viewer-modal-location"),
+    viewerModalDate: document.getElementById("viewer-modal-date")
 };
 
 let app = null;
@@ -85,6 +94,7 @@ function initialize() {
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
+    setupViewerModalInteractions();
 
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
@@ -247,6 +257,7 @@ async function openAlbum(albumId) {
 
     activeAlbum = album;
     isOwnerViewing = Boolean(isOwner);
+    document.body.classList.toggle("viewer-only", !isOwnerViewing);
     dom.activeAlbumTitle.textContent = album.title || "Untitled album";
     dom.activeAlbumVisibility.hidden = false;
     dom.activeAlbumVisibility.textContent = album.visibility || "private";
@@ -289,19 +300,16 @@ function renderEntries(entries) {
         const locationText = toDisplayText(entry.locationText, "");
         const captureDate = toDisplayText(entry.captureDate, "");
 
-        const viewerNode = document.createElement("article");
-        viewerNode.className = "journal-card";
-        viewerNode.innerHTML = `
-            <img class="journal-image" alt="">
-            <div class="journal-meta">
-                <p>${escapeHtml(storyText || "No story yet.")}</p>
-                <p><strong>Location:</strong> ${escapeHtml(locationText || "Not set")}</p>
-                <p><strong>Date:</strong> ${escapeHtml(captureDate || "Not set")}</p>
-            </div>
-        `;
-        const viewerImg = viewerNode.querySelector(".journal-image");
-        viewerImg.src = entry.photoUrl;
-        viewerImg.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
+        const viewerNode = document.createElement("button");
+        viewerNode.type = "button";
+        viewerNode.className = "polaroid-card";
+        viewerNode.dataset.fullSrc = entry.photoUrl;
+        viewerNode.dataset.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
+        viewerNode.dataset.title = activeAlbum?.title || "Lumen Journal Entry";
+        viewerNode.dataset.story = storyText || "No story yet.";
+        viewerNode.dataset.location = locationText || "Not set";
+        viewerNode.dataset.date = captureDate || "Not set";
+        viewerNode.innerHTML = `<img src="${escapeHtml(entry.photoUrl)}" alt="${escapeHtml(viewerNode.dataset.alt)}">`;
         dom.entryGridViewer.appendChild(viewerNode);
 
         if (!isOwnerViewing) {
@@ -351,6 +359,131 @@ function renderEntries(entries) {
 
         dom.entryGridEditor.appendChild(node);
     });
+}
+
+function setupViewerModalInteractions() {
+    if (!dom.entryGridViewer || !dom.viewerModal || !dom.viewerModalCard || !dom.viewerModalImage) {
+        return;
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    dom.entryGridViewer.addEventListener("click", (event) => {
+        const card = event.target.closest(".polaroid-card");
+        if (!card) {
+            return;
+        }
+        openViewerCard(card);
+    });
+
+    if (dom.viewerModalFlip) {
+        dom.viewerModalFlip.addEventListener("click", (event) => {
+            if (!dom.viewerModal.open) {
+                return;
+            }
+            event.stopPropagation();
+            dom.viewerModalCard.style.setProperty("--card-tilt-x", "0deg");
+            dom.viewerModalCard.style.setProperty("--card-tilt-y", "0deg");
+            dom.viewerModalCard.style.setProperty("--card-move-x", "0px");
+            dom.viewerModalCard.style.setProperty("--card-move-y", "0px");
+            dom.viewerModalCard.classList.toggle("is-flipped");
+        });
+    }
+
+    if (!prefersReducedMotion) {
+        dom.viewerModal.addEventListener("pointermove", (event) => {
+            if (!dom.viewerModal.open) {
+                return;
+            }
+            const bounds = dom.viewerModalCard.getBoundingClientRect();
+            const x = event.clientX - bounds.left;
+            const y = event.clientY - bounds.top;
+            const xRatio = Math.min(1, Math.max(0, x / bounds.width));
+            const yRatio = Math.min(1, Math.max(0, y / bounds.height));
+            const tiltY = (xRatio - 0.5) * 12;
+            const tiltX = (0.5 - yRatio) * 12;
+            const moveX = (xRatio - 0.5) * 6;
+            const moveY = (yRatio - 0.5) * 4;
+            const sheenAngle = 110 + (xRatio - 0.5) * 40 - (yRatio - 0.5) * 12;
+
+            dom.viewerModalCard.style.setProperty("--card-tilt-x", `${tiltX.toFixed(2)}deg`);
+            dom.viewerModalCard.style.setProperty("--card-tilt-y", `${tiltY.toFixed(2)}deg`);
+            dom.viewerModalCard.style.setProperty("--card-move-x", `${moveX.toFixed(2)}px`);
+            dom.viewerModalCard.style.setProperty("--card-move-y", `${moveY.toFixed(2)}px`);
+            dom.viewerModalCard.style.setProperty("--sheen-angle", `${sheenAngle.toFixed(2)}deg`);
+        });
+
+        dom.viewerModal.addEventListener("pointerleave", () => {
+            if (!dom.viewerModal.open) {
+                return;
+            }
+            resetViewerModalCard();
+        });
+    }
+
+    dom.viewerModal.addEventListener("click", (event) => {
+        if (event.target === dom.viewerModal) {
+            dom.viewerModal.close();
+        }
+    });
+
+    dom.viewerModal.addEventListener("close", () => {
+        document.body.classList.remove("modal-open");
+        resetViewerModalCard();
+    });
+}
+
+function openViewerCard(card) {
+    if (!dom.viewerModal || !dom.viewerModalCard || !dom.viewerModalImage) {
+        return;
+    }
+    const thumbImage = card.querySelector("img");
+    const fullSrc = card.dataset.fullSrc;
+    if (!fullSrc) {
+        return;
+    }
+
+    dom.viewerModalTitle.textContent = card.dataset.title || "Lumen Journal Entry";
+    dom.viewerModalBackTitle.textContent = card.dataset.title || "Lumen Journal Entry";
+    dom.viewerModalStory.textContent = `Story: ${card.dataset.story || "No story yet."}`;
+    dom.viewerModalLocation.textContent = `Location: ${card.dataset.location || "Not set"}`;
+    dom.viewerModalDate.textContent = `Date: ${card.dataset.date || "Not set"}`;
+    dom.viewerModalImage.src = fullSrc;
+    dom.viewerModalImage.alt = card.dataset.alt || "Journal entry image";
+    dom.viewerModalCard.classList.remove("is-flipped");
+
+    if (dom.viewerModalFlip && thumbImage && thumbImage.naturalWidth && thumbImage.naturalHeight) {
+        dom.viewerModalFlip.style.setProperty("--photo-ratio", `${thumbImage.naturalWidth} / ${thumbImage.naturalHeight}`);
+        dom.viewerModalFlip.style.setProperty("--photo-ratio-num", `${thumbImage.naturalWidth / thumbImage.naturalHeight}`);
+    }
+
+    const applyPhotoRatio = () => {
+        if (!dom.viewerModalFlip || !dom.viewerModalImage.naturalWidth || !dom.viewerModalImage.naturalHeight) {
+            return;
+        }
+        dom.viewerModalFlip.style.setProperty("--photo-ratio", `${dom.viewerModalImage.naturalWidth} / ${dom.viewerModalImage.naturalHeight}`);
+        dom.viewerModalFlip.style.setProperty("--photo-ratio-num", `${dom.viewerModalImage.naturalWidth / dom.viewerModalImage.naturalHeight}`);
+    };
+    if (dom.viewerModalImage.complete) {
+        applyPhotoRatio();
+    } else {
+        dom.viewerModalImage.addEventListener("load", applyPhotoRatio, { once: true });
+    }
+
+    dom.viewerModal.showModal();
+    document.body.classList.add("modal-open");
+}
+
+function resetViewerModalCard() {
+    if (!dom.viewerModalCard) {
+        return;
+    }
+    dom.viewerModalCard.classList.remove("is-flipped");
+    dom.viewerModalCard.style.setProperty("--card-tilt-x", "0deg");
+    dom.viewerModalCard.style.setProperty("--card-tilt-y", "0deg");
+    dom.viewerModalCard.style.setProperty("--card-move-x", "0px");
+    dom.viewerModalCard.style.setProperty("--card-move-y", "0px");
+    dom.viewerModalCard.style.setProperty("--sheen-angle", "130deg");
 }
 
 async function handleSaveAlbumSettings() {
@@ -461,6 +594,7 @@ function clearAlbumView() {
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
+    document.body.classList.remove("viewer-only");
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
 }

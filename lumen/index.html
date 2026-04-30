@@ -73,8 +73,8 @@
             </p>
 
             <section class="entries-section">
-                <h3>Journal viewer</h3>
-                <div id="entry-grid-viewer" class="entry-grid viewer-grid"></div>
+                <h3 class="viewer-title">Journal viewer</h3>
+                <div id="entry-grid-viewer" class="entry-grid viewer-grid polaroid-grid"></div>
             </section>
 
             <section id="owner-editor-section" class="entries-section" hidden>
@@ -109,6 +109,25 @@
             </div>
         </article>
     </template>
+
+    <dialog id="viewer-modal" aria-labelledby="viewer-modal-title">
+        <article id="viewer-modal-card" class="modal-content">
+            <h2 id="viewer-modal-title"></h2>
+            <div class="modal-flip">
+                <section class="modal-face modal-front">
+                    <div class="modal-photo">
+                        <img id="viewer-modal-image" src="" alt="">
+                    </div>
+                </section>
+                <section class="modal-face modal-back" aria-label="Photo details">
+                    <h3 id="viewer-modal-back-title"></h3>
+                    <p id="viewer-modal-story"></p>
+                    <p id="viewer-modal-location"></p>
+                    <p id="viewer-modal-date"></p>
+                </section>
+            </div>
+        </article>
+    </dialog>
 
     <script src="firebase-config.js"></script>
     <script type="module" src="app.js"></script>
