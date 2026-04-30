@@ -249,6 +249,19 @@ textarea {
     box-shadow: 0 3px 10px rgba(20, 34, 52, 0.2);
 }
 
+.mode-toggle-secondary {
+    background: #f3f6fa;
+    color: #34465e;
+}
+
+.mode-toggle-secondary:hover {
+    background: #e6edf6;
+}
+
+body.owner-settings-collapsed #album-controls {
+    display: none !important;
+}
+
 body.owner-mode-editor .entries-section:first-of-type {
     display: none;
 }

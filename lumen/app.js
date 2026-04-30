@@ -56,6 +56,7 @@ const dom = {
     ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
     showViewerModeBtn: document.getElementById("show-viewer-mode"),
     showEditorModeBtn: document.getElementById("show-editor-mode"),
+    toggleAlbumSettingsBtn: document.getElementById("toggle-album-settings"),
     entryGridViewer: document.getElementById("entry-grid-viewer"),
     ownerEditorSection: document.getElementById("owner-editor-section"),
     entryGridEditor: document.getElementById("entry-grid-editor"),
@@ -80,6 +81,7 @@ let activeAlbum = null;
 let unsubscribeEntries = null;
 let unsubscribeAlbums = null;
 let isOwnerViewing = false;
+let isOwnerSettingsCollapsed = false;
 
 if (!hasFirebaseConfig) {
     dom.authStatus.textContent = "Firebase is not configured yet. Update lumen/firebase-config.js to start.";
@@ -100,6 +102,7 @@ function initialize() {
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
+    dom.toggleAlbumSettingsBtn.addEventListener("click", () => setOwnerSettingsCollapsed(!isOwnerSettingsCollapsed));
     setupViewerModalInteractions();
 
     onAuthStateChanged(auth, async (user) => {
@@ -278,8 +281,10 @@ async function openAlbum(albumId) {
     dom.ownerViewModeToggle.hidden = !isOwnerViewing;
     if (isOwnerViewing) {
         setOwnerViewMode("viewer");
+        setOwnerSettingsCollapsed(false);
     } else {
         document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
+        document.body.classList.remove("owner-settings-collapsed");
     }
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
@@ -622,6 +627,8 @@ function clearAlbumView() {
     dom.entryGridEditor.innerHTML = "";
     document.body.classList.remove("viewer-only");
     document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
+    document.body.classList.remove("owner-settings-collapsed");
+    isOwnerSettingsCollapsed = false;
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
     applyViewerColumns(3);
@@ -724,4 +731,11 @@ function setOwnerViewMode(mode) {
     document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
     dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
     dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
+}
+
+function setOwnerSettingsCollapsed(collapsed) {
+    isOwnerSettingsCollapsed = Boolean(collapsed);
+    document.body.classList.toggle("owner-settings-collapsed", isOwnerSettingsCollapsed);
+    dom.toggleAlbumSettingsBtn.textContent = isOwnerSettingsCollapsed ? "Show settings" : "Hide settings";
+    dom.toggleAlbumSettingsBtn.setAttribute("aria-expanded", String(!isOwnerSettingsCollapsed));
 }
