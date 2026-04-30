@@ -15,6 +15,8 @@
         <p>Create your own metadata-aware photo journal.</p>
         <div class="header-actions">
             <button id="sign-in-btn" type="button">Sign in with Google</button>
+            <button id="guest-sign-in-btn" type="button">Continue as Guest</button>
+            <button id="link-account-btn" type="button" hidden>Link account</button>
             <button id="sign-out-btn" type="button" hidden>Sign out</button>
         </div>
         <p id="auth-status" class="auth-status">Checking authentication...</p>
@@ -73,7 +75,10 @@
                         <button id="save-album-settings" type="button">Save album settings</button>
                     </div>
                 </details>
-                <p class="muted" id="share-url-text"></p>
+                <div class="share-url-row">
+                    <p class="muted share-url-text" id="share-url-text"></p>
+                    <button id="copy-share-url" type="button" class="copy-share-btn">Copy link</button>
+                </div>
                 <label>
                     Upload photos (metadata auto-filled when available)
                     <input id="photo-upload-input" type="file" multiple accept="image/*">
