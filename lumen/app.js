@@ -285,19 +285,23 @@ function renderEntries(entries) {
     }
 
     entries.forEach((entry) => {
+        const storyText = toDisplayText(entry.storyText, "");
+        const locationText = toDisplayText(entry.locationText, "");
+        const captureDate = toDisplayText(entry.captureDate, "");
+
         const viewerNode = document.createElement("article");
         viewerNode.className = "journal-card";
         viewerNode.innerHTML = `
             <img class="journal-image" alt="">
             <div class="journal-meta">
-                <p>${escapeHtml(entry.storyText || "No story yet.")}</p>
-                <p><strong>Location:</strong> ${escapeHtml(entry.locationText || "Not set")}</p>
-                <p><strong>Date:</strong> ${escapeHtml(entry.captureDate || "Not set")}</p>
+                <p>${escapeHtml(storyText || "No story yet.")}</p>
+                <p><strong>Location:</strong> ${escapeHtml(locationText || "Not set")}</p>
+                <p><strong>Date:</strong> ${escapeHtml(captureDate || "Not set")}</p>
             </div>
         `;
         const viewerImg = viewerNode.querySelector(".journal-image");
         viewerImg.src = entry.photoUrl;
-        viewerImg.alt = entry.storyText ? `Album entry: ${entry.storyText}` : "Album entry";
+        viewerImg.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
         dom.entryGridViewer.appendChild(viewerNode);
 
         if (!isOwnerViewing) {
@@ -314,10 +318,10 @@ function renderEntries(entries) {
         const delBtn = node.querySelector(".entry-delete");
 
         img.src = entry.photoUrl;
-        img.alt = entry.storyText ? `Album entry: ${entry.storyText}` : "Album entry";
-        storyEl.value = entry.storyText || "";
-        locEl.value = entry.locationText || "";
-        dateEl.value = entry.captureDate || "";
+        img.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
+        storyEl.value = storyText;
+        locEl.value = locationText;
+        dateEl.value = captureDate;
         metaEl.textContent = `Entry ID: ${entry.id}`;
 
         saveBtn.addEventListener("click", async () => {
@@ -462,12 +466,34 @@ function clearAlbumView() {
 }
 
 function escapeHtml(value) {
-    return value
+    return String(value)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll("\"", "&quot;")
         .replaceAll("'", "&#39;");
+}
+
+function toDisplayText(value, fallback = "") {
+    if (value === null || value === undefined) {
+        return fallback;
+    }
+    if (typeof value === "string") {
+        return value;
+    }
+    if (typeof value === "number" || typeof value === "boolean") {
+        return String(value);
+    }
+    if (value instanceof Date) {
+        return value.toISOString().slice(0, 19).replace("T", " ");
+    }
+    if (typeof value === "object" && typeof value.toDate === "function") {
+        const date = value.toDate();
+        if (date instanceof Date && !Number.isNaN(date.getTime())) {
+            return date.toISOString().slice(0, 19).replace("T", " ");
+        }
+    }
+    return fallback;
 }
 
 function applyAlbumBackground(color) {
