@@ -48,6 +48,7 @@ const dom = {
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
     albumBackgroundColor: document.getElementById("album-background-color"),
+    albumViewerColumns: document.getElementById("album-viewer-columns"),
     saveAlbumSettings: document.getElementById("save-album-settings"),
     shareUrlText: document.getElementById("share-url-text"),
     photoUploadInput: document.getElementById("photo-upload-input"),
@@ -225,6 +226,7 @@ async function handleCreateAlbum(event) {
         ownerUid: currentUser.uid,
         title,
         visibility,
+        viewerColumns: 3,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
@@ -266,8 +268,10 @@ async function openAlbum(albumId) {
     dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
+    dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
     dom.shareUrlText.textContent = `Share URL: ${window.location.origin}${window.location.pathname}?album=${album.id}`;
     applyAlbumBackground(album.pageBackground);
+    applyViewerColumns(album.viewerColumns);
     history.replaceState(null, "", `?album=${album.id}`);
 
     subscribeEntries(album.id);
@@ -492,15 +496,19 @@ async function handleSaveAlbumSettings() {
     }
     const visibility = dom.albumVisibilitySelect.value;
     const pageBackground = normalizeColor(dom.albumBackgroundColor.value || "#f1ece4");
+    const viewerColumns = normalizeViewerColumns(dom.albumViewerColumns.value);
     await updateDoc(doc(db, "albums", activeAlbum.id), {
         visibility,
         pageBackground,
+        viewerColumns,
         updatedAt: serverTimestamp()
     });
     activeAlbum.visibility = visibility;
     activeAlbum.pageBackground = pageBackground;
+    activeAlbum.viewerColumns = viewerColumns;
     dom.activeAlbumVisibility.textContent = visibility;
     applyAlbumBackground(pageBackground);
+    applyViewerColumns(viewerColumns);
 }
 
 async function handleUploadPhotos(event) {
@@ -597,6 +605,7 @@ function clearAlbumView() {
     document.body.classList.remove("viewer-only");
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
+    applyViewerColumns(3);
 }
 
 function escapeHtml(value) {
@@ -641,4 +650,20 @@ function normalizeColor(value) {
     }
     const trimmed = value.trim();
     return /^#[0-9a-fA-F]{6}$/.test(trimmed) ? trimmed : "#f1ece4";
+}
+
+function normalizeViewerColumns(value) {
+    const num = Number.parseInt(value, 10);
+    if (!Number.isFinite(num)) {
+        return 3;
+    }
+    return Math.min(5, Math.max(1, num));
+}
+
+function applyViewerColumns(value) {
+    if (!dom.entryGridViewer) {
+        return;
+    }
+    const cols = normalizeViewerColumns(value);
+    dom.entryGridViewer.style.setProperty("--viewer-columns", String(cols));
 }

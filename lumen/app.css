@@ -192,7 +192,7 @@ textarea {
 
 .polaroid-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--viewer-columns, 3), minmax(0, 1fr));
     gap: 1.25rem;
     max-width: 1100px;
     padding: 0.8rem 0 1.6rem;
@@ -203,6 +203,7 @@ textarea {
     appearance: none;
     border: 1px solid rgba(255, 255, 255, 0.8);
     background: #fff;
+    border-radius: 0;
     padding: 0.8rem 0.8rem 4.5rem;
     text-align: center;
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.14);
@@ -212,8 +213,8 @@ textarea {
 
 .polaroid-card img {
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
     display: block;
     background: #edf1f7;
 }
