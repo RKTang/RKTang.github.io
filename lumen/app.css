@@ -9,6 +9,10 @@ body {
     color: #1f1f1f;
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
 .page-header {
     color: #1f1f1f;
     padding: 2rem 1rem 1rem;
@@ -74,6 +78,19 @@ button:hover {
     display: grid;
     grid-template-columns: 340px 1fr;
     gap: 1rem;
+}
+
+body.viewer-only .layout {
+    max-width: 1120px;
+    grid-template-columns: 1fr;
+}
+
+body.viewer-only .layout > .panel:first-child,
+body.viewer-only #album-controls,
+body.viewer-only #owner-editor-section,
+body.viewer-only #album-view-state,
+body.viewer-only .viewer-title {
+    display: none !important;
 }
 
 .panel {
@@ -173,36 +190,177 @@ textarea {
     font-size: 1.7rem;
 }
 
-.viewer-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+.polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    max-width: 1100px;
+    padding: 0.8rem 0 1.6rem;
+    margin: 0;
 }
 
-.journal-card {
+.polaroid-card {
+    appearance: none;
     border: 1px solid rgba(255, 255, 255, 0.8);
-    overflow: visible;
     background: #fff;
-    padding: 0.75rem 0.75rem 3.4rem;
+    padding: 0.8rem 0.8rem 4.5rem;
+    text-align: center;
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.14);
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
-.journal-image {
+.polaroid-card img {
     width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     display: block;
     background: #edf1f7;
 }
 
-.journal-meta {
-    margin-top: 0.65rem;
-    display: grid;
-    gap: 0.3rem;
-    font-size: 0.88rem;
-    color: #2f2f2f;
+.polaroid-card:hover,
+.polaroid-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
 }
 
-.journal-meta p {
+dialog {
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0.8rem;
+    width: auto;
+    max-width: 92vw;
+    max-height: 90vh;
     margin: 0;
+    overflow: visible;
+    perspective: 1200px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+dialog[open] {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin: 0;
+    transform: translate(-50%, -50%);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.62);
+}
+
+.modal-content {
+    margin: 0;
+    padding: 1rem 0.7rem 4.8rem;
+    display: grid;
+    gap: 0.85rem;
+    width: fit-content;
+    max-width: min(88vw, 760px);
+    position: relative;
+    border-radius: 0;
+    background: #fff;
+    transform-origin: center center;
+    transform-style: preserve-3d;
+    transform: translate3d(var(--card-move-x, 0px), var(--card-move-y, 0px), 0)
+        rotateX(var(--card-tilt-x, 0deg))
+        rotateY(calc(var(--card-tilt-y, 0deg) + var(--flip-rot, 0deg)));
+    transition: transform 140ms ease;
+}
+
+.modal-flip {
+    position: relative;
+    width: min(62vw, 500px, calc(58vh * var(--photo-ratio-num, 0.8)));
+    aspect-ratio: var(--photo-ratio, 4 / 5);
+    transform-style: preserve-3d;
+    transform: rotateY(0deg);
+}
+
+.modal-content.is-flipped {
+    --flip-rot: 180deg;
+}
+
+.modal-face {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    background: #fff;
+    transition: transform 350ms ease, opacity 350ms ease;
+}
+
+.modal-front {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.modal-back {
+    transform: rotateY(180deg);
+    background: #f5f2ee;
+    border: 1px solid #dfd9d0;
+    padding: 1.1rem;
+    color: #2b2b2b;
+    display: none;
+    align-content: start;
+    gap: 0.7rem;
+    overflow: auto;
+}
+
+.modal-content.is-flipped .modal-front {
+    display: none;
+}
+
+.modal-content.is-flipped .modal-back {
+    display: grid;
+    transform: rotateY(180deg);
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    z-index: 3;
+}
+
+.modal-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            var(--sheen-angle, 130deg),
+            rgba(255, 255, 255, 0.46) 0%,
+            rgba(255, 255, 255, 0.92) 22%,
+            rgba(255, 255, 255, 0.26) 38%,
+            rgba(255, 255, 255, 0) 62%
+        );
+    mix-blend-mode: screen;
+    opacity: 0.32;
+}
+
+#viewer-modal-title {
+    display: none;
+}
+
+.modal-photo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: var(--photo-ratio, 4 / 5);
+}
+
+#viewer-modal-image {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: contrast(1.08) saturate(1.06) brightness(0.97);
 }
 
 .editor-grid {
@@ -243,5 +401,16 @@ textarea {
 @media (max-width: 950px) {
     .layout {
         grid-template-columns: 1fr;
+    }
+
+    .polaroid-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .polaroid-grid {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
     }
 }
