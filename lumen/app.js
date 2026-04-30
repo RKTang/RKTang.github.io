@@ -2,7 +2,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
     getAuth,
     GoogleAuthProvider,
+    linkWithPopup,
     signInWithPopup,
+    signInAnonymously,
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -36,6 +38,8 @@ const hasFirebaseConfig = firebaseConfig && firebaseConfig.apiKey && firebaseCon
 
 const dom = {
     signInBtn: document.getElementById("sign-in-btn"),
+    guestSignInBtn: document.getElementById("guest-sign-in-btn"),
+    linkAccountBtn: document.getElementById("link-account-btn"),
     signOutBtn: document.getElementById("sign-out-btn"),
     authStatus: document.getElementById("auth-status"),
     newAlbumForm: document.getElementById("new-album-form"),
@@ -52,6 +56,7 @@ const dom = {
     albumSettingsDropdown: document.getElementById("album-settings-dropdown"),
     saveAlbumSettings: document.getElementById("save-album-settings"),
     shareUrlText: document.getElementById("share-url-text"),
+    copyShareUrlBtn: document.getElementById("copy-share-url"),
     photoUploadInput: document.getElementById("photo-upload-input"),
     albumViewState: document.getElementById("album-view-state"),
     ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
@@ -95,9 +100,12 @@ if (!hasFirebaseConfig) {
 
 function initialize() {
     dom.signInBtn.addEventListener("click", handleSignIn);
+    dom.guestSignInBtn.addEventListener("click", handleGuestSignIn);
+    dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
+    dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
@@ -126,6 +134,27 @@ async function handleSignOut() {
     clearAlbumView();
 }
 
+async function handleGuestSignIn() {
+    try {
+        await signInAnonymously(auth);
+    } catch (error) {
+        dom.authStatus.textContent = `Guest sign-in failed: ${error.message}`;
+    }
+}
+
+async function handleLinkAccount() {
+    if (!currentUser || !currentUser.isAnonymous) {
+        return;
+    }
+    const provider = new GoogleAuthProvider();
+    try {
+        await linkWithPopup(currentUser, provider);
+        dom.authStatus.textContent = "Guest account linked to Google.";
+    } catch (error) {
+        dom.authStatus.textContent = `Link account failed: ${error.message}`;
+    }
+}
+
 async function ensureUserDoc(user) {
     if (!user) {
         return;
@@ -145,12 +174,23 @@ async function ensureUserDoc(user) {
 
 function updateAuthUI() {
     const loggedIn = Boolean(currentUser);
+    const isGuest = Boolean(currentUser?.isAnonymous);
     dom.signInBtn.hidden = loggedIn;
+    dom.guestSignInBtn.hidden = loggedIn;
+    dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
-    dom.authStatus.textContent = loggedIn
-        ? `Signed in as ${currentUser.displayName || currentUser.email}`
-        : "Sign in to create private/public albums.";
+    if (!loggedIn) {
+        dom.authStatus.textContent = "Sign in with Google or continue as guest to create albums.";
+        return;
+    }
+
+    if (isGuest) {
+        dom.authStatus.textContent = "Signed in as Guest. Link account to keep long-term access.";
+        return;
+    }
+
+    dom.authStatus.textContent = `Signed in as ${currentUser.displayName || currentUser.email}`;
 }
 
 function subscribeAlbumList() {
@@ -288,7 +328,9 @@ async function openAlbum(albumId) {
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
-    dom.shareUrlText.textContent = `Share URL: ${window.location.origin}${window.location.pathname}?album=${album.id}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}?album=${album.id}`;
+    dom.shareUrlText.textContent = `Share URL: ${shareUrl}`;
+    dom.shareUrlText.dataset.url = shareUrl;
     applyAlbumBackground(album.pageBackground);
     applyViewerColumns(album.viewerColumns);
     history.replaceState(null, "", `?album=${album.id}`);
@@ -632,6 +674,7 @@ function clearAlbumView() {
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
     applyViewerColumns(3);
+    dom.shareUrlText.dataset.url = "";
 }
 
 function escapeHtml(value) {
@@ -731,4 +774,23 @@ function setOwnerViewMode(mode) {
     document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
     dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
     dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
+}
+
+async function handleCopyShareUrl() {
+    const url = (dom.shareUrlText.dataset.url || "").trim();
+    if (!url) {
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(url);
+        dom.copyShareUrlBtn.textContent = "Copied";
+        setTimeout(() => {
+            dom.copyShareUrlBtn.textContent = "Copy link";
+        }, 1200);
+    } catch (_error) {
+        dom.copyShareUrlBtn.textContent = "Copy failed";
+        setTimeout(() => {
+            dom.copyShareUrlBtn.textContent = "Copy link";
+        }, 1200);
+    }
 }
