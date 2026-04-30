@@ -10,6 +10,10 @@ body {
     line-height: 1.5;
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
 .page-header {
     text-align: center;
     padding: 2.5rem 1rem 1.5rem;
