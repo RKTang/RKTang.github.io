@@ -44,6 +44,7 @@ const dom = {
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
+    activeAlbumOwner: document.getElementById("active-album-owner"),
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
@@ -224,6 +225,7 @@ async function handleCreateAlbum(event) {
     const visibility = dom.newAlbumVisibility.value;
     const albumRef = await addDoc(collection(db, "albums"), {
         ownerUid: currentUser.uid,
+        ownerDisplayName: currentUser.displayName || currentUser.email || "",
         title,
         visibility,
         viewerColumns: 3,
@@ -260,7 +262,11 @@ async function openAlbum(albumId) {
     activeAlbum = album;
     isOwnerViewing = Boolean(isOwner);
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
+
+    const ownerName = await resolveAlbumOwnerName(album, isOwner);
     dom.activeAlbumTitle.textContent = album.title || "Untitled album";
+    dom.activeAlbumOwner.hidden = false;
+    dom.activeAlbumOwner.textContent = `By ${ownerName}`;
     dom.activeAlbumVisibility.hidden = false;
     dom.activeAlbumVisibility.textContent = album.visibility || "private";
     dom.albumViewState.textContent = "";
@@ -597,6 +603,8 @@ function clearAlbumView() {
         unsubscribeEntries = null;
     }
     dom.activeAlbumTitle.textContent = "Open an album";
+    dom.activeAlbumOwner.hidden = true;
+    dom.activeAlbumOwner.textContent = "";
     dom.activeAlbumVisibility.hidden = true;
     dom.albumControls.hidden = true;
     dom.ownerEditorSection.hidden = true;
@@ -666,4 +674,35 @@ function applyViewerColumns(value) {
     }
     const cols = normalizeViewerColumns(value);
     dom.entryGridViewer.style.setProperty("--viewer-columns", String(cols));
+}
+
+async function resolveAlbumOwnerName(album, isOwner) {
+    const inlineName = toDisplayText(album?.ownerDisplayName, "").trim();
+    if (inlineName) {
+        return inlineName;
+    }
+
+    if (isOwner && currentUser) {
+        const selfName = toDisplayText(currentUser.displayName || currentUser.email, "").trim();
+        if (selfName) {
+            return selfName;
+        }
+    }
+
+    if (album?.ownerUid) {
+        try {
+            const ownerSnap = await getDoc(doc(db, "users", album.ownerUid));
+            if (ownerSnap.exists()) {
+                const ownerData = ownerSnap.data() || {};
+                const fetchedName = toDisplayText(ownerData.displayName || ownerData.email, "").trim();
+                if (fetchedName) {
+                    return fetchedName;
+                }
+            }
+        } catch (_error) {
+            // fall back below when owner lookup is unavailable
+        }
+    }
+
+    return "Album owner";
 }
