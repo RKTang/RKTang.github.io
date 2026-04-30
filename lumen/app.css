@@ -42,7 +42,7 @@ body.modal-open {
     margin-top: 0.8rem;
     display: flex;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.7rem;
     flex-wrap: wrap;
 }
 
@@ -82,7 +82,7 @@ button:hover {
     margin: 1rem auto 2rem;
     padding: 0;
     display: grid;
-    grid-template-columns: 340px 1fr;
+    grid-template-columns: 310px minmax(0, 1fr);
     gap: 1rem;
 }
 
@@ -215,13 +215,64 @@ textarea {
     font-size: 0.95rem;
 }
 
+#album-settings-panel {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 0.7rem;
+}
+
+.album-settings-row {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.5fr) minmax(170px, 1.1fr) auto;
+    gap: 0.7rem;
+    align-items: end;
+}
+
+.album-setting-field {
+    margin: 0;
+}
+
+.album-setting-color {
+    width: fit-content;
+}
+
+.album-settings-dropdown {
+    border: 1px solid #e8dfd3;
+    background: #fffdfa;
+    padding: 0.55rem 0.65rem 0.7rem;
+}
+
+.album-settings-dropdown > summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #2a3c52;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+}
+
+.album-settings-dropdown > summary::-webkit-details-marker {
+    display: none;
+}
+
+.album-settings-dropdown > summary::before {
+    content: "▾";
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.album-settings-dropdown:not([open]) > summary::before {
+    content: "▸";
+}
+
 #album-controls .muted {
     margin: 0;
 }
 
 #album-background-color {
-    width: 3rem;
-    height: 1.7rem;
+    width: 3.3rem;
+    height: 2rem;
     padding: 0.1rem;
 }
 
@@ -247,19 +298,6 @@ textarea {
     background: #2c3e50;
     color: #fff;
     box-shadow: 0 3px 10px rgba(20, 34, 52, 0.2);
-}
-
-.mode-toggle-secondary {
-    background: #f3f6fa;
-    color: #34465e;
-}
-
-.mode-toggle-secondary:hover {
-    background: #e6edf6;
-}
-
-body.owner-settings-collapsed #album-controls {
-    display: none !important;
 }
 
 body.owner-mode-editor .entries-section:first-of-type {
@@ -512,6 +550,14 @@ dialog::backdrop {
 
     .polaroid-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .album-settings-row {
+        grid-template-columns: 1fr;
+    }
+
+    .album-setting-color {
+        width: 100%;
     }
 }
 
