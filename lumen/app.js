@@ -40,7 +40,6 @@ const dom = {
     authStatus: document.getElementById("auth-status"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
-    newAlbumVisibility: document.getElementById("new-album-visibility"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
@@ -54,6 +53,9 @@ const dom = {
     shareUrlText: document.getElementById("share-url-text"),
     photoUploadInput: document.getElementById("photo-upload-input"),
     albumViewState: document.getElementById("album-view-state"),
+    ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
+    showViewerModeBtn: document.getElementById("show-viewer-mode"),
+    showEditorModeBtn: document.getElementById("show-editor-mode"),
     entryGridViewer: document.getElementById("entry-grid-viewer"),
     ownerEditorSection: document.getElementById("owner-editor-section"),
     entryGridEditor: document.getElementById("entry-grid-editor"),
@@ -96,6 +98,8 @@ function initialize() {
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
+    dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
+    dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
     setupViewerModalInteractions();
 
     onAuthStateChanged(auth, async (user) => {
@@ -222,12 +226,11 @@ async function handleCreateAlbum(event) {
     if (!title) {
         return;
     }
-    const visibility = dom.newAlbumVisibility.value;
     const albumRef = await addDoc(collection(db, "albums"), {
         ownerUid: currentUser.uid,
         ownerDisplayName: currentUser.displayName || currentUser.email || "",
         title,
-        visibility,
+        visibility: "private",
         viewerColumns: 3,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
@@ -272,6 +275,12 @@ async function openAlbum(albumId) {
     dom.albumViewState.textContent = "";
     dom.albumControls.hidden = !isOwnerViewing;
     dom.ownerEditorSection.hidden = !isOwnerViewing;
+    dom.ownerViewModeToggle.hidden = !isOwnerViewing;
+    if (isOwnerViewing) {
+        setOwnerViewMode("viewer");
+    } else {
+        document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
+    }
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
@@ -607,10 +616,12 @@ function clearAlbumView() {
     dom.activeAlbumOwner.textContent = "";
     dom.activeAlbumVisibility.hidden = true;
     dom.albumControls.hidden = true;
+    dom.ownerViewModeToggle.hidden = true;
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
     document.body.classList.remove("viewer-only");
+    document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
     applyViewerColumns(3);
@@ -705,4 +716,12 @@ async function resolveAlbumOwnerName(album, isOwner) {
     }
 
     return "Album owner";
+}
+
+function setOwnerViewMode(mode) {
+    const normalized = mode === "editor" ? "editor" : "viewer";
+    document.body.classList.toggle("owner-mode-editor", normalized === "editor");
+    document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
+    dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
+    dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
 }

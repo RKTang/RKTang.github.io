@@ -29,13 +29,6 @@
                     Album title
                     <input id="new-album-title" type="text" maxlength="120" placeholder="Summer Memories" required>
                 </label>
-                <label>
-                    Visibility
-                    <select id="new-album-visibility">
-                        <option value="private">Private</option>
-                        <option value="public">Public</option>
-                    </select>
-                </label>
                 <button type="submit">Create album</button>
             </form>
             <p id="album-list-empty" class="muted">Sign in to create and manage albums.</p>
@@ -84,6 +77,11 @@
             <p id="album-view-state" class="muted">
                 Select an album to view entries, or open a shared public link.
             </p>
+
+            <div id="owner-view-mode-toggle" class="owner-view-mode-toggle" hidden>
+                <button id="show-viewer-mode" type="button" class="mode-toggle-btn is-active">Viewer</button>
+                <button id="show-editor-mode" type="button" class="mode-toggle-btn">Editor</button>
+            </div>
 
             <section class="entries-section">
                 <h3 class="viewer-title">Journal viewer</h3>
