@@ -60,6 +60,7 @@ function openPolaroid(card) {
     }
 
     modal.showModal();
+    document.body.classList.add("modal-open");
 }
 
 cards.forEach((card) => {
@@ -143,6 +144,7 @@ modal.addEventListener("click", (event) => {
 });
 
 modal.addEventListener("close", () => {
+    document.body.classList.remove("modal-open");
     if (modalCard) {
         modalCard.classList.remove("is-flipped");
         modalCard.style.setProperty("--card-tilt-x", "0deg");
