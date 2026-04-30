@@ -45,28 +45,32 @@
             </div>
 
             <div id="album-controls" class="stack" hidden>
-                <label>
-                    Album visibility
-                    <select id="album-visibility-select">
-                        <option value="private">Private</option>
-                        <option value="public">Public</option>
-                    </select>
-                </label>
-                <label>
-                    Album background
-                    <input id="album-background-color" type="color" value="#f1ece4">
-                </label>
-                <label>
-                    Viewer columns
-                    <select id="album-viewer-columns">
-                        <option value="1">1 column</option>
-                        <option value="2">2 columns</option>
-                        <option value="3" selected>3 columns</option>
-                        <option value="4">4 columns</option>
-                        <option value="5">5 columns</option>
-                    </select>
-                </label>
-                <button id="save-album-settings" type="button">Save album settings</button>
+                <div id="album-settings-panel" class="album-settings-panel">
+                    <div class="album-settings-row">
+                        <label class="album-setting-field">
+                            Album visibility
+                            <select id="album-visibility-select">
+                                <option value="private">Private</option>
+                                <option value="public">Public</option>
+                            </select>
+                        </label>
+                        <label class="album-setting-field album-setting-color">
+                            Album background
+                            <input id="album-background-color" type="color" value="#f1ece4">
+                        </label>
+                        <label class="album-setting-field">
+                            Viewer columns
+                            <select id="album-viewer-columns">
+                                <option value="1">1 column</option>
+                                <option value="2">2 columns</option>
+                                <option value="3" selected>3 columns</option>
+                                <option value="4">4 columns</option>
+                                <option value="5">5 columns</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button id="save-album-settings" type="button">Save album settings</button>
+                </div>
                 <p class="muted" id="share-url-text"></p>
                 <label>
                     Upload photos (metadata auto-filled when available)
