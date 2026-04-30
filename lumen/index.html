@@ -56,6 +56,10 @@
                         <option value="public">Public</option>
                     </select>
                 </label>
+                <label>
+                    Album background
+                    <input id="album-background-color" type="color" value="#f1ece4">
+                </label>
                 <button id="save-album-settings" type="button">Save album settings</button>
                 <p class="muted" id="share-url-text"></p>
                 <label>
@@ -68,14 +72,23 @@
                 Select an album to view entries, or open a shared public link.
             </p>
 
-            <div id="entry-grid" class="entry-grid"></div>
+            <section class="entries-section">
+                <h3>Journal viewer</h3>
+                <div id="entry-grid-viewer" class="entry-grid viewer-grid"></div>
+            </section>
+
+            <section id="owner-editor-section" class="entries-section" hidden>
+                <h3>Owner editor</h3>
+                <p class="muted">Edit story, location, and date/time for each entry.</p>
+                <div id="entry-grid-editor" class="entry-grid editor-grid"></div>
+            </section>
         </section>
     </main>
 
-    <template id="entry-template">
-        <article class="entry-card">
-            <img class="entry-image" alt="">
-            <div class="entry-fields stack">
+    <template id="entry-editor-template">
+        <article class="entry-editor-card">
+            <img class="entry-editor-image" alt="">
+            <div class="entry-editor-fields stack">
                 <label>
                     Story
                     <textarea class="entry-story" rows="3"></textarea>
@@ -85,7 +98,7 @@
                     <input class="entry-location" type="text">
                 </label>
                 <label>
-                    Date
+                    Date / Time
                     <input class="entry-date" type="text">
                 </label>
                 <div class="entry-meta muted"></div>
