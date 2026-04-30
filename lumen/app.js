@@ -47,12 +47,15 @@ const dom = {
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
+    albumBackgroundColor: document.getElementById("album-background-color"),
     saveAlbumSettings: document.getElementById("save-album-settings"),
     shareUrlText: document.getElementById("share-url-text"),
     photoUploadInput: document.getElementById("photo-upload-input"),
     albumViewState: document.getElementById("album-view-state"),
-    entryGrid: document.getElementById("entry-grid"),
-    entryTemplate: document.getElementById("entry-template")
+    entryGridViewer: document.getElementById("entry-grid-viewer"),
+    ownerEditorSection: document.getElementById("owner-editor-section"),
+    entryGridEditor: document.getElementById("entry-grid-editor"),
+    entryEditorTemplate: document.getElementById("entry-editor-template")
 };
 
 let app = null;
@@ -249,8 +252,11 @@ async function openAlbum(albumId) {
     dom.activeAlbumVisibility.textContent = album.visibility || "private";
     dom.albumViewState.textContent = "";
     dom.albumControls.hidden = !isOwnerViewing;
+    dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.albumVisibilitySelect.value = album.visibility || "private";
+    dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
     dom.shareUrlText.textContent = `Share URL: ${window.location.origin}${window.location.pathname}?album=${album.id}`;
+    applyAlbumBackground(album.pageBackground);
     history.replaceState(null, "", `?album=${album.id}`);
 
     subscribeEntries(album.id);
@@ -268,16 +274,38 @@ function subscribeEntries(albumId) {
 }
 
 function renderEntries(entries) {
-    dom.entryGrid.innerHTML = "";
+    dom.entryGridViewer.innerHTML = "";
+    dom.entryGridEditor.innerHTML = "";
     if (!entries.length) {
         dom.albumViewState.textContent = isOwnerViewing
             ? "No photos yet. Upload one or more images to start this album."
             : "No photos in this album yet.";
+    } else {
+        dom.albumViewState.textContent = "";
     }
 
     entries.forEach((entry) => {
-        const node = dom.entryTemplate.content.firstElementChild.cloneNode(true);
-        const img = node.querySelector(".entry-image");
+        const viewerNode = document.createElement("article");
+        viewerNode.className = "journal-card";
+        viewerNode.innerHTML = `
+            <img class="journal-image" alt="">
+            <div class="journal-meta">
+                <p>${escapeHtml(entry.storyText || "No story yet.")}</p>
+                <p><strong>Location:</strong> ${escapeHtml(entry.locationText || "Not set")}</p>
+                <p><strong>Date:</strong> ${escapeHtml(entry.captureDate || "Not set")}</p>
+            </div>
+        `;
+        const viewerImg = viewerNode.querySelector(".journal-image");
+        viewerImg.src = entry.photoUrl;
+        viewerImg.alt = entry.storyText ? `Album entry: ${entry.storyText}` : "Album entry";
+        dom.entryGridViewer.appendChild(viewerNode);
+
+        if (!isOwnerViewing) {
+            return;
+        }
+
+        const node = dom.entryEditorTemplate.content.firstElementChild.cloneNode(true);
+        const img = node.querySelector(".entry-editor-image");
         const storyEl = node.querySelector(".entry-story");
         const locEl = node.querySelector(".entry-location");
         const dateEl = node.querySelector(".entry-date");
@@ -291,13 +319,6 @@ function renderEntries(entries) {
         locEl.value = entry.locationText || "";
         dateEl.value = entry.captureDate || "";
         metaEl.textContent = `Entry ID: ${entry.id}`;
-
-        const disabled = !isOwnerViewing;
-        storyEl.disabled = disabled;
-        locEl.disabled = disabled;
-        dateEl.disabled = disabled;
-        saveBtn.hidden = disabled;
-        delBtn.hidden = disabled;
 
         saveBtn.addEventListener("click", async () => {
             await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
@@ -324,7 +345,7 @@ function renderEntries(entries) {
             await touchAlbumUpdatedAt(activeAlbum.id);
         });
 
-        dom.entryGrid.appendChild(node);
+        dom.entryGridEditor.appendChild(node);
     });
 }
 
@@ -333,12 +354,16 @@ async function handleSaveAlbumSettings() {
         return;
     }
     const visibility = dom.albumVisibilitySelect.value;
+    const pageBackground = normalizeColor(dom.albumBackgroundColor.value || "#f1ece4");
     await updateDoc(doc(db, "albums", activeAlbum.id), {
         visibility,
+        pageBackground,
         updatedAt: serverTimestamp()
     });
     activeAlbum.visibility = visibility;
+    activeAlbum.pageBackground = pageBackground;
     dom.activeAlbumVisibility.textContent = visibility;
+    applyAlbumBackground(pageBackground);
 }
 
 async function handleUploadPhotos(event) {
@@ -429,8 +454,11 @@ function clearAlbumView() {
     dom.activeAlbumTitle.textContent = "Open an album";
     dom.activeAlbumVisibility.hidden = true;
     dom.albumControls.hidden = true;
-    dom.entryGrid.innerHTML = "";
+    dom.ownerEditorSection.hidden = true;
+    dom.entryGridViewer.innerHTML = "";
+    dom.entryGridEditor.innerHTML = "";
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
+    applyAlbumBackground("");
 }
 
 function escapeHtml(value) {
@@ -440,4 +468,17 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll("\"", "&quot;")
         .replaceAll("'", "&#39;");
+}
+
+function applyAlbumBackground(color) {
+    const normalized = normalizeColor(color || "#f1ece4");
+    document.body.style.background = normalized;
+}
+
+function normalizeColor(value) {
+    if (typeof value !== "string") {
+        return "#f1ece4";
+    }
+    const trimmed = value.trim();
+    return /^#[0-9a-fA-F]{6}$/.test(trimmed) ? trimmed : "#f1ece4";
 }
