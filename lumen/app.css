@@ -104,7 +104,7 @@ body.viewer-only #owner-view-mode-toggle {
     background: #fff;
     border: 1px solid #ece6dd;
     border-radius: 0;
-    padding: 1rem;
+    padding: 1.1rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
@@ -177,6 +177,7 @@ textarea {
     background: rgba(255, 253, 248, 0.85);
     border: 1px solid #e8dfd3;
     padding: 0.5rem 0.7rem;
+    margin-bottom: 0.8rem;
 }
 
 .panel-heading-text {
@@ -194,22 +195,58 @@ textarea {
     font-size: 0.92rem;
 }
 
+.entries-section {
+    margin-top: 0.8rem;
+}
+
+.entries-section:first-of-type {
+    margin-top: 0.4rem;
+}
+
+#album-controls {
+    margin-top: 0.6rem;
+    padding: 0.85rem;
+    border: 1px solid #e8dfd3;
+    background: rgba(255, 253, 248, 0.78);
+    gap: 0.75rem;
+}
+
+#album-controls label {
+    font-size: 0.95rem;
+}
+
+#album-controls .muted {
+    margin: 0;
+}
+
+#album-background-color {
+    width: 3rem;
+    height: 1.7rem;
+    padding: 0.1rem;
+}
+
 .owner-view-mode-toggle {
     display: flex;
     gap: 0.55rem;
-    margin-top: 0.9rem;
+    margin: 0.8rem 0 0.25rem;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: #e9eef4;
+    width: fit-content;
 }
 
 .mode-toggle-btn {
-    border-radius: 999px;
-    background: #d9e0ea;
+    border-radius: 999px !important;
+    background: transparent;
     color: #22364d;
     padding: 0.45rem 0.9rem;
+    transition: background 120ms ease, color 120ms ease;
 }
 
 .mode-toggle-btn.is-active {
     background: #2c3e50;
     color: #fff;
+    box-shadow: 0 3px 10px rgba(20, 34, 52, 0.2);
 }
 
 body.owner-mode-editor .entries-section:first-of-type {
@@ -245,7 +282,8 @@ body.owner-mode-viewer #owner-editor-section {
     display: grid;
     grid-template-columns: repeat(var(--viewer-columns, 3), minmax(0, 1fr));
     gap: 1.25rem;
-    max-width: 1100px;
+    width: 100%;
+    max-width: 100%;
     padding: 0.8rem 0 1.6rem;
     margin: 0;
 }
@@ -285,8 +323,8 @@ dialog {
     border-radius: 0;
     padding: 0.8rem;
     width: auto;
-    max-width: 92vw;
-    max-height: 90vh;
+    max-width: 96vw;
+    max-height: 94vh;
     margin: 0;
     overflow: visible;
     perspective: 1200px;
@@ -314,7 +352,7 @@ dialog::backdrop {
     display: grid;
     gap: 0.85rem;
     width: fit-content;
-    max-width: min(88vw, 760px);
+    max-width: min(94vw, 980px);
     position: relative;
     border-radius: 0;
     background: #fff;
@@ -328,7 +366,7 @@ dialog::backdrop {
 
 .modal-flip {
     position: relative;
-    width: min(62vw, 500px, calc(58vh * var(--photo-ratio-num, 0.8)));
+    width: min(84vw, 920px, calc(76vh * var(--photo-ratio-num, 0.8)));
     aspect-ratio: var(--photo-ratio, 4 / 5);
     transform-style: preserve-3d;
     transform: rotateY(0deg);
