@@ -372,8 +372,12 @@ function renderAlbumList(albums, ownedQuery) {
         card.innerHTML = `
             <div class="album-item-inner">
                 <button type="button" class="album-item-open">
-                    <span class="album-item-title">${titleHtml}</span>
-                    ${visHtml}
+                    <span class="album-item-text">
+                        <span class="album-item-title-row">
+                            <span class="album-item-title">${titleHtml}</span>
+                            ${visHtml}
+                        </span>
+                    </span>
                 </button>
                 ${deleteBtnHtml}
             </div>
@@ -389,6 +393,7 @@ function renderAlbumList(albums, ownedQuery) {
         dom.albumList.appendChild(card);
     });
 }
+
 
 async function handleCreateAlbum(event) {
     event.preventDefault();

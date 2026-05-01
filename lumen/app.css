@@ -87,7 +87,7 @@ button:hover {
 }
 
 body.viewer-only .layout {
-    max-width: 1120px;
+    max-width: 1100px;
     grid-template-columns: 1fr;
 }
 
@@ -262,9 +262,7 @@ textarea {
 .album-item-open {
     flex: 1;
     min-width: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
+    display: inline-block;
     margin: 0;
     padding: 0.2rem 0.15rem;
     border: 0;
@@ -282,6 +280,18 @@ textarea {
     color: inherit;
     box-shadow: none;
     outline: none;
+}
+
+.album-item-text {
+    display: block;
+    min-width: 0;
+}
+
+.album-item-title-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
 }
 
 .album-item-title {
