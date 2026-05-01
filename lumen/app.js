@@ -87,6 +87,7 @@ let activeAlbum = null;
 let unsubscribeEntries = null;
 let unsubscribeAlbums = null;
 let isOwnerViewing = false;
+let isGuestSignInAvailable = true;
 
 if (!hasFirebaseConfig) {
     dom.authStatus.textContent = "Firebase is not configured yet. Update lumen/firebase-config.js to start.";
@@ -177,6 +178,15 @@ async function handleGuestSignIn() {
     try {
         await signInAnonymously(auth);
     } catch (error) {
+        const code = error?.code || "";
+        const anonDisabled =
+            code === "auth/admin-restricted-operation" || code === "auth/operation-not-allowed";
+        if (anonDisabled) {
+            isGuestSignInAvailable = false;
+            updateAuthUI();
+            dom.authStatus.textContent = "Guest mode is disabled in Firebase Auth. Use Google sign-in.";
+            return;
+        }
         dom.authStatus.textContent = `Guest sign-in failed: ${error.message}`;
     }
 }
@@ -215,12 +225,14 @@ function updateAuthUI() {
     const loggedIn = Boolean(currentUser);
     const isGuest = Boolean(currentUser?.isAnonymous);
     dom.signInBtn.hidden = loggedIn;
-    dom.guestSignInBtn.hidden = loggedIn;
+    dom.guestSignInBtn.hidden = loggedIn || !isGuestSignInAvailable;
     dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
     if (!loggedIn) {
-        dom.authStatus.textContent = "Sign in with Google or continue as guest to create albums.";
+        dom.authStatus.textContent = isGuestSignInAvailable
+            ? "Sign in with Google or continue as guest to create albums."
+            : "Sign in with Google to create albums.";
         return;
     }
 
@@ -667,8 +679,7 @@ async function handleSaveAlbumSettings() {
     activeAlbum.visibility = visibility;
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
-    dom.activeAlbumVisibility.textContent = visibility === "public" ? "🌐" : "🔒";
-    dom.activeAlbumVisibility.setAttribute("aria-label", visibility === "public" ? "Public album" : "Private album");
+    setActiveAlbumVisibilityPill(visibility);
     setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
