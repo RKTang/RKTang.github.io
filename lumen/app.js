@@ -90,7 +90,7 @@ let isOwnerViewing = false;
 let isGuestSignInAvailable = true;
 
 if (!hasFirebaseConfig) {
-    dom.authStatus.textContent = "Firebase is not configured yet. Update lumen/firebase-config.js to start.";
+    setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
     dom.signInBtn.disabled = true;
 } else {
     app = initializeApp(firebaseConfig);
@@ -165,7 +165,10 @@ async function handleSignIn() {
     try {
         await signInWithPopup(auth, provider);
     } catch (error) {
-        dom.authStatus.textContent = `Sign-in failed: ${error.message}`;
+        const friendly = getAuthErrorMessage(error, "sign-in");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
 }
 
@@ -184,10 +187,13 @@ async function handleGuestSignIn() {
         if (anonDisabled) {
             isGuestSignInAvailable = false;
             updateAuthUI();
-            dom.authStatus.textContent = "Guest mode is disabled in Firebase Auth. Use Google sign-in.";
+            setAuthStatus("Guest mode is disabled in Firebase Auth. Use Google sign-in.", "error");
             return;
         }
-        dom.authStatus.textContent = `Guest sign-in failed: ${error.message}`;
+        const friendly = getAuthErrorMessage(error, "guest-sign-in");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
 }
 
@@ -198,10 +204,38 @@ async function handleLinkAccount() {
     const provider = new GoogleAuthProvider();
     try {
         await linkWithPopup(currentUser, provider);
-        dom.authStatus.textContent = "Guest account linked to Google.";
+        setAuthStatus("Guest account linked to Google.", "success");
     } catch (error) {
-        dom.authStatus.textContent = `Link account failed: ${error.message}`;
+        const friendly = getAuthErrorMessage(error, "link-account");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
+}
+
+function setAuthStatus(message, type = "info") {
+    dom.authStatus.textContent = message;
+    dom.authStatus.classList.remove("is-error", "is-success", "is-info");
+    dom.authStatus.classList.add(
+        type === "error" ? "is-error" : type === "success" ? "is-success" : "is-info"
+    );
+}
+
+function getAuthErrorMessage(error, action) {
+    const code = error?.code || "";
+    if (code === "auth/popup-closed-by-user") {
+        if (action === "link-account") {
+            return { message: "Link account canceled.", type: "info" };
+        }
+        return { message: "Sign-in canceled.", type: "info" };
+    }
+    if (code === "auth/popup-blocked") {
+        return { message: "Popup blocked by browser. Allow popups and try again.", type: "error" };
+    }
+    if (code === "auth/network-request-failed") {
+        return { message: "Network error. Check your connection and try again.", type: "error" };
+    }
+    return { message: `Authentication failed. ${error?.message || "Please try again."}`, type: "error" };
 }
 
 async function ensureUserDoc(user) {
@@ -230,18 +264,21 @@ function updateAuthUI() {
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
     if (!loggedIn) {
-        dom.authStatus.textContent = isGuestSignInAvailable
-            ? "Sign in with Google or continue as guest to create albums."
-            : "Sign in with Google to create albums.";
+        setAuthStatus(
+            isGuestSignInAvailable
+                ? "Sign in with Google or continue as guest to create albums."
+                : "Sign in with Google to create albums.",
+            "info"
+        );
         return;
     }
 
     if (isGuest) {
-        dom.authStatus.textContent = "Signed in as Guest. Link account to keep long-term access.";
+        setAuthStatus("Signed in as Guest. Link account to keep long-term access.", "info");
         return;
     }
 
-    dom.authStatus.textContent = `Signed in as ${currentUser.displayName || currentUser.email}`;
+    setAuthStatus(`Signed in as ${currentUser.displayName || currentUser.email}`, "success");
 }
 
 function subscribeAlbumList() {
