@@ -66,6 +66,8 @@ const dom = {
     ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
     showViewerModeBtn: document.getElementById("show-viewer-mode"),
     showEditorModeBtn: document.getElementById("show-editor-mode"),
+    viewerSectionTitle: document.getElementById("viewer-section-title"),
+    editorSectionTitle: document.getElementById("editor-section-title"),
     entryGridViewer: document.getElementById("entry-grid-viewer"),
     ownerEditorSection: document.getElementById("owner-editor-section"),
     entryGridEditor: document.getElementById("entry-grid-editor"),
@@ -538,7 +540,7 @@ async function openAlbum(albumId) {
     dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.ownerViewModeToggle.hidden = !isOwnerViewing;
     if (isOwnerViewing) {
-        setOwnerViewMode("viewer");
+        setOwnerViewMode("editor");
         if (dom.albumSettingsDropdown) {
             dom.albumSettingsDropdown.open = true;
         }
@@ -592,6 +594,15 @@ function renderEntries(entries) {
         const locationCoords = toDisplayText(entry.locationCoords, "");
         const locationCityState = toDisplayText(entry.locationCityState, "");
         const captureDate = toDisplayText(entry.captureDate, "");
+        const locationMode = activeAlbum?.locationDisplayMode || "city-state";
+        const dateMode = activeAlbum?.dateDisplayMode || "date-time";
+        const formattedLocation = formatLocationForDisplay(
+            locationText || "Not set",
+            locationCoords,
+            locationCityState,
+            locationMode
+        );
+        const formattedDate = formatCaptureDateForDisplay(captureDate || "Not set", dateMode);
 
         const viewerNode = document.createElement("button");
         viewerNode.type = "button";
@@ -624,8 +635,8 @@ function renderEntries(entries) {
         img.src = entry.photoUrl;
         img.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
         storyEl.value = storyText;
-        locEl.value = locationText;
-        dateEl.value = captureDate;
+        locEl.value = formattedLocation === "Not set" ? "" : formattedLocation;
+        dateEl.value = formattedDate === "Not set" ? "" : formattedDate;
 
         saveBtn.addEventListener("click", async () => {
             await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
@@ -1264,6 +1275,12 @@ function setOwnerViewMode(mode) {
     document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
     dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
     dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
+    if (dom.viewerSectionTitle) {
+        dom.viewerSectionTitle.textContent = "Viewing Journal";
+    }
+    if (dom.editorSectionTitle) {
+        dom.editorSectionTitle.textContent = "Editing Journal";
+    }
 }
 
 async function handleCopyShareUrl() {
