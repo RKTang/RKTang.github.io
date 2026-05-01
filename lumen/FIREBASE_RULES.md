@@ -20,6 +20,11 @@ service cloud.firestore {
       allow read, write: if isOwner(uid);
     }
 
+    // Bookmarks for albums opened via shared/public links (not covered by the parent `users/{uid}` rule).
+    match /users/{uid}/sharedAlbums/{docId} {
+      allow read, write: if isOwner(uid);
+    }
+
     match /albums/{albumId} {
       allow read: if resource.data.visibility == "public" || isOwner(resource.data.ownerUid);
       allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;

@@ -104,6 +104,7 @@ let isGuestSignInAvailable = true;
 let albumSettingsSaveTimer = null;
 let albumSettingsStatusTimer = null;
 const entryAutoSaveTimers = new Map();
+const SAVE_SHARED_BTN_DEFAULT = "+ Save to shared";
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -593,6 +594,7 @@ async function openAlbum(albumId) {
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
     updateSubtitleVisibility(Boolean(currentUser));
     dom.backToListBtn.hidden = false;
+    dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
     dom.saveSharedBtn.hidden = !currentUser || isOwnerViewing;
 
     const ownerName = await resolveAlbumOwnerName(album, isOwner);
@@ -644,22 +646,36 @@ async function handleSaveSharedAlbum() {
     if (!currentUser || !activeAlbum || isOwnerViewing) {
         return;
     }
-    await setDoc(
-        doc(db, "users", currentUser.uid, "sharedAlbums", activeAlbum.id),
-        {
-            albumId: activeAlbum.id,
-            title: activeAlbum.title || "Untitled album",
-            savedAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-        },
-        { merge: true }
-    );
-    dom.saveSharedBtn.textContent = "Saved";
-    setTimeout(() => {
-        if (dom.saveSharedBtn) {
-            dom.saveSharedBtn.textContent = "Save to shared";
-        }
-    }, 1000);
+    dom.saveSharedBtn.disabled = true;
+    try {
+        await ensureUserDoc(currentUser);
+        await setDoc(
+            doc(db, "users", currentUser.uid, "sharedAlbums", activeAlbum.id),
+            {
+                albumId: activeAlbum.id,
+                title: activeAlbum.title || "Untitled album",
+                savedAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            },
+            { merge: true }
+        );
+        dom.saveSharedBtn.textContent = "Saved";
+        setTimeout(() => {
+            if (dom.saveSharedBtn) {
+                dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
+            }
+        }, 1200);
+    } catch (error) {
+        console.warn("Save to shared failed", error);
+        const code = error?.code || "";
+        const message =
+            code === "permission-denied"
+                ? "Could not save to Shared with me. Firestore rules must allow users/{uid}/sharedAlbums — see lumen/FIREBASE_RULES.md."
+                : "Could not save to Shared with me. Try again.";
+        setAuthStatus(message, "error");
+    } finally {
+        dom.saveSharedBtn.disabled = false;
+    }
 }
 
 function handleBackToList() {
@@ -730,7 +746,7 @@ function renderEntries(entries) {
         const storyEl = node.querySelector(".entry-story");
         const locEl = node.querySelector(".entry-location");
         const dateEl = node.querySelector(".entry-date");
-        const saveBtn = node.querySelector(".entry-save");
+        const saveStatusEl = node.querySelector(".entry-save-status");
         const delBtn = node.querySelector(".entry-delete");
         delBtn.innerHTML = iconSvgTrash();
 
@@ -740,20 +756,32 @@ function renderEntries(entries) {
         locEl.value = formattedLocation === "Not set" ? "" : formattedLocation;
         dateEl.value = formattedDate === "Not set" ? "" : formattedDate;
 
+        const setEntrySaveStatus = (text, kind = "") => {
+            saveStatusEl.textContent = text;
+            saveStatusEl.classList.remove("is-saving", "is-saved", "is-error");
+            if (kind) {
+                saveStatusEl.classList.add(`is-${kind}`);
+            }
+        };
+
         const saveEntryChanges = async () => {
-            await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
-                storyText: storyEl.value.trim(),
-                locationText: locEl.value.trim(),
-                captureDate: dateEl.value.trim(),
-                updatedAt: serverTimestamp()
-            });
-            await touchAlbumUpdatedAt(activeAlbum.id);
-            saveBtn.textContent = "Saved";
-            setTimeout(() => {
-                if (saveBtn.isConnected) {
-                    saveBtn.textContent = "Save";
-                }
-            }, 900);
+            try {
+                await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
+                    storyText: storyEl.value.trim(),
+                    locationText: locEl.value.trim(),
+                    captureDate: dateEl.value.trim(),
+                    updatedAt: serverTimestamp()
+                });
+                await touchAlbumUpdatedAt(activeAlbum.id);
+                setEntrySaveStatus("Saved", "saved");
+                setTimeout(() => {
+                    if (saveStatusEl.isConnected) {
+                        setEntrySaveStatus("", "");
+                    }
+                }, 1600);
+            } catch (_error) {
+                setEntrySaveStatus("Could not save. Try again.", "error");
+            }
         };
 
         const queueEntryAutoSave = () => {
@@ -761,22 +789,30 @@ function renderEntries(entries) {
             if (existingTimer) {
                 clearTimeout(existingTimer);
             }
-            saveBtn.textContent = "Saving...";
+            setEntrySaveStatus("Saving…", "saving");
             const timer = setTimeout(async () => {
                 entryAutoSaveTimers.delete(entry.id);
-                try {
-                    await saveEntryChanges();
-                } catch (_error) {
-                    saveBtn.textContent = "Save";
-                }
+                await saveEntryChanges();
             }, 450);
             entryAutoSaveTimers.set(entry.id, timer);
         };
 
-        saveBtn.addEventListener("click", saveEntryChanges);
+        const flushPendingEntrySave = () => {
+            const existingTimer = entryAutoSaveTimers.get(entry.id);
+            if (!existingTimer) {
+                return;
+            }
+            clearTimeout(existingTimer);
+            entryAutoSaveTimers.delete(entry.id);
+            saveEntryChanges();
+        };
+
         storyEl.addEventListener("input", queueEntryAutoSave);
         locEl.addEventListener("input", queueEntryAutoSave);
         dateEl.addEventListener("input", queueEntryAutoSave);
+        storyEl.addEventListener("blur", flushPendingEntrySave);
+        locEl.addEventListener("blur", flushPendingEntrySave);
+        dateEl.addEventListener("blur", flushPendingEntrySave);
 
         delBtn.addEventListener("click", async () => {
             if (!confirm("Delete this photo entry?")) {
@@ -1161,7 +1197,7 @@ function clearAlbumView() {
     dom.ownerViewModeToggle.hidden = true;
     dom.backToListBtn.hidden = true;
     dom.saveSharedBtn.hidden = true;
-    dom.saveSharedBtn.textContent = "Save to shared";
+    dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
