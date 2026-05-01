@@ -156,6 +156,10 @@ textarea {
     background: #edf4ff;
 }
 
+.auth-banner[hidden] {
+    display: none !important;
+}
+
 .auth-status {
     margin: 0;
     min-height: 1rem;
@@ -1059,12 +1063,28 @@ dialog::backdrop {
 }
 
 .entry-actions {
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
 }
 
-.entry-save {
-    width: 100%;
-    border-radius: 10px !important;
+.entry-save-status {
+    display: block;
+    min-height: 1.2rem;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #5a6570;
+    transition: color 0.15s ease;
+}
+
+.entry-save-status.is-saving {
+    color: #2c5282;
+}
+
+.entry-save-status.is-saved {
+    color: #276749;
+}
+
+.entry-save-status.is-error {
+    color: #8a2d2d;
 }
 
 .entry-delete {
