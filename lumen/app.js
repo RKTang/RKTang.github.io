@@ -44,12 +44,12 @@ const dom = {
     authStatus: document.getElementById("auth-status"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
-    newAlbumToggleBtn: document.getElementById("new-album-toggle-btn"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
     activeAlbumOwner: document.getElementById("active-album-owner"),
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
+    deleteAlbumBtn: document.getElementById("delete-album-btn"),
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
     albumBackgroundColor: document.getElementById("album-background-color"),
@@ -106,7 +106,7 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
-    dom.newAlbumToggleBtn.addEventListener("click", toggleNewAlbumForm);
+    dom.deleteAlbumBtn.addEventListener("click", handleDeleteAlbum);
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
@@ -220,15 +220,11 @@ function updateAuthUI() {
     dom.guestSignInBtn.hidden = loggedIn;
     dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
-    dom.newAlbumToggleBtn.hidden = !loggedIn;
+    dom.newAlbumForm.hidden = !loggedIn;
     if (!loggedIn) {
-        dom.newAlbumForm.hidden = true;
-        dom.newAlbumToggleBtn.setAttribute("aria-expanded", "false");
         dom.authStatus.textContent = "Sign in with Google or continue as guest to create albums.";
         return;
     }
-
-    dom.newAlbumToggleBtn.setAttribute("aria-expanded", dom.newAlbumForm.hidden ? "false" : "true");
 
     if (isGuest) {
         dom.authStatus.textContent = "Signed in as Guest. Link account to keep long-term access.";
@@ -293,12 +289,15 @@ function renderAlbumList(albums, ownedQuery) {
             card.classList.add("active");
         }
         const owned = currentUser && album.ownerUid === currentUser.uid;
+        const visibility = (album.visibility || "private").toLowerCase();
+        const visibilityIcon = visibility === "public" ? "🌐" : "🔒";
+        const visibilityLabel = visibility === "public" ? "Public" : "Private";
         card.tabIndex = 0;
         card.setAttribute("role", "button");
         card.setAttribute("aria-label", `Open album ${album.title || "Untitled album"}`);
         card.innerHTML = `
             <p class="album-item-title">${escapeHtml(album.title || "Untitled album")}</p>
-            <p class="muted">${owned ? "Owned by you" : "Public album"} · ${album.visibility || "private"}</p>
+            <p class="muted">${owned ? "Owned by you" : "Public album"} · <span aria-label="${visibilityLabel}" title="${visibilityLabel}">${visibilityIcon}</span></p>
         `;
         card.addEventListener("click", () => openAlbum(album.id));
         card.addEventListener("keydown", (event) => {
@@ -330,20 +329,7 @@ async function handleCreateAlbum(event) {
         updatedAt: serverTimestamp()
     });
     dom.newAlbumForm.reset();
-    setNewAlbumFormOpen(false);
     await openAlbum(albumRef.id);
-}
-
-function setNewAlbumFormOpen(open) {
-    dom.newAlbumForm.hidden = !open;
-    dom.newAlbumToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) {
-        requestAnimationFrame(() => dom.newAlbumTitle.focus());
-    }
-}
-
-function toggleNewAlbumForm() {
-    setNewAlbumFormOpen(dom.newAlbumForm.hidden);
 }
 
 function handleAlbumBackgroundInput() {
@@ -394,11 +380,13 @@ async function openAlbum(albumId) {
     dom.activeAlbumOwner.hidden = false;
     dom.activeAlbumOwner.textContent = `By ${ownerName}`;
     dom.activeAlbumVisibility.hidden = false;
-    dom.activeAlbumVisibility.textContent = album.visibility || "private";
+    dom.activeAlbumVisibility.textContent = album.visibility === "public" ? "🌐" : "🔒";
+    dom.activeAlbumVisibility.setAttribute("aria-label", album.visibility === "public" ? "Public album" : "Private album");
     dom.albumViewState.textContent = "";
     dom.albumControls.hidden = !isOwnerViewing;
     dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.ownerViewModeToggle.hidden = !isOwnerViewing;
+    dom.deleteAlbumBtn.hidden = !isOwnerViewing;
     if (isOwnerViewing) {
         setOwnerViewMode("viewer");
         if (dom.albumSettingsDropdown) {
@@ -650,10 +638,41 @@ async function handleSaveAlbumSettings() {
     activeAlbum.visibility = visibility;
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
-    dom.activeAlbumVisibility.textContent = visibility;
+    dom.activeAlbumVisibility.textContent = visibility === "public" ? "🌐" : "🔒";
+    dom.activeAlbumVisibility.setAttribute("aria-label", visibility === "public" ? "Public album" : "Private album");
     setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
+}
+
+async function handleDeleteAlbum() {
+    if (!activeAlbum || !isOwnerViewing) {
+        return;
+    }
+    const albumTitle = activeAlbum.title || "this album";
+    if (!confirm(`Delete ${albumTitle}? This permanently removes all photos and entries.`)) {
+        return;
+    }
+
+    const albumId = activeAlbum.id;
+    const entriesRef = collection(db, "albums", albumId, "entries");
+    const entriesSnap = await getDocs(entriesRef);
+    for (const entryDoc of entriesSnap.docs) {
+        const entry = entryDoc.data() || {};
+        if (entry.storagePath) {
+            try {
+                await deleteObject(ref(storage, entry.storagePath));
+            } catch (_error) {
+                // continue cleanup even when storage object is already missing
+            }
+        }
+        await deleteDoc(doc(db, "albums", albumId, "entries", entryDoc.id));
+    }
+
+    await deleteDoc(doc(db, "albums", albumId));
+    clearAlbumView();
+    history.replaceState(null, "", window.location.pathname);
+    subscribeAlbumList();
 }
 
 async function handleUploadPhotos(event) {
@@ -745,7 +764,9 @@ function clearAlbumView() {
     dom.activeAlbumOwner.hidden = true;
     dom.activeAlbumOwner.textContent = "";
     dom.activeAlbumVisibility.hidden = true;
+    dom.activeAlbumVisibility.textContent = "";
     dom.albumControls.hidden = true;
+    dom.deleteAlbumBtn.hidden = true;
     dom.ownerViewModeToggle.hidden = true;
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";

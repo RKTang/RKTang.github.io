@@ -160,29 +160,13 @@ textarea {
 .album-sidebar-header {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+    justify-content: flex-start;
     margin-bottom: 0.55rem;
 }
 
 .album-sidebar-header h2 {
     margin: 0;
     line-height: 1.1;
-}
-
-.btn-new-album {
-    border-radius: 999px !important;
-    background: #eef3f9 !important;
-    color: #27405c !important;
-    padding: 0.42rem 0.85rem !important;
-    font-size: 0.88rem;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.btn-new-album:hover {
-    background: #dde7f3 !important;
 }
 
 .new-album-inline-form {
@@ -266,8 +250,32 @@ textarea {
     gap: 0.12rem;
 }
 
+.panel-heading-title-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
 .panel-heading-text h2 {
     margin: 0;
+}
+
+.delete-album-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px !important;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: #fff1f1 !important;
+    color: #7b2a2a !important;
+    box-shadow: inset 0 0 0 1px #e5c9c9;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.delete-album-btn:hover {
+    background: #ffe5e5 !important;
 }
 
 .active-album-owner {
@@ -329,14 +337,6 @@ textarea {
 .visibility-copy-row select {
     flex: 1;
     min-width: 0;
-}
-
-.album-setting-visibility .share-url-text {
-    margin: 0.35rem 0 0;
-    font-size: 0.82rem;
-    line-height: 1.35;
-    white-space: normal;
-    word-break: break-all;
 }
 
 .album-background-label {
@@ -603,9 +603,13 @@ body.owner-mode-viewer #owner-editor-section {
 .pill {
     border-radius: 999px;
     font-size: 0.82rem;
-    padding: 0.2rem 0.6rem;
+    padding: 0.15rem 0.45rem;
     background: #ece7df;
     color: #2c3e50;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.55rem;
 }
 
 .entry-grid {
