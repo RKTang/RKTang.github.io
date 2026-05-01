@@ -23,17 +23,25 @@
     </header>
 
     <main class="layout">
-        <section class="panel">
-            <h2>Your Albums</h2>
-            <form id="new-album-form" class="stack" hidden>
+        <section class="panel album-sidebar">
+            <div class="album-sidebar-header">
+                <h2>Your albums</h2>
+                <button id="new-album-toggle-btn" type="button" class="btn-new-album" hidden aria-expanded="false">
+                    + New album
+                </button>
+            </div>
+            <form id="new-album-form" class="stack new-album-inline-form" hidden>
                 <label>
                     Album title
                     <input id="new-album-title" type="text" maxlength="120" placeholder="Summer Memories" required>
                 </label>
-                <button type="submit">Create album</button>
+                <div class="new-album-form-actions">
+                    <button type="submit">Create album</button>
+                    <button id="new-album-cancel-btn" type="button" class="btn-text">Cancel</button>
+                </div>
             </form>
             <p id="album-list-empty" class="muted">Sign in to create and manage albums.</p>
-            <div id="album-list" class="album-list"></div>
+            <ul id="album-list" class="album-list" role="list"></ul>
         </section>
 
         <section class="panel">
@@ -42,20 +50,30 @@
                     <h2 id="active-album-title">Open an album</h2>
                     <p id="active-album-owner" class="active-album-owner" hidden></p>
                 </div>
-                <span id="active-album-visibility" class="pill" hidden></span>
+                <div class="panel-heading-trailing">
+                    <span id="active-album-visibility" class="pill" hidden></span>
+                    <div id="owner-view-mode-toggle" class="owner-view-mode-toggle" hidden>
+                        <button id="show-viewer-mode" type="button" class="mode-toggle-btn is-active">Viewer</button>
+                        <button id="show-editor-mode" type="button" class="mode-toggle-btn">Editor</button>
+                    </div>
+                </div>
             </div>
 
-            <div id="album-controls" class="stack" hidden>
+            <div id="album-controls" class="stack album-controls" hidden>
                 <details id="album-settings-dropdown" class="album-settings-dropdown" open>
                     <summary>Album settings</summary>
                     <div id="album-settings-panel" class="album-settings-panel">
                         <div class="album-settings-row">
-                            <label class="album-setting-field">
+                            <label class="album-setting-field album-setting-visibility">
                                 Album visibility
-                                <select id="album-visibility-select">
-                                    <option value="private">Private</option>
-                                    <option value="public">Public</option>
-                                </select>
+                                <div class="visibility-copy-row">
+                                    <select id="album-visibility-select">
+                                        <option value="private">Private</option>
+                                        <option value="public">Public</option>
+                                    </select>
+                                    <button id="copy-share-url" type="button" class="copy-share-btn">Copy link</button>
+                                </div>
+                                <p class="muted share-url-text" id="share-url-text"></p>
                             </label>
                             <label class="album-setting-field">
                                 Viewer columns
@@ -67,32 +85,39 @@
                                     <option value="5">5 columns</option>
                                 </select>
                             </label>
-                            <label class="album-setting-field album-setting-color">
-                                Album background
-                                <input id="album-background-color" type="color" value="#f1ece4">
-                            </label>
+                            <div class="album-setting-field album-setting-background">
+                                <span class="album-background-label">Album background</span>
+                                <div class="album-bg-picker">
+                                    <div id="album-bg-swatches" class="album-bg-swatches" role="group" aria-label="Preset background colors">
+                                        <button type="button" class="album-bg-swatch" data-color="#f1ece4" style="--swatch-color:#f1ece4" title="Warm cream" aria-label="Warm cream"></button>
+                                        <button type="button" class="album-bg-swatch" data-color="#fdf6e3" style="--swatch-color:#fdf6e3" title="Paper" aria-label="Paper"></button>
+                                        <button type="button" class="album-bg-swatch" data-color="#dce8f0" style="--swatch-color:#dce8f0" title="Mist blue" aria-label="Mist blue"></button>
+                                        <button type="button" class="album-bg-swatch" data-color="#e6efe8" style="--swatch-color:#e6efe8" title="Sage" aria-label="Sage"></button>
+                                        <button type="button" class="album-bg-swatch" data-color="#ffffff" style="--swatch-color:#ffffff" title="White" aria-label="White"></button>
+                                        <button type="button" class="album-bg-swatch" data-color="#2c3e50" style="--swatch-color:#2c3e50" title="Deep slate" aria-label="Deep slate"></button>
+                                    </div>
+                                    <label class="album-bg-custom-wrap" title="Custom color">
+                                        <span class="sr-only">Pick a custom color</span>
+                                        <input id="album-background-color" class="album-bg-native-input" type="color" value="#f1ece4" title="Custom color" aria-label="Custom album background">
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <button id="save-album-settings" type="button">Save album settings</button>
                     </div>
                 </details>
-                <div class="share-url-row">
-                    <p class="muted share-url-text" id="share-url-text"></p>
-                    <button id="copy-share-url" type="button" class="copy-share-btn">Copy link</button>
+                <div class="content-management-panel">
+                    <h4 class="content-management-title">Content management</h4>
+                    <label>
+                        Upload photos (metadata auto-filled when available)
+                        <input id="photo-upload-input" type="file" multiple accept="image/*">
+                    </label>
                 </div>
-                <label>
-                    Upload photos (metadata auto-filled when available)
-                    <input id="photo-upload-input" type="file" multiple accept="image/*">
-                </label>
             </div>
 
             <p id="album-view-state" class="muted">
                 Select an album to view entries, or open a shared public link.
             </p>
-
-            <div id="owner-view-mode-toggle" class="owner-view-mode-toggle" hidden>
-                <button id="show-viewer-mode" type="button" class="mode-toggle-btn is-active">Viewer</button>
-                <button id="show-editor-mode" type="button" class="mode-toggle-btn">Editor</button>
-            </div>
 
             <section class="entries-section">
                 <h3 class="viewer-title">Journal viewer</h3>

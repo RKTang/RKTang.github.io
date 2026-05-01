@@ -44,6 +44,8 @@ const dom = {
     authStatus: document.getElementById("auth-status"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
+    newAlbumToggleBtn: document.getElementById("new-album-toggle-btn"),
+    newAlbumCancelBtn: document.getElementById("new-album-cancel-btn"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
@@ -104,9 +106,19 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
+    dom.newAlbumToggleBtn.addEventListener("click", toggleNewAlbumForm);
+    dom.newAlbumCancelBtn.addEventListener("click", () => setNewAlbumFormOpen(false));
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
+    dom.albumBackgroundColor.addEventListener("input", handleAlbumBackgroundInput);
+    document.querySelectorAll(".album-bg-swatch").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const raw = btn.dataset.color;
+            dom.albumBackgroundColor.value = normalizeColor(raw || "#f1ece4");
+            handleAlbumBackgroundInput();
+        });
+    });
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
     setupViewerModalInteractions();
@@ -179,11 +191,15 @@ function updateAuthUI() {
     dom.guestSignInBtn.hidden = loggedIn;
     dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
-    dom.newAlbumForm.hidden = !loggedIn;
+    dom.newAlbumToggleBtn.hidden = !loggedIn;
     if (!loggedIn) {
+        dom.newAlbumForm.hidden = true;
+        dom.newAlbumToggleBtn.setAttribute("aria-expanded", "false");
         dom.authStatus.textContent = "Sign in with Google or continue as guest to create albums.";
         return;
     }
+
+    dom.newAlbumToggleBtn.setAttribute("aria-expanded", dom.newAlbumForm.hidden ? "false" : "true");
 
     if (isGuest) {
         dom.authStatus.textContent = "Signed in as Guest. Link account to keep long-term access.";
@@ -242,7 +258,7 @@ function renderAlbumList(albums, ownedQuery) {
         : "Sign in to create albums, or open a public album by shared link.";
 
     merged.forEach((album) => {
-        const card = document.createElement("div");
+        const card = document.createElement("li");
         card.className = "album-item";
         if (activeAlbum?.id === album.id) {
             card.classList.add("active");
@@ -277,7 +293,36 @@ async function handleCreateAlbum(event) {
         updatedAt: serverTimestamp()
     });
     dom.newAlbumForm.reset();
+    setNewAlbumFormOpen(false);
     await openAlbum(albumRef.id);
+}
+
+function setNewAlbumFormOpen(open) {
+    dom.newAlbumForm.hidden = !open;
+    dom.newAlbumToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+        requestAnimationFrame(() => dom.newAlbumTitle.focus());
+    }
+}
+
+function toggleNewAlbumForm() {
+    setNewAlbumFormOpen(dom.newAlbumForm.hidden);
+}
+
+function handleAlbumBackgroundInput() {
+    updateAlbumBgSwatchSelection();
+    if (activeAlbum && isOwnerViewing) {
+        applyAlbumBackground(dom.albumBackgroundColor.value);
+    }
+}
+
+function updateAlbumBgSwatchSelection() {
+    const current = normalizeColor(dom.albumBackgroundColor.value || "#f1ece4").toLowerCase();
+    document.querySelectorAll(".album-bg-swatch").forEach((btn) => {
+        const hex = normalizeColor(btn.dataset.color || "").toLowerCase();
+        btn.classList.toggle("is-selected", hex === current);
+        btn.setAttribute("aria-pressed", hex === current ? "true" : "false");
+    });
 }
 
 async function tryOpenAlbumFromUrl() {
@@ -327,6 +372,7 @@ async function openAlbum(albumId) {
     }
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
+    updateAlbumBgSwatchSelection();
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
     const shareUrl = `${window.location.origin}${window.location.pathname}?album=${album.id}`;
     dom.shareUrlText.textContent = `Share URL: ${shareUrl}`;
@@ -674,6 +720,7 @@ function clearAlbumView() {
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
     applyViewerColumns(3);
+    dom.shareUrlText.textContent = "";
     dom.shareUrlText.dataset.url = "";
 }
 
