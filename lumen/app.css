@@ -823,6 +823,7 @@ dialog::backdrop {
         rotateX(var(--card-tilt-x, 0deg))
         rotateY(calc(var(--card-tilt-y, 0deg) + var(--flip-rot, 0deg)));
     transition: transform 140ms ease;
+    will-change: transform;
 }
 
 .modal-flip {
@@ -884,6 +885,7 @@ dialog::backdrop {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    border-radius: 0;
     background:
         linear-gradient(
             var(--sheen-angle, 130deg),
@@ -891,7 +893,20 @@ dialog::backdrop {
             rgba(255, 255, 255, 0.92) 22%,
             rgba(255, 255, 255, 0.26) 38%,
             rgba(255, 255, 255, 0) 62%
+        ),
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) + 32deg),
+            rgba(255, 255, 255, 0) 30%,
+            rgba(255, 255, 255, 0.34) 54%,
+            rgba(255, 255, 255, 0) 78%
+        ),
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) - 22deg),
+            rgba(255, 255, 255, 0) 22%,
+            rgba(255, 255, 255, 0.28) 44%,
+            rgba(255, 255, 255, 0) 66%
         );
+    background-position: var(--sheen-x, 50%) var(--sheen-y, 50%);
     mix-blend-mode: screen;
     opacity: 0.32;
 }
@@ -904,7 +919,25 @@ dialog::backdrop {
     position: relative;
     width: 100%;
     height: 100%;
+    margin: 0 auto;
     aspect-ratio: var(--photo-ratio, 4 / 5);
+}
+
+.modal-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            calc(var(--sheen-angle, 130deg) + 12deg),
+            rgba(255, 255, 255, 0) 22%,
+            rgba(255, 255, 255, 0.26) 44%,
+            rgba(255, 255, 255, 0.06) 58%,
+            rgba(255, 255, 255, 0) 74%
+        );
+    mix-blend-mode: screen;
+    opacity: 0.5;
 }
 
 #viewer-modal-image {
@@ -914,6 +947,7 @@ dialog::backdrop {
     height: 100%;
     object-fit: contain;
     display: block;
+    border-radius: 0;
     filter: contrast(1.08) saturate(1.06) brightness(0.97);
 }
 
