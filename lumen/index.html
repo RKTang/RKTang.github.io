@@ -36,6 +36,13 @@
             </form>
             <p id="album-list-empty" class="muted">Sign in to create and manage albums.</p>
             <ul id="album-list" class="album-list" role="list"></ul>
+            <div id="shared-sidebar-section" class="shared-sidebar-section" hidden>
+                <div class="album-sidebar-header">
+                    <h2>Shared with me</h2>
+                </div>
+                <p id="shared-list-empty" class="muted">Save shared links to keep them in your sidebar.</p>
+                <ul id="shared-album-list" class="album-list" role="list"></ul>
+            </div>
         </section>
 
         <section class="panel">
@@ -48,6 +55,8 @@
                     <p id="active-album-owner" class="active-album-owner" hidden></p>
                 </div>
                 <div class="panel-heading-trailing">
+                    <button id="back-to-list-btn" type="button" class="mode-toggle-btn" hidden>Back</button>
+                    <button id="save-shared-btn" type="button" class="mode-toggle-btn" hidden>Save to shared</button>
                     <div id="owner-view-mode-toggle" class="owner-view-mode-toggle" hidden>
                         <button id="show-viewer-mode" type="button" class="mode-toggle-btn is-active">Viewer</button>
                         <button id="show-editor-mode" type="button" class="mode-toggle-btn">Editor</button>
@@ -145,7 +154,6 @@
 
             <section id="owner-editor-section" class="entries-section" hidden>
                 <h3 id="editor-section-title">Editing Journal</h3>
-                <p class="muted">Edit story, location, and date/time for each entry.</p>
                 <div id="entry-grid-editor" class="entry-grid editor-grid"></div>
             </section>
         </section>

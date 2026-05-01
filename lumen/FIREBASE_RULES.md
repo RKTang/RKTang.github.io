@@ -61,4 +61,5 @@ In Firebase Auth -> Settings -> Authorized domains, include:
 1. Commit and push repository updates.
 2. Ensure GitHub Pages is enabled for the default branch.
 3. Open the app at:
-   - `https://rktang.github.io/lumen/`
+  - `https://rktang.github.io/lumen/`
+

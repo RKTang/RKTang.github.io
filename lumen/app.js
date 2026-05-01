@@ -46,6 +46,9 @@ const dom = {
     newAlbumTitle: document.getElementById("new-album-title"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
+    sharedSidebarSection: document.getElementById("shared-sidebar-section"),
+    sharedListEmpty: document.getElementById("shared-list-empty"),
+    sharedAlbumList: document.getElementById("shared-album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
     activeAlbumOwner: document.getElementById("active-album-owner"),
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
@@ -63,6 +66,8 @@ const dom = {
     photoSelectBtn: document.getElementById("photo-select-btn"),
     photoUploadInput: document.getElementById("photo-upload-input"),
     albumViewState: document.getElementById("album-view-state"),
+    backToListBtn: document.getElementById("back-to-list-btn"),
+    saveSharedBtn: document.getElementById("save-shared-btn"),
     ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
     showViewerModeBtn: document.getElementById("show-viewer-mode"),
     showEditorModeBtn: document.getElementById("show-editor-mode"),
@@ -91,10 +96,12 @@ let currentUser = null;
 let activeAlbum = null;
 let unsubscribeEntries = null;
 let unsubscribeAlbums = null;
+let unsubscribeSharedAlbums = null;
 let isOwnerViewing = false;
 let isGuestSignInAvailable = true;
 let albumSettingsSaveTimer = null;
 let albumSettingsStatusTimer = null;
+const entryAutoSaveTimers = new Map();
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -113,6 +120,8 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
+    dom.backToListBtn.addEventListener("click", handleBackToList);
+    dom.saveSharedBtn.addEventListener("click", handleSaveSharedAlbum);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
     dom.photoSelectBtn.addEventListener("click", (event) => {
@@ -181,6 +190,7 @@ function initialize() {
         await ensureUserDoc(user);
         updateAuthUI();
         subscribeAlbumList();
+        subscribeSharedAlbumList();
         await tryOpenAlbumFromUrl();
     });
 }
@@ -355,15 +365,29 @@ function subscribeAlbumList() {
                 renderAlbumList(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })), true);
             })
         );
+    } else {
+        dom.albumListEmpty.hidden = false;
     }
 
-    watchers.push(
-        onSnapshot(query(albumsRef, where("visibility", "==", "public")), (snapshot) => {
-            renderAlbumList(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })), false);
-        })
-    );
-
     unsubscribeAlbums = () => watchers.forEach((fn) => fn());
+}
+
+function subscribeSharedAlbumList() {
+    if (unsubscribeSharedAlbums) {
+        unsubscribeSharedAlbums();
+        unsubscribeSharedAlbums = null;
+    }
+    dom.sharedAlbumList.innerHTML = "";
+    dom.sharedListEmpty.hidden = false;
+    dom.sharedSidebarSection.hidden = !currentUser;
+    if (!currentUser) {
+        return;
+    }
+    const sharedRef = collection(db, "users", currentUser.uid, "sharedAlbums");
+    unsubscribeSharedAlbums = onSnapshot(sharedRef, async (snapshot) => {
+        const docs = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        await renderSharedAlbumList(docs);
+    });
 }
 
 const albumMap = new Map();
@@ -452,6 +476,53 @@ function renderAlbumList(albums, ownedQuery) {
     });
 }
 
+async function renderSharedAlbumList(sharedItems) {
+    dom.sharedAlbumList.innerHTML = "";
+    if (!sharedItems.length) {
+        dom.sharedListEmpty.hidden = false;
+        return;
+    }
+    const loadedAlbums = await Promise.all(
+        sharedItems.map(async (item) => {
+            try {
+                const snap = await getDoc(doc(db, "albums", item.albumId || item.id));
+                if (!snap.exists()) {
+                    return null;
+                }
+                const data = snap.data() || {};
+                return { id: snap.id, ...data };
+            } catch (_error) {
+                return null;
+            }
+        })
+    );
+    const albums = loadedAlbums.filter(Boolean);
+    dom.sharedListEmpty.hidden = albums.length > 0;
+    albums.forEach((album) => {
+        const card = document.createElement("li");
+        card.className = "album-item";
+        if (activeAlbum?.id === album.id) {
+            card.classList.add("active");
+        }
+        const titleHtml = escapeHtml(album.title || "Untitled album");
+        const visHtml = visibilityIconMarkup(album.visibility);
+        card.innerHTML = `
+            <div class="album-item-inner">
+                <button type="button" class="album-item-open">
+                    <span class="album-item-text">
+                        <span class="album-item-title-row">
+                            <span class="album-item-title">${titleHtml}</span>
+                            ${visHtml}
+                        </span>
+                    </span>
+                </button>
+            </div>
+        `;
+        card.querySelector(".album-item-open").addEventListener("click", () => openAlbum(album.id));
+        dom.sharedAlbumList.appendChild(card);
+    });
+}
+
 
 async function handleCreateAlbum(event) {
     event.preventDefault();
@@ -520,6 +591,8 @@ async function openAlbum(albumId) {
     activeAlbum = album;
     isOwnerViewing = Boolean(isOwner);
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
+    dom.backToListBtn.hidden = false;
+    dom.saveSharedBtn.hidden = !currentUser || isOwnerViewing;
 
     const ownerName = await resolveAlbumOwnerName(album, isOwner);
     if (isOwner) {
@@ -563,6 +636,34 @@ async function openAlbum(albumId) {
 
     subscribeEntries(album.id);
     subscribeAlbumList();
+    subscribeSharedAlbumList();
+}
+
+async function handleSaveSharedAlbum() {
+    if (!currentUser || !activeAlbum || isOwnerViewing) {
+        return;
+    }
+    await setDoc(
+        doc(db, "users", currentUser.uid, "sharedAlbums", activeAlbum.id),
+        {
+            albumId: activeAlbum.id,
+            title: activeAlbum.title || "Untitled album",
+            savedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        },
+        { merge: true }
+    );
+    dom.saveSharedBtn.textContent = "Saved";
+    setTimeout(() => {
+        if (dom.saveSharedBtn) {
+            dom.saveSharedBtn.textContent = "Save to shared";
+        }
+    }, 1000);
+}
+
+function handleBackToList() {
+    clearAlbumView();
+    history.replaceState(null, "", window.location.pathname);
 }
 
 function subscribeEntries(albumId) {
@@ -638,7 +739,7 @@ function renderEntries(entries) {
         locEl.value = formattedLocation === "Not set" ? "" : formattedLocation;
         dateEl.value = formattedDate === "Not set" ? "" : formattedDate;
 
-        saveBtn.addEventListener("click", async () => {
+        const saveEntryChanges = async () => {
             await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
                 storyText: storyEl.value.trim(),
                 locationText: locEl.value.trim(),
@@ -646,7 +747,35 @@ function renderEntries(entries) {
                 updatedAt: serverTimestamp()
             });
             await touchAlbumUpdatedAt(activeAlbum.id);
-        });
+            saveBtn.textContent = "Saved";
+            setTimeout(() => {
+                if (saveBtn.isConnected) {
+                    saveBtn.textContent = "Save";
+                }
+            }, 900);
+        };
+
+        const queueEntryAutoSave = () => {
+            const existingTimer = entryAutoSaveTimers.get(entry.id);
+            if (existingTimer) {
+                clearTimeout(existingTimer);
+            }
+            saveBtn.textContent = "Saving...";
+            const timer = setTimeout(async () => {
+                entryAutoSaveTimers.delete(entry.id);
+                try {
+                    await saveEntryChanges();
+                } catch (_error) {
+                    saveBtn.textContent = "Save";
+                }
+            }, 450);
+            entryAutoSaveTimers.set(entry.id, timer);
+        };
+
+        saveBtn.addEventListener("click", saveEntryChanges);
+        storyEl.addEventListener("input", queueEntryAutoSave);
+        locEl.addEventListener("input", queueEntryAutoSave);
+        dateEl.addEventListener("input", queueEntryAutoSave);
 
         delBtn.addEventListener("click", async () => {
             if (!confirm("Delete this photo entry?")) {
@@ -1017,6 +1146,10 @@ function clearAlbumView() {
         unsubscribeEntries();
         unsubscribeEntries = null;
     }
+    for (const timer of entryAutoSaveTimers.values()) {
+        clearTimeout(timer);
+    }
+    entryAutoSaveTimers.clear();
     dom.activeAlbumTitle.textContent = "Open an album";
     dom.activeAlbumOwner.hidden = true;
     dom.activeAlbumOwner.textContent = "";
@@ -1025,6 +1158,9 @@ function clearAlbumView() {
     dom.activeAlbumVisibility.innerHTML = "";
     dom.albumControls.hidden = true;
     dom.ownerViewModeToggle.hidden = true;
+    dom.backToListBtn.hidden = true;
+    dom.saveSharedBtn.hidden = true;
+    dom.saveSharedBtn.textContent = "Save to shared";
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
