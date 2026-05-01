@@ -87,9 +87,10 @@ let activeAlbum = null;
 let unsubscribeEntries = null;
 let unsubscribeAlbums = null;
 let isOwnerViewing = false;
+let isGuestSignInAvailable = true;
 
 if (!hasFirebaseConfig) {
-    dom.authStatus.textContent = "Firebase is not configured yet. Update lumen/firebase-config.js to start.";
+    setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
     dom.signInBtn.disabled = true;
 } else {
     app = initializeApp(firebaseConfig);
@@ -164,7 +165,10 @@ async function handleSignIn() {
     try {
         await signInWithPopup(auth, provider);
     } catch (error) {
-        dom.authStatus.textContent = `Sign-in failed: ${error.message}`;
+        const friendly = getAuthErrorMessage(error, "sign-in");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
 }
 
@@ -177,7 +181,19 @@ async function handleGuestSignIn() {
     try {
         await signInAnonymously(auth);
     } catch (error) {
-        dom.authStatus.textContent = `Guest sign-in failed: ${error.message}`;
+        const code = error?.code || "";
+        const anonDisabled =
+            code === "auth/admin-restricted-operation" || code === "auth/operation-not-allowed";
+        if (anonDisabled) {
+            isGuestSignInAvailable = false;
+            updateAuthUI();
+            setAuthStatus("Guest mode is disabled in Firebase Auth. Use Google sign-in.", "error");
+            return;
+        }
+        const friendly = getAuthErrorMessage(error, "guest-sign-in");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
 }
 
@@ -188,10 +204,38 @@ async function handleLinkAccount() {
     const provider = new GoogleAuthProvider();
     try {
         await linkWithPopup(currentUser, provider);
-        dom.authStatus.textContent = "Guest account linked to Google.";
+        setAuthStatus("Guest account linked to Google.", "success");
     } catch (error) {
-        dom.authStatus.textContent = `Link account failed: ${error.message}`;
+        const friendly = getAuthErrorMessage(error, "link-account");
+        if (friendly) {
+            setAuthStatus(friendly.message, friendly.type);
+        }
     }
+}
+
+function setAuthStatus(message, type = "info") {
+    dom.authStatus.textContent = message;
+    dom.authStatus.classList.remove("is-error", "is-success", "is-info");
+    dom.authStatus.classList.add(
+        type === "error" ? "is-error" : type === "success" ? "is-success" : "is-info"
+    );
+}
+
+function getAuthErrorMessage(error, action) {
+    const code = error?.code || "";
+    if (code === "auth/popup-closed-by-user") {
+        if (action === "link-account") {
+            return { message: "Link account canceled.", type: "info" };
+        }
+        return { message: "Sign-in canceled.", type: "info" };
+    }
+    if (code === "auth/popup-blocked") {
+        return { message: "Popup blocked by browser. Allow popups and try again.", type: "error" };
+    }
+    if (code === "auth/network-request-failed") {
+        return { message: "Network error. Check your connection and try again.", type: "error" };
+    }
+    return { message: `Authentication failed. ${error?.message || "Please try again."}`, type: "error" };
 }
 
 async function ensureUserDoc(user) {
@@ -215,21 +259,26 @@ function updateAuthUI() {
     const loggedIn = Boolean(currentUser);
     const isGuest = Boolean(currentUser?.isAnonymous);
     dom.signInBtn.hidden = loggedIn;
-    dom.guestSignInBtn.hidden = loggedIn;
+    dom.guestSignInBtn.hidden = loggedIn || !isGuestSignInAvailable;
     dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
     if (!loggedIn) {
-        dom.authStatus.textContent = "Sign in with Google or continue as guest to create albums.";
+        setAuthStatus(
+            isGuestSignInAvailable
+                ? "Sign in with Google or continue as guest to create albums."
+                : "Sign in with Google to create albums.",
+            "info"
+        );
         return;
     }
 
     if (isGuest) {
-        dom.authStatus.textContent = "Signed in as Guest. Link account to keep long-term access.";
+        setAuthStatus("Signed in as Guest. Link account to keep long-term access.", "info");
         return;
     }
 
-    dom.authStatus.textContent = `Signed in as ${currentUser.displayName || currentUser.email}`;
+    setAuthStatus(`Signed in as ${currentUser.displayName || currentUser.email}`, "success");
 }
 
 function subscribeAlbumList() {
@@ -323,8 +372,12 @@ function renderAlbumList(albums, ownedQuery) {
         card.innerHTML = `
             <div class="album-item-inner">
                 <button type="button" class="album-item-open">
-                    <span class="album-item-title">${titleHtml}</span>
-                    ${visHtml}
+                    <span class="album-item-text">
+                        <span class="album-item-title-row">
+                            <span class="album-item-title">${titleHtml}</span>
+                            ${visHtml}
+                        </span>
+                    </span>
                 </button>
                 ${deleteBtnHtml}
             </div>
@@ -340,6 +393,7 @@ function renderAlbumList(albums, ownedQuery) {
         dom.albumList.appendChild(card);
     });
 }
+
 
 async function handleCreateAlbum(event) {
     event.preventDefault();
@@ -667,8 +721,7 @@ async function handleSaveAlbumSettings() {
     activeAlbum.visibility = visibility;
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
-    dom.activeAlbumVisibility.textContent = visibility === "public" ? "🌐" : "🔒";
-    dom.activeAlbumVisibility.setAttribute("aria-label", visibility === "public" ? "Public album" : "Private album");
+    setActiveAlbumVisibilityPill(visibility);
     setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
