@@ -22,7 +22,8 @@ import {
     serverTimestamp,
     setDoc,
     updateDoc,
-    where
+    where,
+    writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import {
     deleteObject,
@@ -105,6 +106,8 @@ let albumSettingsSaveTimer = null;
 let albumSettingsStatusTimer = null;
 const entryAutoSaveTimers = new Map();
 const SAVE_SHARED_BTN_DEFAULT = "+ Save to shared";
+let editorDnDBound = false;
+let draggedEditorCard = null;
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -187,6 +190,7 @@ function initialize() {
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
     setupViewerModalInteractions();
+    setupEditorEntryDragAndDrop();
 
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
@@ -235,25 +239,38 @@ async function handleGuestSignIn() {
     }
 }
 
-async function handleLinkAccount() {
-    if (!currentUser || !currentUser.isAnonymous) {
-        return;
+async function linkAnonymousAccountWithGoogle(options = {}) {
+    const { quiet = false } = options;
+    const user = auth.currentUser;
+    if (!user?.isAnonymous) {
+        return true;
     }
     const provider = new GoogleAuthProvider();
     try {
-        await linkWithPopup(currentUser, provider);
-        const linkedUser = auth.currentUser || currentUser;
+        await linkWithPopup(user, provider);
+        const linkedUser = auth.currentUser || user;
         const preferredName = getPreferredOwnerDisplayName(linkedUser);
         if (preferredName) {
             await backfillOwnerDisplayName(linkedUser.uid, preferredName);
         }
-        setAuthStatus("Guest account linked to Google.", "success");
+        if (!quiet) {
+            setAuthStatus("Guest account linked to Google.", "success");
+        }
+        return true;
     } catch (error) {
         const friendly = getAuthErrorMessage(error, "link-account");
         if (friendly) {
             setAuthStatus(friendly.message, friendly.type);
         }
+        return false;
     }
+}
+
+async function handleLinkAccount() {
+    if (!currentUser || !currentUser.isAnonymous) {
+        return;
+    }
+    await linkAnonymousAccountWithGoogle({ quiet: false });
 }
 
 function setAuthStatus(message, type = "info") {
@@ -595,7 +612,7 @@ async function openAlbum(albumId) {
     updateSubtitleVisibility(Boolean(currentUser));
     dom.backToListBtn.hidden = false;
     dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
-    dom.saveSharedBtn.hidden = !currentUser || isOwnerViewing;
+    dom.saveSharedBtn.hidden = isOwnerViewing;
 
     const ownerName = await resolveAlbumOwnerName(album, isOwner);
     if (isOwner) {
@@ -643,14 +660,51 @@ async function openAlbum(albumId) {
 }
 
 async function handleSaveSharedAlbum() {
-    if (!currentUser || !activeAlbum || isOwnerViewing) {
+    if (!activeAlbum || isOwnerViewing) {
         return;
     }
+
     dom.saveSharedBtn.disabled = true;
     try {
-        await ensureUserDoc(currentUser);
+        let user = auth.currentUser;
+
+        if (!user) {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                user = auth.currentUser;
+                if (user) {
+                    await ensureUserDoc(user);
+                }
+            } catch (error) {
+                const friendly = getAuthErrorMessage(error, "sign-in");
+                if (friendly) {
+                    setAuthStatus(friendly.message, friendly.type);
+                }
+                return;
+            }
+        }
+
+        if (!user) {
+            return;
+        }
+
+        if (user.isAnonymous) {
+            const linked = await linkAnonymousAccountWithGoogle({ quiet: true });
+            if (!linked) {
+                return;
+            }
+            user = auth.currentUser;
+        }
+
+        if (!user || user.isAnonymous) {
+            return;
+        }
+
+        setAuthStatus("", "info");
+        await ensureUserDoc(user);
         await setDoc(
-            doc(db, "users", currentUser.uid, "sharedAlbums", activeAlbum.id),
+            doc(db, "users", user.uid, "sharedAlbums", activeAlbum.id),
             {
                 albumId: activeAlbum.id,
                 title: activeAlbum.title || "Untitled album",
@@ -683,6 +737,66 @@ function handleBackToList() {
     history.replaceState(null, "", window.location.pathname);
 }
 
+function setupEditorEntryDragAndDrop() {
+    if (editorDnDBound || !dom.entryGridEditor) {
+        return;
+    }
+    editorDnDBound = true;
+    dom.entryGridEditor.addEventListener("dragover", (e) => {
+        if (!dom.entryGridEditor.classList.contains("is-custom-sort")) {
+            return;
+        }
+        const card = e.target.closest(".entry-editor-card");
+        if (!card) {
+            return;
+        }
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    });
+    dom.entryGridEditor.addEventListener("drop", async (e) => {
+        if (!dom.entryGridEditor.classList.contains("is-custom-sort") || !activeAlbum?.id || !isOwnerViewing) {
+            return;
+        }
+        const targetCard = e.target.closest(".entry-editor-card");
+        if (!targetCard || !draggedEditorCard || targetCard === draggedEditorCard) {
+            return;
+        }
+        e.preventDefault();
+        const rect = targetCard.getBoundingClientRect();
+        const insertBefore = e.clientY < rect.top + rect.height / 2;
+        if (insertBefore) {
+            dom.entryGridEditor.insertBefore(draggedEditorCard, targetCard);
+        } else {
+            dom.entryGridEditor.insertBefore(draggedEditorCard, targetCard.nextSibling);
+        }
+        try {
+            await persistEntryOrderFromEditorDom();
+        } catch (_err) {
+            setAuthStatus("Could not save photo order. Try again.", "error");
+        }
+    });
+}
+
+async function persistEntryOrderFromEditorDom() {
+    if (!db || !activeAlbum?.id) {
+        return;
+    }
+    const cards = [...dom.entryGridEditor.querySelectorAll(".entry-editor-card")];
+    const batch = writeBatch(db);
+    cards.forEach((card, index) => {
+        const id = card.dataset.entryId;
+        if (!id) {
+            return;
+        }
+        batch.update(doc(db, "albums", activeAlbum.id, "entries", id), {
+            orderIndex: index,
+            updatedAt: serverTimestamp()
+        });
+    });
+    await batch.commit();
+    await touchAlbumUpdatedAt(activeAlbum.id);
+}
+
 function subscribeEntries(albumId) {
     if (unsubscribeEntries) {
         unsubscribeEntries();
@@ -696,6 +810,10 @@ function subscribeEntries(albumId) {
 function renderEntries(entries) {
     const sortMode = activeAlbum?.entrySortMode || "latest-first";
     const sortedEntries = sortEntriesForViewer(entries, sortMode);
+    const customSort = sortMode === "custom" && isOwnerViewing;
+    if (dom.entryGridEditor) {
+        dom.entryGridEditor.classList.toggle("is-custom-sort", customSort);
+    }
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
     if (!sortedEntries.length) {
@@ -742,13 +860,31 @@ function renderEntries(entries) {
         }
 
         const node = dom.entryEditorTemplate.content.firstElementChild.cloneNode(true);
+        node.dataset.entryId = entry.id;
         const img = node.querySelector(".entry-editor-image");
         const storyEl = node.querySelector(".entry-story");
         const locEl = node.querySelector(".entry-location");
         const dateEl = node.querySelector(".entry-date");
         const saveStatusEl = node.querySelector(".entry-save-status");
         const delBtn = node.querySelector(".entry-delete");
+        const dragHandle = node.querySelector(".entry-drag-handle");
         delBtn.innerHTML = iconSvgTrash();
+        if (dragHandle) {
+            dragHandle.draggable = customSort;
+            dragHandle.tabIndex = customSort ? 0 : -1;
+            if (customSort) {
+                dragHandle.addEventListener("dragstart", (e) => {
+                    draggedEditorCard = node;
+                    e.dataTransfer.setData("text/plain", entry.id);
+                    e.dataTransfer.effectAllowed = "move";
+                    node.classList.add("is-entry-dragging");
+                });
+                dragHandle.addEventListener("dragend", () => {
+                    node.classList.remove("is-entry-dragging");
+                    draggedEditorCard = null;
+                });
+            }
+        }
 
         img.src = entry.photoUrl;
         img.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
@@ -1376,6 +1512,16 @@ function getEntrySortTimestamp(entry) {
 }
 
 function sortEntriesForViewer(entries, mode) {
+    if (mode === "custom") {
+        return [...entries].sort((a, b) => {
+            const orderA = Number(a?.orderIndex) || 0;
+            const orderB = Number(b?.orderIndex) || 0;
+            if (orderA !== orderB) {
+                return orderA - orderB;
+            }
+            return String(a.id).localeCompare(String(b.id));
+        });
+    }
     const normalizedMode = mode === "earliest-first" ? "earliest-first" : "latest-first";
     const sorted = [...entries].sort((a, b) => {
         const tsA = getEntrySortTimestamp(a);
