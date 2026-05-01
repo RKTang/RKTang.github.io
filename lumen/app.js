@@ -581,7 +581,6 @@ function renderEntries(entries) {
         const storyEl = node.querySelector(".entry-story");
         const locEl = node.querySelector(".entry-location");
         const dateEl = node.querySelector(".entry-date");
-        const metaEl = node.querySelector(".entry-meta");
         const saveBtn = node.querySelector(".entry-save");
         const delBtn = node.querySelector(".entry-delete");
 
@@ -590,7 +589,6 @@ function renderEntries(entries) {
         storyEl.value = storyText;
         locEl.value = locationText;
         dateEl.value = captureDate;
-        metaEl.textContent = `Entry ID: ${entry.id}`;
 
         saveBtn.addEventListener("click", async () => {
             await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {

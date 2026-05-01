@@ -134,6 +134,7 @@
 
     <template id="entry-editor-template">
         <article class="entry-editor-card">
+            <button class="entry-delete entry-delete-corner" type="button" aria-label="Delete entry" title="Delete entry">🗑</button>
             <img class="entry-editor-image" alt="">
             <div class="entry-editor-fields stack">
                 <label>
@@ -148,10 +149,8 @@
                     Date / Time
                     <input class="entry-date" type="text">
                 </label>
-                <div class="entry-meta muted"></div>
                 <div class="entry-actions">
                     <button class="entry-save" type="button">Save</button>
-                    <button class="entry-delete" type="button">Delete</button>
                 </div>
             </div>
         </article>
