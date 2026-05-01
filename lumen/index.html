@@ -28,12 +28,10 @@
                 <h2>Your albums</h2>
             </div>
             <form id="new-album-form" class="stack new-album-inline-form" hidden>
-                <label>
-                    Album title
-                    <input id="new-album-title" type="text" maxlength="120" placeholder="Summer Memories" required>
-                </label>
                 <div class="new-album-form-actions">
-                    <button type="submit" class="btn-new-album-submit">+ New album</button>
+                    <label class="sr-only" for="new-album-title">Album title</label>
+                    <input id="new-album-title" type="text" maxlength="120" placeholder="Summer Memories" required>
+                    <button type="submit" class="btn-new-album-submit" aria-label="Create album">+</button>
                 </div>
             </form>
             <p id="album-list-empty" class="muted">Sign in to create and manage albums.</p>
@@ -59,7 +57,7 @@
 
             <div id="album-controls" class="stack album-controls" hidden>
                 <details id="album-settings-dropdown" class="album-settings-dropdown" open>
-                    <summary>Album settings</summary>
+                    <summary>Album settings <span id="album-settings-status" class="album-settings-status" aria-live="polite"></span></summary>
                     <div id="album-settings-panel" class="album-settings-panel">
                         <div class="album-settings-row">
                             <label class="album-setting-field album-setting-visibility">
@@ -94,6 +92,7 @@
                                         <button type="button" class="album-bg-swatch" data-color="#2c3e50" style="--swatch-color:#2c3e50" title="Deep slate" aria-label="Deep slate"></button>
                                     </div>
                                     <label class="album-bg-custom-wrap" title="Custom color">
+                                        <span class="album-bg-custom-plus" aria-hidden="true">+</span>
                                         <span class="sr-only">Pick a custom color</span>
                                         <input id="album-background-color" class="album-bg-native-input" type="color" value="#f1ece4" title="Custom color" aria-label="Custom album background">
                                     </label>
@@ -103,7 +102,7 @@
                                 Location display
                                 <select id="album-location-display">
                                     <option value="gps">GPS coordinates</option>
-                                    <option value="city-state">City / State</option>
+                                    <option value="city-state" selected>City / State</option>
                                 </select>
                             </label>
                             <label class="album-setting-field">
@@ -113,8 +112,14 @@
                                     <option value="date-only">Date only</option>
                                 </select>
                             </label>
+                            <label class="album-setting-field">
+                                Entry sort
+                                <select id="album-entry-sort">
+                                    <option value="latest-first" selected>Latest to earliest</option>
+                                    <option value="earliest-first">Earliest to latest</option>
+                                </select>
+                            </label>
                         </div>
-                        <button id="save-album-settings" type="button">Save album settings</button>
                     </div>
                 </details>
                 <div class="content-management-panel">
