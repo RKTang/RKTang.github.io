@@ -41,7 +41,9 @@ const dom = {
     guestSignInBtn: document.getElementById("guest-sign-in-btn"),
     linkAccountBtn: document.getElementById("link-account-btn"),
     signOutBtn: document.getElementById("sign-out-btn"),
+    authBanner: document.getElementById("auth-banner"),
     authStatus: document.getElementById("auth-status"),
+    pageSubtitle: document.getElementById("page-subtitle"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
     albumListEmpty: document.getElementById("album-list-empty"),
@@ -254,11 +256,13 @@ async function handleLinkAccount() {
 }
 
 function setAuthStatus(message, type = "info") {
-    dom.authStatus.textContent = message;
+    const text = (message || "").trim();
+    dom.authStatus.textContent = text;
     dom.authStatus.classList.remove("is-error", "is-success", "is-info");
     dom.authStatus.classList.add(
         type === "error" ? "is-error" : type === "success" ? "is-success" : "is-info"
     );
+    dom.authBanner.hidden = !text;
 }
 
 function getAuthErrorMessage(error, action) {
@@ -328,25 +332,21 @@ function updateAuthUI() {
     const isGuest = Boolean(currentUser?.isAnonymous);
     dom.signInBtn.hidden = loggedIn;
     dom.guestSignInBtn.hidden = loggedIn || !isGuestSignInAvailable;
-    dom.linkAccountBtn.hidden = !isGuest;
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
+    dom.linkAccountBtn.hidden = !isGuest;
+    updateSubtitleVisibility(loggedIn);
     if (!loggedIn) {
-        setAuthStatus(
-            isGuestSignInAvailable
-                ? "Sign in with Google or continue as guest to create albums."
-                : "Sign in with Google to create albums.",
-            "info"
-        );
+        setAuthStatus("", "info");
         return;
     }
 
     if (isGuest) {
-        setAuthStatus("Signed in as Guest. Link account to keep long-term access.", "info");
+        setAuthStatus("You are viewing as a Guest. Use Link Account to keep long-term access.", "info");
         return;
     }
 
-    setAuthStatus(`Signed in as ${currentUser.displayName || currentUser.email}`, "success");
+    setAuthStatus("", "info");
 }
 
 function subscribeAlbumList() {
@@ -591,6 +591,7 @@ async function openAlbum(albumId) {
     activeAlbum = album;
     isOwnerViewing = Boolean(isOwner);
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
+    updateSubtitleVisibility(Boolean(currentUser));
     dom.backToListBtn.hidden = false;
     dom.saveSharedBtn.hidden = !currentUser || isOwnerViewing;
 
@@ -605,7 +606,7 @@ async function openAlbum(albumId) {
     }
     dom.activeAlbumTitle.textContent = album.title || "Untitled album";
     dom.activeAlbumOwner.hidden = false;
-    dom.activeAlbumOwner.textContent = `By ${ownerName}`;
+    dom.activeAlbumOwner.textContent = `\u00b7 By ${ownerName}`;
     dom.activeAlbumVisibility.hidden = false;
     setActiveAlbumVisibilityPill(album.visibility);
     dom.albumViewState.textContent = "";
@@ -1183,6 +1184,14 @@ function clearAlbumView() {
     if (dom.albumEntrySort) {
         dom.albumEntrySort.value = "latest-first";
     }
+    updateSubtitleVisibility(Boolean(currentUser));
+}
+
+function updateSubtitleVisibility(loggedIn) {
+    if (!dom.pageSubtitle) {
+        return;
+    }
+    dom.pageSubtitle.hidden = Boolean(loggedIn) || Boolean(activeAlbum);
 }
 
 function setShareLinkVisibility(visibility, isOwner) {

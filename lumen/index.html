@@ -10,16 +10,20 @@
     <link rel="stylesheet" href="app.css">
 </head>
 <body>
-    <header class="page-header">
-        <h1>Lumen Journal</h1>
-        <p>Create your own metadata-aware photo journal.</p>
-        <div class="header-actions">
-            <button id="sign-in-btn" type="button">Sign in with Google</button>
-            <button id="guest-sign-in-btn" type="button">Continue as Guest</button>
-            <button id="link-account-btn" type="button" hidden>Link account</button>
-            <button id="sign-out-btn" type="button" hidden>Sign out</button>
+    <header class="top-header">
+        <div class="top-nav">
+            <h1>Lumen Journal</h1>
+            <div class="header-actions">
+                <button id="sign-in-btn" type="button">Sign in with Google</button>
+                <button id="guest-sign-in-btn" type="button">Continue as Guest</button>
+                <button id="sign-out-btn" type="button" hidden>Sign out</button>
+            </div>
         </div>
-        <p id="auth-status" class="auth-status">Checking authentication...</p>
+        <p id="page-subtitle" class="page-subtitle">Create your own metadata-aware photo journal.</p>
+        <div id="auth-banner" class="auth-banner" hidden>
+            <p id="auth-status" class="auth-status"></p>
+            <button id="link-account-btn" type="button" class="auth-banner-link" hidden>Link Account</button>
+        </div>
     </header>
 
     <main class="layout">
@@ -49,14 +53,14 @@
             <div class="panel-heading">
                 <div class="panel-heading-text">
                     <div class="panel-heading-title-row">
+                        <button id="back-to-list-btn" type="button" class="back-inline-btn" hidden aria-label="Back to album list">← Back</button>
                         <h2 id="active-album-title">Open an album</h2>
                         <span id="active-album-visibility" class="pill" hidden></span>
+                        <span id="active-album-owner" class="active-album-owner-inline" hidden></span>
                     </div>
-                    <p id="active-album-owner" class="active-album-owner" hidden></p>
                 </div>
                 <div class="panel-heading-trailing">
-                    <button id="back-to-list-btn" type="button" class="mode-toggle-btn" hidden>Back</button>
-                    <button id="save-shared-btn" type="button" class="mode-toggle-btn" hidden>Save to shared</button>
+                    <button id="save-shared-btn" type="button" class="save-shared-btn" hidden>+ Save to shared</button>
                     <div id="owner-view-mode-toggle" class="owner-view-mode-toggle" hidden>
                         <button id="show-viewer-mode" type="button" class="mode-toggle-btn is-active">Viewer</button>
                         <button id="show-editor-mode" type="button" class="mode-toggle-btn">Editor</button>
