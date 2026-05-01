@@ -198,6 +198,13 @@ textarea {
     flex-wrap: wrap;
 }
 
+.btn-new-album-submit {
+    border-radius: 999px !important;
+    background: #2c3e50 !important;
+    color: #fff !important;
+    padding: 0.58rem 1rem !important;
+}
+
 .album-list {
     list-style: none;
     margin: 0;
@@ -387,7 +394,7 @@ textarea {
     padding: 0;
     align-items: center;
     border-radius: 8px;
-    padding: 2px;
+    padding: 4px;
     background: linear-gradient(
         90deg,
         #ff4d4d,
@@ -488,10 +495,77 @@ textarea {
     color: #2a3c52;
 }
 
-.content-management-panel label {
+.photo-drop-zone {
+    border: 2px dashed #b8ad9d;
+    background: rgba(255, 253, 248, 0.8);
+    padding: 1rem 0.9rem 1.1rem;
     display: grid;
+    justify-items: center;
+    text-align: center;
     gap: 0.35rem;
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.photo-drop-zone:hover,
+.photo-drop-zone:focus-visible,
+.photo-drop-zone.is-drag-over {
+    border-color: #2c3e50;
+    background: #f8f3ec;
+}
+
+.photo-upload-input {
+    display: none;
+}
+
+.photo-drop-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: #e8edf3;
+    color: #28415e;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.photo-drop-title {
+    margin: 0.1rem 0 0;
+    font-weight: 700;
+    color: #24374e;
+}
+
+.photo-drop-helper {
     margin: 0;
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: #2c3e50;
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-2px);
+    transition: opacity 120ms ease, max-height 120ms ease, transform 120ms ease;
+    overflow: hidden;
+}
+
+.photo-drop-zone.is-drag-over .photo-drop-helper {
+    opacity: 1;
+    max-height: 1.2rem;
+    transform: translateY(0);
+}
+
+.photo-drop-subtitle {
+    margin: 0;
+    color: #5f6167;
+    font-size: 0.9rem;
+}
+
+.photo-select-btn {
+    margin-top: 0.35rem;
+    border-radius: 999px !important;
+    background: #2c3e50 !important;
+    color: #fff !important;
+    padding: 0.45rem 0.95rem !important;
 }
 
 .owner-view-mode-toggle {

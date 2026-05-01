@@ -36,7 +36,7 @@
                     <input id="new-album-title" type="text" maxlength="120" placeholder="Summer Memories" required>
                 </label>
                 <div class="new-album-form-actions">
-                    <button type="submit">Create album</button>
+                    <button type="submit" class="btn-new-album-submit">+ New album</button>
                 </div>
             </form>
             <p id="album-list-empty" class="muted">Sign in to create and manage albums.</p>
@@ -72,7 +72,6 @@
                                     </select>
                                     <button id="copy-share-url" type="button" class="copy-share-btn">Copy link</button>
                                 </div>
-                                <p class="muted share-url-text" id="share-url-text"></p>
                             </label>
                             <label class="album-setting-field">
                                 Viewer columns
@@ -107,10 +106,14 @@
                 </details>
                 <div class="content-management-panel">
                     <h4 class="content-management-title">Content management</h4>
-                    <label>
-                        Upload photos (metadata auto-filled when available)
-                        <input id="photo-upload-input" type="file" multiple accept="image/*">
-                    </label>
+                    <div id="photo-drop-zone" class="photo-drop-zone" role="button" tabindex="0" aria-label="Upload photos by drag and drop or select photos">
+                        <input id="photo-upload-input" class="photo-upload-input" type="file" multiple accept="image/*">
+                        <div class="photo-drop-icon" aria-hidden="true">⬆</div>
+                        <p class="photo-drop-title">Drag and drop photos here</p>
+                        <p class="photo-drop-helper" aria-live="polite">Drop files now</p>
+                        <p class="photo-drop-subtitle">Metadata is auto-filled when available</p>
+                        <button id="photo-select-btn" class="photo-select-btn" type="button">Select Photos</button>
+                    </div>
                 </div>
             </div>
 

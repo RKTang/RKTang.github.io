@@ -56,8 +56,9 @@ const dom = {
     albumViewerColumns: document.getElementById("album-viewer-columns"),
     albumSettingsDropdown: document.getElementById("album-settings-dropdown"),
     saveAlbumSettings: document.getElementById("save-album-settings"),
-    shareUrlText: document.getElementById("share-url-text"),
     copyShareUrlBtn: document.getElementById("copy-share-url"),
+    photoDropZone: document.getElementById("photo-drop-zone"),
+    photoSelectBtn: document.getElementById("photo-select-btn"),
     photoUploadInput: document.getElementById("photo-upload-input"),
     albumViewState: document.getElementById("album-view-state"),
     ownerViewModeToggle: document.getElementById("owner-view-mode-toggle"),
@@ -109,6 +110,33 @@ function initialize() {
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
+    dom.photoSelectBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        dom.photoUploadInput.click();
+    });
+    dom.photoDropZone.addEventListener("click", () => dom.photoUploadInput.click());
+    dom.photoDropZone.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            dom.photoUploadInput.click();
+        }
+    });
+    dom.photoDropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dom.photoDropZone.classList.add("is-drag-over");
+    });
+    dom.photoDropZone.addEventListener("dragleave", () => {
+        dom.photoDropZone.classList.remove("is-drag-over");
+    });
+    dom.photoDropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dom.photoDropZone.classList.remove("is-drag-over");
+        const files = Array.from(event.dataTransfer?.files || []);
+        if (!files.length) {
+            return;
+        }
+        handleUploadPhotos({ target: { files } });
+    });
     dom.albumVisibilitySelect.addEventListener("change", () => {
         setShareLinkVisibility(dom.albumVisibilitySelect.value, isOwnerViewing);
     });
@@ -384,8 +412,7 @@ async function openAlbum(albumId) {
     updateAlbumBgSwatchSelection();
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
     const shareUrl = `${window.location.origin}${window.location.pathname}?album=${album.id}`;
-    dom.shareUrlText.textContent = `Share URL: ${shareUrl}`;
-    dom.shareUrlText.dataset.url = shareUrl;
+    dom.copyShareUrlBtn.dataset.url = shareUrl;
     setShareLinkVisibility(album.visibility || "private", isOwnerViewing);
     applyAlbumBackground(album.pageBackground);
     applyViewerColumns(album.viewerColumns);
@@ -731,21 +758,13 @@ function clearAlbumView() {
     dom.albumViewState.textContent = "Select an album to view entries, or open a shared public link.";
     applyAlbumBackground("");
     applyViewerColumns(3);
-    dom.shareUrlText.textContent = "";
-    dom.shareUrlText.dataset.url = "";
+    dom.copyShareUrlBtn.dataset.url = "";
     setShareLinkVisibility("private", false);
 }
 
 function setShareLinkVisibility(visibility, isOwner) {
     const canShowShare = isOwner && visibility === "public";
     dom.copyShareUrlBtn.hidden = !canShowShare;
-    dom.shareUrlText.hidden = !canShowShare;
-    if (!canShowShare) {
-        dom.shareUrlText.textContent = "";
-    } else {
-        const url = (dom.shareUrlText.dataset.url || "").trim();
-        dom.shareUrlText.textContent = url ? `Share URL: ${url}` : "";
-    }
 }
 
 function escapeHtml(value) {
@@ -848,7 +867,7 @@ function setOwnerViewMode(mode) {
 }
 
 async function handleCopyShareUrl() {
-    const url = (dom.shareUrlText.dataset.url || "").trim();
+    const url = (dom.copyShareUrlBtn.dataset.url || "").trim();
     if (!url) {
         return;
     }
