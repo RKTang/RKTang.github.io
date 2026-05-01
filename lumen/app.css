@@ -195,16 +195,26 @@ textarea {
 
 .new-album-form-actions {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0.5rem;
-    flex-wrap: wrap;
+}
+
+.new-album-form-actions input {
+    flex: 1;
+    min-width: 0;
 }
 
 .btn-new-album-submit {
     border-radius: 999px !important;
     background: #2c3e50 !important;
     color: #fff !important;
-    padding: 0.58rem 1rem !important;
+    width: 2.65rem;
+    min-width: 2.65rem;
+    padding: 0 !important;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    line-height: 1;
 }
 
 .album-list {
@@ -506,28 +516,35 @@ textarea {
     margin: 0;
     padding: 0;
     align-items: center;
-    border-radius: 8px;
-    padding: 4px;
-    background: linear-gradient(
-        90deg,
-        #ff4d4d,
-        #ffa94d,
-        #ffe066,
-        #69db7c,
-        #4dabf7,
-        #845ef7,
-        #ff6bcb
-    );
+    justify-content: center;
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #c9baa8;
+    border-radius: 6px;
+    background: #fffdf8;
+    cursor: pointer;
+}
+
+.album-bg-custom-plus {
+    color: #4f5963;
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1;
+    pointer-events: none;
 }
 
 .album-bg-native-input {
     width: 2rem;
     height: 2rem;
     padding: 0;
-    border: 1px solid #c9baa8;
+    border: 0;
     border-radius: 6px;
-    background: #fff;
+    background: transparent;
     cursor: pointer;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
 }
 
 .album-bg-native-input::-webkit-color-swatch-wrapper {
@@ -558,6 +575,22 @@ textarea {
     display: inline-flex;
     align-items: center;
     gap: 0.38rem;
+}
+
+.album-settings-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.1rem;
+    margin-left: 0.2rem;
+    color: #607086;
+    font-size: 0.78rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.album-settings-status.is-visible {
+    opacity: 1;
 }
 
 .album-settings-dropdown > summary::-webkit-details-marker {

@@ -53,10 +53,11 @@ const dom = {
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
     albumLocationDisplay: document.getElementById("album-location-display"),
     albumDateDisplay: document.getElementById("album-date-display"),
+    albumEntrySort: document.getElementById("album-entry-sort"),
     albumBackgroundColor: document.getElementById("album-background-color"),
     albumViewerColumns: document.getElementById("album-viewer-columns"),
     albumSettingsDropdown: document.getElementById("album-settings-dropdown"),
-    saveAlbumSettings: document.getElementById("save-album-settings"),
+    albumSettingsStatus: document.getElementById("album-settings-status"),
     copyShareUrlBtn: document.getElementById("copy-share-url"),
     photoDropZone: document.getElementById("photo-drop-zone"),
     photoSelectBtn: document.getElementById("photo-select-btn"),
@@ -90,6 +91,8 @@ let unsubscribeEntries = null;
 let unsubscribeAlbums = null;
 let isOwnerViewing = false;
 let isGuestSignInAvailable = true;
+let albumSettingsSaveTimer = null;
+let albumSettingsStatusTimer = null;
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -108,7 +111,6 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
-    dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
     dom.photoSelectBtn.addEventListener("click", (event) => {
@@ -140,13 +142,32 @@ function initialize() {
     });
     dom.albumVisibilitySelect.addEventListener("change", () => {
         setShareLinkVisibility(dom.albumVisibilitySelect.value, isOwnerViewing);
+        queueAlbumSettingsAutoSave();
+    });
+    dom.albumLocationDisplay.addEventListener("change", () => {
+        queueAlbumSettingsAutoSave();
+    });
+    dom.albumDateDisplay.addEventListener("change", () => {
+        queueAlbumSettingsAutoSave();
+    });
+    dom.albumEntrySort.addEventListener("change", () => {
+        if (activeAlbum?.id) {
+            subscribeEntries(activeAlbum.id);
+        }
+        queueAlbumSettingsAutoSave();
+    });
+    dom.albumViewerColumns.addEventListener("change", () => {
+        applyViewerColumns(dom.albumViewerColumns.value);
+        queueAlbumSettingsAutoSave();
     });
     dom.albumBackgroundColor.addEventListener("input", handleAlbumBackgroundInput);
+    dom.albumBackgroundColor.addEventListener("change", queueAlbumSettingsAutoSave);
     document.querySelectorAll(".album-bg-swatch").forEach((btn) => {
         btn.addEventListener("click", () => {
             const raw = btn.dataset.color;
             dom.albumBackgroundColor.value = normalizeColor(raw || "#f1ece4");
             handleAlbumBackgroundInput();
+            queueAlbumSettingsAutoSave();
         });
     });
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
@@ -354,7 +375,7 @@ function iconSvgGlobe() {
 }
 
 function iconSvgTrash() {
-    return `<svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 3h6a1 1 0 011 1v1h4v2H4V5h4V4a1 1 0 011-1zm1 5h2v9h-2V8zm4 0h2v9h-2V8zM6 8h2v11a2 2 0 002 2h6a2 2 0 002-2V8h2v11a4 4 0 01-4 4H10a4 4 0 01-4-4V8z"/></svg>`;
+    return `<svg class="icon-svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M170.5 51.6L151.5 80H40c-22.1 0-40 17.9-40 40s17.9 40 40 40h16l21.2 339.4c1.3 20.6 18.4 36.6 39 36.6h215.6c20.6 0 37.7-16 39-36.6L392 160h16c22.1 0 40-17.9 40-40s-17.9-40-40-40H296.5l-19-28.4C269.9 40.3 257.2 32 243.6 32h-39.1c-13.6 0-26.3 8.3-34 19.6zM177.9 467c-10.7-.4-19.1-9.4-18.7-20.1l8-208c.4-10.7 9.4-19.1 20.1-18.7s19.1 9.4 18.7 20.1l-8 208c-.4 10.5-9 18.7-19.5 18.7zm92.2-208l8 208c.4 10.7-8 19.7-18.7 20.1-10.5 0-19.1-8.2-19.5-18.7l-8-208c-.4-10.7 8-19.7 18.7-20.1s19.7 8 20.1 18.7z"/></svg>`;
 }
 
 function visibilityIconMarkup(visibility) {
@@ -445,8 +466,9 @@ async function handleCreateAlbum(event) {
         title,
         visibility: "private",
         viewerColumns: 3,
-        locationDisplayMode: "gps",
+        locationDisplayMode: "city-state",
         dateDisplayMode: "date-time",
+        entrySortMode: "latest-first",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
@@ -524,8 +546,9 @@ async function openAlbum(albumId) {
         document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
     }
     dom.albumVisibilitySelect.value = album.visibility || "private";
-    dom.albumLocationDisplay.value = album.locationDisplayMode || "gps";
+    dom.albumLocationDisplay.value = album.locationDisplayMode || "city-state";
     dom.albumDateDisplay.value = album.dateDisplayMode || "date-time";
+    dom.albumEntrySort.value = album.entrySortMode || "latest-first";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
     updateAlbumBgSwatchSelection();
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
@@ -551,9 +574,11 @@ function subscribeEntries(albumId) {
 }
 
 function renderEntries(entries) {
+    const sortMode = activeAlbum?.entrySortMode || "latest-first";
+    const sortedEntries = sortEntriesForViewer(entries, sortMode);
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
-    if (!entries.length) {
+    if (!sortedEntries.length) {
         dom.albumViewState.textContent = isOwnerViewing
             ? "No photos yet. Upload one or more images to start this album."
             : "No photos in this album yet.";
@@ -561,7 +586,7 @@ function renderEntries(entries) {
         dom.albumViewState.textContent = "";
     }
 
-    entries.forEach((entry) => {
+    sortedEntries.forEach((entry, index) => {
         const storyText = toDisplayText(entry.storyText, "");
         const locationText = toDisplayText(entry.locationText, "");
         const locationCoords = toDisplayText(entry.locationCoords, "");
@@ -573,7 +598,8 @@ function renderEntries(entries) {
         viewerNode.className = "polaroid-card";
         viewerNode.dataset.fullSrc = entry.photoUrl;
         viewerNode.dataset.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
-        viewerNode.dataset.title = activeAlbum?.title || "Lumen Journal Entry";
+        const albumTitle = activeAlbum?.title || "Untitled album";
+        viewerNode.dataset.title = `${albumTitle} - Journal Entry ${index + 1}`;
         viewerNode.dataset.story = storyText || "No story yet.";
         viewerNode.dataset.location = locationText || "Not set";
         viewerNode.dataset.locationCoords = locationCoords || "";
@@ -593,6 +619,7 @@ function renderEntries(entries) {
         const dateEl = node.querySelector(".entry-date");
         const saveBtn = node.querySelector(".entry-save");
         const delBtn = node.querySelector(".entry-delete");
+        delBtn.innerHTML = iconSvgTrash();
 
         img.src = entry.photoUrl;
         img.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
@@ -713,7 +740,7 @@ function openViewerCard(card) {
 
     dom.viewerModalTitle.textContent = card.dataset.title || "Lumen Journal Entry";
     dom.viewerModalBackTitle.textContent = card.dataset.title || "Lumen Journal Entry";
-    const locationMode = activeAlbum?.locationDisplayMode || "gps";
+    const locationMode = activeAlbum?.locationDisplayMode || "city-state";
     const dateMode = activeAlbum?.dateDisplayMode || "date-time";
     const formattedLocation = formatLocationForDisplay(
         card.dataset.location || "Not set",
@@ -770,12 +797,14 @@ async function handleSaveAlbumSettings() {
     const visibility = dom.albumVisibilitySelect.value;
     const locationDisplayMode = dom.albumLocationDisplay.value;
     const dateDisplayMode = dom.albumDateDisplay.value;
+    const entrySortMode = dom.albumEntrySort.value;
     const pageBackground = normalizeColor(dom.albumBackgroundColor.value || "#f1ece4");
     const viewerColumns = normalizeViewerColumns(dom.albumViewerColumns.value);
     await updateDoc(doc(db, "albums", activeAlbum.id), {
         visibility,
         locationDisplayMode,
         dateDisplayMode,
+        entrySortMode,
         pageBackground,
         viewerColumns,
         updatedAt: serverTimestamp()
@@ -783,12 +812,46 @@ async function handleSaveAlbumSettings() {
     activeAlbum.visibility = visibility;
     activeAlbum.locationDisplayMode = locationDisplayMode;
     activeAlbum.dateDisplayMode = dateDisplayMode;
+    activeAlbum.entrySortMode = entrySortMode;
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
     setActiveAlbumVisibilityPill(visibility);
     setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
+    if (unsubscribeEntries && activeAlbum?.id) {
+        subscribeEntries(activeAlbum.id);
+    }
+}
+
+function queueAlbumSettingsAutoSave() {
+    if (!activeAlbum || !isOwnerViewing) {
+        return;
+    }
+    if (albumSettingsSaveTimer) {
+        clearTimeout(albumSettingsSaveTimer);
+    }
+    albumSettingsSaveTimer = setTimeout(async () => {
+        albumSettingsSaveTimer = null;
+        await handleSaveAlbumSettings();
+        showAlbumSettingsSavedStatus();
+    }, 350);
+}
+
+function showAlbumSettingsSavedStatus() {
+    if (!dom.albumSettingsStatus) {
+        return;
+    }
+    dom.albumSettingsStatus.textContent = "Changes saved";
+    dom.albumSettingsStatus.classList.add("is-visible");
+    if (albumSettingsStatusTimer) {
+        clearTimeout(albumSettingsStatusTimer);
+    }
+    albumSettingsStatusTimer = setTimeout(() => {
+        dom.albumSettingsStatus.classList.remove("is-visible");
+        dom.albumSettingsStatus.textContent = "";
+        albumSettingsStatusTimer = null;
+    }, 1400);
 }
 
 async function handleDeleteAlbum(albumId) {
@@ -927,6 +990,18 @@ async function touchAlbumUpdatedAt(albumId) {
 function clearAlbumView() {
     activeAlbum = null;
     isOwnerViewing = false;
+    if (albumSettingsSaveTimer) {
+        clearTimeout(albumSettingsSaveTimer);
+        albumSettingsSaveTimer = null;
+    }
+    if (albumSettingsStatusTimer) {
+        clearTimeout(albumSettingsStatusTimer);
+        albumSettingsStatusTimer = null;
+    }
+    if (dom.albumSettingsStatus) {
+        dom.albumSettingsStatus.classList.remove("is-visible");
+        dom.albumSettingsStatus.textContent = "";
+    }
     if (unsubscribeEntries) {
         unsubscribeEntries();
         unsubscribeEntries = null;
@@ -953,10 +1028,13 @@ function clearAlbumView() {
     dom.copyShareUrlBtn.dataset.url = "";
     setShareLinkVisibility("private", false);
     if (dom.albumLocationDisplay) {
-        dom.albumLocationDisplay.value = "gps";
+        dom.albumLocationDisplay.value = "city-state";
     }
     if (dom.albumDateDisplay) {
         dom.albumDateDisplay.value = "date-time";
+    }
+    if (dom.albumEntrySort) {
+        dom.albumEntrySort.value = "latest-first";
     }
 }
 
@@ -1087,6 +1165,37 @@ function formatCaptureDateForDisplay(rawDate, mode) {
     }
     const token = value.split(" ")[0];
     return token || value;
+}
+
+function getEntrySortTimestamp(entry) {
+    const captureRaw = toDisplayText(entry?.captureDate, "").trim();
+    if (captureRaw) {
+        const normalized = captureRaw.includes("T") ? captureRaw : captureRaw.replace(" ", "T");
+        const parsedMs = Date.parse(normalized);
+        if (Number.isFinite(parsedMs)) {
+            return parsedMs;
+        }
+    }
+    const createdAtSeconds = entry?.createdAt?.seconds;
+    if (Number.isFinite(createdAtSeconds)) {
+        return createdAtSeconds * 1000;
+    }
+    return Number(entry?.orderIndex) || 0;
+}
+
+function sortEntriesForViewer(entries, mode) {
+    const normalizedMode = mode === "earliest-first" ? "earliest-first" : "latest-first";
+    const sorted = [...entries].sort((a, b) => {
+        const tsA = getEntrySortTimestamp(a);
+        const tsB = getEntrySortTimestamp(b);
+        if (tsA === tsB) {
+            const orderA = Number(a?.orderIndex) || 0;
+            const orderB = Number(b?.orderIndex) || 0;
+            return orderA - orderB;
+        }
+        return normalizedMode === "earliest-first" ? tsA - tsB : tsB - tsA;
+    });
+    return sorted;
 }
 
 function applyAlbumBackground(color) {
