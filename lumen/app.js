@@ -45,7 +45,6 @@ const dom = {
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
     newAlbumToggleBtn: document.getElementById("new-album-toggle-btn"),
-    newAlbumCancelBtn: document.getElementById("new-album-cancel-btn"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     activeAlbumTitle: document.getElementById("active-album-title"),
@@ -107,10 +106,12 @@ function initialize() {
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
     dom.newAlbumToggleBtn.addEventListener("click", toggleNewAlbumForm);
-    dom.newAlbumCancelBtn.addEventListener("click", () => setNewAlbumFormOpen(false));
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
+    dom.albumVisibilitySelect.addEventListener("change", () => {
+        setShareLinkVisibility(dom.albumVisibilitySelect.value, isOwnerViewing);
+    });
     dom.albumBackgroundColor.addEventListener("input", handleAlbumBackgroundInput);
     document.querySelectorAll(".album-bg-swatch").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -264,12 +265,20 @@ function renderAlbumList(albums, ownedQuery) {
             card.classList.add("active");
         }
         const owned = currentUser && album.ownerUid === currentUser.uid;
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", `Open album ${album.title || "Untitled album"}`);
         card.innerHTML = `
             <p class="album-item-title">${escapeHtml(album.title || "Untitled album")}</p>
             <p class="muted">${owned ? "Owned by you" : "Public album"} · ${album.visibility || "private"}</p>
-            <button type="button">${activeAlbum?.id === album.id ? "Opened" : "Open album"}</button>
         `;
-        card.querySelector("button").addEventListener("click", () => openAlbum(album.id));
+        card.addEventListener("click", () => openAlbum(album.id));
+        card.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openAlbum(album.id);
+            }
+        });
         dom.albumList.appendChild(card);
     });
 }
@@ -377,6 +386,7 @@ async function openAlbum(albumId) {
     const shareUrl = `${window.location.origin}${window.location.pathname}?album=${album.id}`;
     dom.shareUrlText.textContent = `Share URL: ${shareUrl}`;
     dom.shareUrlText.dataset.url = shareUrl;
+    setShareLinkVisibility(album.visibility || "private", isOwnerViewing);
     applyAlbumBackground(album.pageBackground);
     applyViewerColumns(album.viewerColumns);
     history.replaceState(null, "", `?album=${album.id}`);
@@ -614,6 +624,7 @@ async function handleSaveAlbumSettings() {
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
     dom.activeAlbumVisibility.textContent = visibility;
+    setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
 }
@@ -722,6 +733,19 @@ function clearAlbumView() {
     applyViewerColumns(3);
     dom.shareUrlText.textContent = "";
     dom.shareUrlText.dataset.url = "";
+    setShareLinkVisibility("private", false);
+}
+
+function setShareLinkVisibility(visibility, isOwner) {
+    const canShowShare = isOwner && visibility === "public";
+    dom.copyShareUrlBtn.hidden = !canShowShare;
+    dom.shareUrlText.hidden = !canShowShare;
+    if (!canShowShare) {
+        dom.shareUrlText.textContent = "";
+    } else {
+        const url = (dom.shareUrlText.dataset.url || "").trim();
+        dom.shareUrlText.textContent = url ? `Share URL: ${url}` : "";
+    }
 }
 
 function escapeHtml(value) {
