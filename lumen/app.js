@@ -204,6 +204,11 @@ async function handleLinkAccount() {
     const provider = new GoogleAuthProvider();
     try {
         await linkWithPopup(currentUser, provider);
+        const linkedUser = auth.currentUser || currentUser;
+        const preferredName = getPreferredOwnerDisplayName(linkedUser);
+        if (preferredName) {
+            await backfillOwnerDisplayName(linkedUser.uid, preferredName);
+        }
         setAuthStatus("Guest account linked to Google.", "success");
     } catch (error) {
         const friendly = getAuthErrorMessage(error, "link-account");
@@ -252,6 +257,34 @@ async function ensureUserDoc(user) {
             createdAt: serverTimestamp()
         },
         { merge: true }
+    );
+}
+
+function getPreferredOwnerDisplayName(user) {
+    const best = toDisplayText(user?.displayName || user?.email, "").trim();
+    if (best) {
+        return best;
+    }
+    if (user?.isAnonymous) {
+        return "Guest";
+    }
+    return "";
+}
+
+async function backfillOwnerDisplayName(ownerUid, ownerDisplayName) {
+    if (!ownerUid || !ownerDisplayName) {
+        return;
+    }
+    const ownerAlbums = await getDocs(query(collection(db, "albums"), where("ownerUid", "==", ownerUid)));
+    await Promise.all(
+        ownerAlbums.docs.map(async (albumDoc) => {
+            const data = albumDoc.data() || {};
+            const existing = toDisplayText(data.ownerDisplayName, "").trim();
+            if (existing === ownerDisplayName) {
+                return;
+            }
+            await updateDoc(doc(db, "albums", albumDoc.id), { ownerDisplayName });
+        })
     );
 }
 
@@ -461,6 +494,14 @@ async function openAlbum(albumId) {
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
 
     const ownerName = await resolveAlbumOwnerName(album, isOwner);
+    if (isOwner) {
+        const existingOwnerLabel = toDisplayText(album.ownerDisplayName, "").trim();
+        const normalizedOwnerLabel = toDisplayText(ownerName, "").trim();
+        if (normalizedOwnerLabel && existingOwnerLabel !== normalizedOwnerLabel) {
+            updateDoc(doc(db, "albums", album.id), { ownerDisplayName: normalizedOwnerLabel }).catch(() => {});
+            album.ownerDisplayName = normalizedOwnerLabel;
+        }
+    }
     dom.activeAlbumTitle.textContent = album.title || "Untitled album";
     dom.activeAlbumOwner.hidden = false;
     dom.activeAlbumOwner.textContent = `By ${ownerName}`;
@@ -949,7 +990,7 @@ async function resolveAlbumOwnerName(album, isOwner) {
     }
 
     if (isOwner && currentUser) {
-        const selfName = toDisplayText(currentUser.displayName || currentUser.email, "").trim();
+        const selfName = getPreferredOwnerDisplayName(currentUser);
         if (selfName) {
             return selfName;
         }
