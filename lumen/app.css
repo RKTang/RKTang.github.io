@@ -200,12 +200,77 @@ textarea {
 .album-item {
     border: 1px solid #e6ddd0;
     border-radius: 0;
-    padding: 0.6rem;
-    display: grid;
-    gap: 0.4rem;
+    padding: 0.45rem 0.5rem;
     background: #fffdf8;
-    cursor: pointer;
     transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.album-item-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.album-item-open {
+    flex: 1;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.2rem 0.15rem;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+}
+
+.album-item-open:hover,
+.album-item-open:focus-visible {
+    outline: none;
+}
+
+.album-item-title {
+    margin: 0;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.album-visibility-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #4e535b;
+}
+
+.icon-svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+.album-item-delete {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px !important;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: #fff1f1 !important;
+    color: #7b2a2a !important;
+    box-shadow: inset 0 0 0 1px #e5c9c9;
+}
+
+.album-item-delete:hover {
+    background: #ffe5e5 !important;
 }
 
 .album-item:hover,
@@ -218,11 +283,6 @@ textarea {
     border-color: #2c3e50;
     box-shadow: 0 0 0 1px #2c3e50 inset;
     background: #f1f6fb;
-}
-
-.album-item-title {
-    margin: 0;
-    font-weight: 700;
 }
 
 .panel-heading {
@@ -258,24 +318,6 @@ textarea {
 
 .panel-heading-text h2 {
     margin: 0;
-}
-
-.delete-album-btn {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 999px !important;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    background: #fff1f1 !important;
-    color: #7b2a2a !important;
-    box-shadow: inset 0 0 0 1px #e5c9c9;
-    font-size: 0.9rem;
-    line-height: 1;
-}
-
-.delete-album-btn:hover {
-    background: #ffe5e5 !important;
 }
 
 .active-album-owner {

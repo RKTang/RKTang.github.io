@@ -49,7 +49,6 @@ const dom = {
     activeAlbumTitle: document.getElementById("active-album-title"),
     activeAlbumOwner: document.getElementById("active-album-owner"),
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
-    deleteAlbumBtn: document.getElementById("delete-album-btn"),
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
     albumBackgroundColor: document.getElementById("album-background-color"),
@@ -106,7 +105,6 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
-    dom.deleteAlbumBtn.addEventListener("click", handleDeleteAlbum);
     dom.saveAlbumSettings.addEventListener("click", handleSaveAlbumSettings);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
     dom.photoUploadInput.addEventListener("change", handleUploadPhotos);
@@ -262,6 +260,32 @@ function subscribeAlbumList() {
 }
 
 const albumMap = new Map();
+
+function iconSvgLock() {
+    return `<svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V11a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 016 0v3H9z"/></svg>`;
+}
+
+function iconSvgGlobe() {
+    return `<svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1 2.05h2V6h-2V4.05zM4.5 10h2.06a12.9 12.9 0 000 4H4.5a8.04 8.04 0 010-4zm3.07 0h4.86v4H7.57a10.9 10.9 0 010-4zm4.86-2H7.57a8.04 8.04 0 011.58-2.8A10.9 10.9 0 0112.43 8zm2 0V5.2A10.9 10.9 0 0116.86 8h-2.43zm2.43 0h2.06a8.04 8.04 0 010 4h-2.06a12.9 12.9 0 000-4zm0 6a8.04 8.04 0 01-2.07 4H18a8.04 8.04 0 002-4zm-4.5 4h-2.43v2.8a10.9 10.9 0 012.43-2.8zm-2 0H9.15a10.9 10.9 0 012.43 2.8V16zm-2.43-2H6.5a8.04 8.04 0 01-1.58-2.8h2.43a12.9 12.9 0 000 2.8zm5.43 0h2.43a12.9 12.9 0 000-2.8h2.43A8.04 8.04 0 0116.86 14h-2.43z"/></svg>`;
+}
+
+function iconSvgTrash() {
+    return `<svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 3h6a1 1 0 011 1v1h4v2H4V5h4V4a1 1 0 011-1zm1 5h2v9h-2V8zm4 0h2v9h-2V8zM6 8h2v11a2 2 0 002 2h6a2 2 0 002-2V8h2v11a4 4 0 01-4 4H10a4 4 0 01-4-4V8z"/></svg>`;
+}
+
+function visibilityIconMarkup(visibility) {
+    const isPublic = (visibility || "private").toLowerCase() === "public";
+    const label = isPublic ? "Public album" : "Private album";
+    const svg = isPublic ? iconSvgGlobe() : iconSvgLock();
+    return `<span class="album-visibility-icon" title="${label}" aria-label="${label}">${svg}</span>`;
+}
+
+function setActiveAlbumVisibilityPill(visibility) {
+    const isPublic = (visibility || "private").toLowerCase() === "public";
+    dom.activeAlbumVisibility.innerHTML = visibilityIconMarkup(visibility);
+    dom.activeAlbumVisibility.setAttribute("aria-label", isPublic ? "Public album" : "Private album");
+}
+
 function renderAlbumList(albums, ownedQuery) {
     for (const album of albums) {
         albumMap.set(album.id, {
@@ -289,23 +313,30 @@ function renderAlbumList(albums, ownedQuery) {
             card.classList.add("active");
         }
         const owned = currentUser && album.ownerUid === currentUser.uid;
-        const visibility = (album.visibility || "private").toLowerCase();
-        const visibilityIcon = visibility === "public" ? "🌐" : "🔒";
-        const visibilityLabel = visibility === "public" ? "Public" : "Private";
-        card.tabIndex = 0;
-        card.setAttribute("role", "button");
-        card.setAttribute("aria-label", `Open album ${album.title || "Untitled album"}`);
+        const rawTitle = album.title || "Untitled album";
+        const titleHtml = escapeHtml(rawTitle);
+        const visHtml = visibilityIconMarkup(album.visibility);
+        const deleteLabel = escapeHtml(`Delete album ${rawTitle}`);
+        const deleteBtnHtml = owned
+            ? `<button type="button" class="album-item-delete" aria-label="${deleteLabel}" title="Delete album">${iconSvgTrash()}</button>`
+            : "";
         card.innerHTML = `
-            <p class="album-item-title">${escapeHtml(album.title || "Untitled album")}</p>
-            <p class="muted">${owned ? "Owned by you" : "Public album"} · <span aria-label="${visibilityLabel}" title="${visibilityLabel}">${visibilityIcon}</span></p>
+            <div class="album-item-inner">
+                <button type="button" class="album-item-open">
+                    <span class="album-item-title">${titleHtml}</span>
+                    ${visHtml}
+                </button>
+                ${deleteBtnHtml}
+            </div>
         `;
-        card.addEventListener("click", () => openAlbum(album.id));
-        card.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                openAlbum(album.id);
-            }
-        });
+        card.querySelector(".album-item-open").addEventListener("click", () => openAlbum(album.id));
+        const del = card.querySelector(".album-item-delete");
+        if (del) {
+            del.addEventListener("click", (event) => {
+                event.stopPropagation();
+                handleDeleteAlbum(album.id);
+            });
+        }
         dom.albumList.appendChild(card);
     });
 }
@@ -380,13 +411,11 @@ async function openAlbum(albumId) {
     dom.activeAlbumOwner.hidden = false;
     dom.activeAlbumOwner.textContent = `By ${ownerName}`;
     dom.activeAlbumVisibility.hidden = false;
-    dom.activeAlbumVisibility.textContent = album.visibility === "public" ? "🌐" : "🔒";
-    dom.activeAlbumVisibility.setAttribute("aria-label", album.visibility === "public" ? "Public album" : "Private album");
+    setActiveAlbumVisibilityPill(album.visibility);
     dom.albumViewState.textContent = "";
     dom.albumControls.hidden = !isOwnerViewing;
     dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.ownerViewModeToggle.hidden = !isOwnerViewing;
-    dom.deleteAlbumBtn.hidden = !isOwnerViewing;
     if (isOwnerViewing) {
         setOwnerViewMode("viewer");
         if (dom.albumSettingsDropdown) {
@@ -645,17 +674,27 @@ async function handleSaveAlbumSettings() {
     applyViewerColumns(viewerColumns);
 }
 
-async function handleDeleteAlbum() {
-    if (!activeAlbum || !isOwnerViewing) {
+async function handleDeleteAlbum(albumId) {
+    const targetId = albumId || activeAlbum?.id;
+    if (!currentUser || !targetId) {
         return;
     }
-    const albumTitle = activeAlbum.title || "this album";
+    const albumRef = doc(db, "albums", targetId);
+    const albumSnap = await getDoc(albumRef);
+    if (!albumSnap.exists()) {
+        return;
+    }
+    const albumData = albumSnap.data();
+    if (albumData.ownerUid !== currentUser.uid) {
+        return;
+    }
+    const albumTitle = albumData.title || "this album";
     if (!confirm(`Delete ${albumTitle}? This permanently removes all photos and entries.`)) {
         return;
     }
 
-    const albumId = activeAlbum.id;
-    const entriesRef = collection(db, "albums", albumId, "entries");
+    const albumIdResolved = albumSnap.id;
+    const entriesRef = collection(db, "albums", albumIdResolved, "entries");
     const entriesSnap = await getDocs(entriesRef);
     for (const entryDoc of entriesSnap.docs) {
         const entry = entryDoc.data() || {};
@@ -666,12 +705,14 @@ async function handleDeleteAlbum() {
                 // continue cleanup even when storage object is already missing
             }
         }
-        await deleteDoc(doc(db, "albums", albumId, "entries", entryDoc.id));
+        await deleteDoc(doc(db, "albums", albumIdResolved, "entries", entryDoc.id));
     }
 
-    await deleteDoc(doc(db, "albums", albumId));
-    clearAlbumView();
-    history.replaceState(null, "", window.location.pathname);
+    await deleteDoc(doc(db, "albums", albumIdResolved));
+    if (activeAlbum?.id === albumIdResolved) {
+        clearAlbumView();
+        history.replaceState(null, "", window.location.pathname);
+    }
     subscribeAlbumList();
 }
 
@@ -765,8 +806,8 @@ function clearAlbumView() {
     dom.activeAlbumOwner.textContent = "";
     dom.activeAlbumVisibility.hidden = true;
     dom.activeAlbumVisibility.textContent = "";
+    dom.activeAlbumVisibility.innerHTML = "";
     dom.albumControls.hidden = true;
-    dom.deleteAlbumBtn.hidden = true;
     dom.ownerViewModeToggle.hidden = true;
     dom.ownerEditorSection.hidden = true;
     dom.entryGridViewer.innerHTML = "";
