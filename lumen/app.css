@@ -145,7 +145,76 @@ textarea {
     min-height: 1.2rem;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.album-sidebar-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.55rem;
+}
+
+.album-sidebar-header h2 {
+    margin: 0;
+    line-height: 1.1;
+}
+
+.btn-new-album {
+    border-radius: 999px !important;
+    background: #eef3f9 !important;
+    color: #27405c !important;
+    padding: 0.42rem 0.85rem !important;
+    font-size: 0.88rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.btn-new-album:hover {
+    background: #dde7f3 !important;
+}
+
+.new-album-inline-form {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #efe8df;
+}
+
+.new-album-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-text {
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #4e535b !important;
+    box-shadow: inset 0 0 0 1px #d8cfc3;
+    font-weight: 600;
+}
+
+.btn-text:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: #2c3e50 !important;
+}
+
 .album-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
     gap: 0.55rem;
 }
@@ -171,13 +240,22 @@ textarea {
 
 .panel-heading {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
     background: rgba(255, 253, 248, 0.85);
     border: 1px solid #e8dfd3;
     padding: 0.5rem 0.7rem;
     margin-bottom: 0.8rem;
+}
+
+.panel-heading-trailing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.45rem;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .panel-heading-text {
@@ -203,12 +281,12 @@ textarea {
     margin-top: 0.4rem;
 }
 
-#album-controls {
+#album-controls.album-controls {
     margin-top: 0.6rem;
-    padding: 0.85rem;
-    border: 1px solid #e8dfd3;
-    background: rgba(255, 253, 248, 0.78);
-    gap: 0.75rem;
+    padding: 0.65rem 0 0;
+    border: 0;
+    background: transparent;
+    gap: 0;
 }
 
 #album-controls label {
@@ -234,14 +312,126 @@ textarea {
     white-space: nowrap;
 }
 
-.album-setting-color {
-    width: 100%;
+.album-setting-visibility {
+    white-space: normal;
+}
+
+.visibility-copy-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.visibility-copy-row select {
+    flex: 1;
+    min-width: 0;
+}
+
+.album-setting-visibility .share-url-text {
+    margin: 0.35rem 0 0;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-all;
+}
+
+.album-background-label {
+    display: block;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+}
+
+.album-bg-picker {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.album-bg-swatches {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.album-bg-swatch {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.65rem;
+    height: 1.65rem;
+    margin: 0;
+    padding: 0;
+    border: 2px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px !important;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    font: inherit;
+    background: var(--swatch-color, #fff) !important;
+    color: transparent !important;
+    border-radius: 6px !important;
+}
+
+.album-bg-swatch:hover {
+    border-color: rgba(44, 62, 80, 0.45);
+}
+
+.album-bg-swatch.is-selected {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px #2c3e50;
+}
+
+.album-bg-custom-wrap {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    border-radius: 8px;
+    padding: 2px;
+    background: linear-gradient(
+        90deg,
+        #ff4d4d,
+        #ffa94d,
+        #ffe066,
+        #69db7c,
+        #4dabf7,
+        #845ef7,
+        #ff6bcb
+    );
+}
+
+.album-bg-native-input {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid #c9baa8;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.album-bg-native-input::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.album-bg-native-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
+.album-setting-background {
+    white-space: normal;
 }
 
 .album-settings-dropdown {
-    border: 1px solid #e8dfd3;
-    background: #fffdfa;
-    padding: 0.55rem 0.65rem 0.7rem;
+    border: 0;
+    background: rgba(255, 253, 248, 0.55);
+    padding: 0.35rem 0 0.85rem;
+    margin: 0;
 }
 
 .album-settings-dropdown > summary {
@@ -272,41 +462,46 @@ textarea {
     margin: 0;
 }
 
-#album-background-color {
-    width: 100%;
-    height: 2rem;
-    padding: 0.1rem;
-}
-
-.share-url-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.share-url-text {
-    flex: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .copy-share-btn {
     border-radius: 999px !important;
     background: #eef3f9;
     color: #27405c;
-    padding: 0.4rem 0.8rem;
+    padding: 0.4rem 0.75rem;
+    flex-shrink: 0;
+    font-size: 0.88rem;
 }
 
 .copy-share-btn:hover {
     background: #dde7f3;
 }
 
+.content-management-panel {
+    border: 0;
+    border-top: 1px solid #e5ddd2;
+    background: rgba(255, 255, 255, 0.35);
+    padding: 1rem 0 0.15rem;
+    margin-top: 0.85rem;
+}
+
+.content-management-title {
+    margin: 0 0 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #2a3c52;
+}
+
+.content-management-panel label {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+}
+
 .owner-view-mode-toggle {
     display: flex;
     gap: 0.55rem;
-    margin: 0.8rem 0 0.25rem;
+    margin: 0;
     padding: 0.2rem;
     border-radius: 999px;
     background: #e9eef4;
@@ -583,8 +778,9 @@ dialog::backdrop {
         grid-template-columns: 1fr;
     }
 
-    .album-setting-color {
-        width: 100%;
+    .album-setting-background .album-bg-picker {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
