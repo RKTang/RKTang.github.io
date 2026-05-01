@@ -51,6 +51,8 @@ const dom = {
     activeAlbumVisibility: document.getElementById("active-album-visibility"),
     albumControls: document.getElementById("album-controls"),
     albumVisibilitySelect: document.getElementById("album-visibility-select"),
+    albumLocationDisplay: document.getElementById("album-location-display"),
+    albumDateDisplay: document.getElementById("album-date-display"),
     albumBackgroundColor: document.getElementById("album-background-color"),
     albumViewerColumns: document.getElementById("album-viewer-columns"),
     albumSettingsDropdown: document.getElementById("album-settings-dropdown"),
@@ -443,6 +445,8 @@ async function handleCreateAlbum(event) {
         title,
         visibility: "private",
         viewerColumns: 3,
+        locationDisplayMode: "gps",
+        dateDisplayMode: "date-time",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
@@ -520,6 +524,8 @@ async function openAlbum(albumId) {
         document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
     }
     dom.albumVisibilitySelect.value = album.visibility || "private";
+    dom.albumLocationDisplay.value = album.locationDisplayMode || "gps";
+    dom.albumDateDisplay.value = album.dateDisplayMode || "date-time";
     dom.albumBackgroundColor.value = normalizeColor(album.pageBackground || "#f1ece4");
     updateAlbumBgSwatchSelection();
     dom.albumViewerColumns.value = String(normalizeViewerColumns(album.viewerColumns));
@@ -558,6 +564,8 @@ function renderEntries(entries) {
     entries.forEach((entry) => {
         const storyText = toDisplayText(entry.storyText, "");
         const locationText = toDisplayText(entry.locationText, "");
+        const locationCoords = toDisplayText(entry.locationCoords, "");
+        const locationCityState = toDisplayText(entry.locationCityState, "");
         const captureDate = toDisplayText(entry.captureDate, "");
 
         const viewerNode = document.createElement("button");
@@ -568,6 +576,8 @@ function renderEntries(entries) {
         viewerNode.dataset.title = activeAlbum?.title || "Lumen Journal Entry";
         viewerNode.dataset.story = storyText || "No story yet.";
         viewerNode.dataset.location = locationText || "Not set";
+        viewerNode.dataset.locationCoords = locationCoords || "";
+        viewerNode.dataset.locationCityState = locationCityState || "";
         viewerNode.dataset.date = captureDate || "Not set";
         viewerNode.innerHTML = `<img src="${escapeHtml(entry.photoUrl)}" alt="${escapeHtml(viewerNode.dataset.alt)}">`;
         dom.entryGridViewer.appendChild(viewerNode);
@@ -703,9 +713,18 @@ function openViewerCard(card) {
 
     dom.viewerModalTitle.textContent = card.dataset.title || "Lumen Journal Entry";
     dom.viewerModalBackTitle.textContent = card.dataset.title || "Lumen Journal Entry";
+    const locationMode = activeAlbum?.locationDisplayMode || "gps";
+    const dateMode = activeAlbum?.dateDisplayMode || "date-time";
+    const formattedLocation = formatLocationForDisplay(
+        card.dataset.location || "Not set",
+        card.dataset.locationCoords || "",
+        card.dataset.locationCityState || "",
+        locationMode
+    );
+    const formattedDate = formatCaptureDateForDisplay(card.dataset.date || "Not set", dateMode);
     dom.viewerModalStory.textContent = `Story: ${card.dataset.story || "No story yet."}`;
-    dom.viewerModalLocation.textContent = `Location: ${card.dataset.location || "Not set"}`;
-    dom.viewerModalDate.textContent = `Date: ${card.dataset.date || "Not set"}`;
+    dom.viewerModalLocation.textContent = `Location: ${formattedLocation}`;
+    dom.viewerModalDate.textContent = `Date: ${formattedDate}`;
     dom.viewerModalImage.src = fullSrc;
     dom.viewerModalImage.alt = card.dataset.alt || "Journal entry image";
     dom.viewerModalCard.classList.remove("is-flipped");
@@ -749,15 +768,21 @@ async function handleSaveAlbumSettings() {
         return;
     }
     const visibility = dom.albumVisibilitySelect.value;
+    const locationDisplayMode = dom.albumLocationDisplay.value;
+    const dateDisplayMode = dom.albumDateDisplay.value;
     const pageBackground = normalizeColor(dom.albumBackgroundColor.value || "#f1ece4");
     const viewerColumns = normalizeViewerColumns(dom.albumViewerColumns.value);
     await updateDoc(doc(db, "albums", activeAlbum.id), {
         visibility,
+        locationDisplayMode,
+        dateDisplayMode,
         pageBackground,
         viewerColumns,
         updatedAt: serverTimestamp()
     });
     activeAlbum.visibility = visibility;
+    activeAlbum.locationDisplayMode = locationDisplayMode;
+    activeAlbum.dateDisplayMode = dateDisplayMode;
     activeAlbum.pageBackground = pageBackground;
     activeAlbum.viewerColumns = viewerColumns;
     setActiveAlbumVisibilityPill(visibility);
@@ -834,6 +859,8 @@ async function handleUploadPhotos(event) {
             storagePath,
             storyText: "",
             locationText: metadata.locationText,
+            locationCoords: metadata.locationCoords,
+            locationCityState: metadata.locationCityState,
             captureDate: metadata.captureDate,
             orderIndex: orderIndex++,
             createdAt: serverTimestamp(),
@@ -848,6 +875,8 @@ async function handleUploadPhotos(event) {
 async function extractMetadata(file) {
     let captureDate = "";
     let locationText = "";
+    let locationCoords = "";
+    let locationCityState = "";
     try {
         const parsed = await exifr.parse(file, {
             gps: true,
@@ -861,7 +890,14 @@ async function extractMetadata(file) {
             captureDate = parsed.CreateDate.toISOString().slice(0, 19).replace("T", " ");
         }
         if (typeof parsed?.latitude === "number" && typeof parsed?.longitude === "number") {
-            locationText = `${parsed.latitude.toFixed(6)}, ${parsed.longitude.toFixed(6)}`;
+            const lat = parsed.latitude;
+            const lon = parsed.longitude;
+            locationCoords = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            locationText = locationCoords;
+            locationCityState = await reverseGeocodeCityState(lat, lon);
+            if (locationCityState) {
+                locationText = locationCityState;
+            }
         }
     } catch (_error) {
         // ignore parse errors and rely on filename fallback
@@ -878,7 +914,9 @@ async function extractMetadata(file) {
 
     return {
         captureDate: captureDate || "",
-        locationText: locationText || ""
+        locationText: locationText || "",
+        locationCoords: locationCoords || "",
+        locationCityState: locationCityState || ""
     };
 }
 
@@ -914,6 +952,12 @@ function clearAlbumView() {
     applyViewerColumns(3);
     dom.copyShareUrlBtn.dataset.url = "";
     setShareLinkVisibility("private", false);
+    if (dom.albumLocationDisplay) {
+        dom.albumLocationDisplay.value = "gps";
+    }
+    if (dom.albumDateDisplay) {
+        dom.albumDateDisplay.value = "date-time";
+    }
 }
 
 function setShareLinkVisibility(visibility, isOwner) {
@@ -950,6 +994,99 @@ function toDisplayText(value, fallback = "") {
         }
     }
     return fallback;
+}
+
+function looksLikeGpsCoordinate(value) {
+    if (typeof value !== "string") {
+        return false;
+    }
+    return /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(value.trim());
+}
+
+function formatLocationForDisplay(rawLocation, rawCoords, rawCityState, mode) {
+    const value = toDisplayText(rawLocation, "Not set").trim();
+    const coordsValue = toDisplayText(rawCoords, "").trim();
+    const cityStateValue = toDisplayText(rawCityState, "").trim();
+    if (!value) {
+        return "Not set";
+    }
+    if (mode !== "city-state") {
+        if (coordsValue) {
+            return coordsValue;
+        }
+        return value;
+    }
+    if (cityStateValue) {
+        return cityStateValue;
+    }
+    if (looksLikeGpsCoordinate(value) || looksLikeGpsCoordinate(coordsValue)) {
+        return "City / state not available";
+    }
+    const parts = value.split(",").map((part) => part.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+        return `${parts[0]}, ${parts[1]}`;
+    }
+    return value;
+}
+
+async function reverseGeocodeCityState(latitude, longitude) {
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return "";
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    try {
+        const url = new URL("https://nominatim.openstreetmap.org/reverse");
+        url.searchParams.set("format", "jsonv2");
+        url.searchParams.set("lat", String(latitude));
+        url.searchParams.set("lon", String(longitude));
+        url.searchParams.set("zoom", "10");
+        url.searchParams.set("addressdetails", "1");
+        const response = await fetch(url.toString(), {
+            headers: {
+                Accept: "application/json"
+            },
+            signal: controller.signal
+        });
+        if (!response.ok) {
+            return "";
+        }
+        const payload = await response.json();
+        const address = payload?.address || {};
+        const city = toDisplayText(
+            address.city || address.town || address.village || address.hamlet || address.municipality,
+            ""
+        ).trim();
+        const state = toDisplayText(address.state || address.region || address.state_district, "").trim();
+        if (city && state) {
+            return `${city}, ${state}`;
+        }
+        return city || state || "";
+    } catch (_error) {
+        return "";
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
+function formatCaptureDateForDisplay(rawDate, mode) {
+    const value = toDisplayText(rawDate, "Not set").trim();
+    if (!value) {
+        return "Not set";
+    }
+    if (mode !== "date-only") {
+        return value;
+    }
+    const isoLikeMatch = value.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoLikeMatch) {
+        return isoLikeMatch[1];
+    }
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+        return parsed.toISOString().slice(0, 10);
+    }
+    const token = value.split(" ")[0];
+    return token || value;
 }
 
 function applyAlbumBackground(color) {
