@@ -198,6 +198,10 @@ function initialize() {
         subscribeAlbumList();
         subscribeSharedAlbumList();
         await tryOpenAlbumFromUrl();
+        if (activeAlbum?.id && !isOwnerViewing) {
+            await maybeAutoBookmarkSharedAlbum();
+        }
+        refreshSaveSharedButtonVisibility();
     });
 }
 
@@ -355,15 +359,18 @@ function updateAuthUI() {
     updateSubtitleVisibility(loggedIn);
     if (!loggedIn) {
         setAuthStatus("", "info");
+        refreshSaveSharedButtonVisibility();
         return;
     }
 
     if (isGuest) {
         setAuthStatus("You are viewing as a Guest. Use Link Account to keep long-term access.", "info");
+        refreshSaveSharedButtonVisibility();
         return;
     }
 
     setAuthStatus("", "info");
+    refreshSaveSharedButtonVisibility();
 }
 
 function subscribeAlbumList() {
@@ -610,7 +617,6 @@ async function openAlbum(albumId) {
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
     updateSubtitleVisibility(Boolean(currentUser));
     dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
-    dom.saveSharedBtn.hidden = isOwnerViewing;
 
     const ownerName = await resolveAlbumOwnerName(album, isOwner);
     if (isOwner) {
@@ -656,6 +662,75 @@ async function openAlbum(albumId) {
     subscribeEntries(album.id);
     subscribeAlbumList();
     subscribeSharedAlbumList();
+
+    await maybeAutoBookmarkSharedAlbum();
+    refreshSaveSharedButtonVisibility();
+}
+
+function refreshSaveSharedButtonVisibility() {
+    if (!dom.saveSharedBtn) {
+        return;
+    }
+    if (!activeAlbum) {
+        dom.saveSharedBtn.hidden = true;
+        return;
+    }
+    if (isOwnerViewing) {
+        dom.saveSharedBtn.hidden = true;
+        return;
+    }
+    const user = auth.currentUser;
+    dom.saveSharedBtn.hidden = Boolean(user && !user.isAnonymous);
+}
+
+async function persistSharedAlbumBookmark(user) {
+    if (!activeAlbum?.id || !user?.uid || user.isAnonymous) {
+        return;
+    }
+    await ensureUserDoc(user);
+    await setDoc(
+        doc(db, "users", user.uid, "sharedAlbums", activeAlbum.id),
+        {
+            albumId: activeAlbum.id,
+            title: activeAlbum.title || "Untitled album",
+            savedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        },
+        { merge: true }
+    );
+}
+
+async function maybeAutoBookmarkSharedAlbum() {
+    if (!activeAlbum?.id || isOwnerViewing) {
+        return;
+    }
+    const user = auth.currentUser;
+    if (!user || user.isAnonymous) {
+        return;
+    }
+    try {
+        await persistSharedAlbumBookmark(user);
+    } catch (error) {
+        console.warn("Auto-bookmark shared album failed", error);
+    }
+}
+
+async function promoteEntrySortToCustomIfNeeded() {
+    if (!isOwnerViewing || !activeAlbum?.id || !db) {
+        return;
+    }
+    if (activeAlbum.entrySortMode === "custom") {
+        return;
+    }
+    await updateDoc(doc(db, "albums", activeAlbum.id), {
+        entrySortMode: "custom",
+        updatedAt: serverTimestamp()
+    });
+    activeAlbum.entrySortMode = "custom";
+    if (dom.albumEntrySort) {
+        dom.albumEntrySort.value = "custom";
+    }
+    showAlbumSettingsSavedStatus();
 }
 
 async function handleSaveSharedAlbum() {
@@ -701,18 +776,9 @@ async function handleSaveSharedAlbum() {
         }
 
         setAuthStatus("", "info");
-        await ensureUserDoc(user);
-        await setDoc(
-            doc(db, "users", user.uid, "sharedAlbums", activeAlbum.id),
-            {
-                albumId: activeAlbum.id,
-                title: activeAlbum.title || "Untitled album",
-                savedAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            },
-            { merge: true }
-        );
+        await persistSharedAlbumBookmark(user);
         dom.saveSharedBtn.textContent = "Saved";
+        refreshSaveSharedButtonVisibility();
         setTimeout(() => {
             if (dom.saveSharedBtn) {
                 dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
@@ -777,9 +843,9 @@ function renderEntries(entries) {
     destroyEditorSortable();
     const sortMode = activeAlbum?.entrySortMode || "latest-first";
     const sortedEntries = sortEntriesForViewer(entries, sortMode);
-    const customSort = sortMode === "custom" && isOwnerViewing;
+    const editorReorderEnabled = isOwnerViewing && sortedEntries.length > 0;
     if (dom.entryGridEditor) {
-        dom.entryGridEditor.classList.toggle("is-custom-sort", customSort);
+        dom.entryGridEditor.classList.toggle("is-reorder-enabled", editorReorderEnabled);
     }
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
@@ -837,7 +903,7 @@ function renderEntries(entries) {
         const dragHandle = node.querySelector(".entry-drag-handle");
         delBtn.innerHTML = iconSvgTrash();
         if (dragHandle) {
-            dragHandle.tabIndex = customSort ? 0 : -1;
+            dragHandle.tabIndex = editorReorderEnabled ? 0 : -1;
         }
 
         img.src = entry.photoUrl;
@@ -922,7 +988,7 @@ function renderEntries(entries) {
         dom.entryGridEditor.appendChild(node);
     });
 
-    if (customSort && sortedEntries.length > 0 && dom.entryGridEditor && isOwnerViewing) {
+    if (editorReorderEnabled && dom.entryGridEditor) {
         const sortAnim =
             typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches
                 ? 0
@@ -942,6 +1008,13 @@ function renderEntries(entries) {
                     await persistEntryOrderFromEditorDom();
                 } catch (_err) {
                     setAuthStatus("Could not save photo order. Try again.", "error");
+                    return;
+                }
+                try {
+                    await promoteEntrySortToCustomIfNeeded();
+                } catch (err) {
+                    console.warn("Could not switch entry sort to Custom", err);
+                    setAuthStatus("Order saved; could not update sort mode to Custom.", "error");
                 }
             }
         });
