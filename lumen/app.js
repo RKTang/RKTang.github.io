@@ -724,7 +724,7 @@ async function handleSaveSharedAlbum() {
         const code = error?.code || "";
         const message =
             code === "permission-denied"
-                ? "Could not save to Shared with me. Firestore rules must allow users/{uid}/sharedAlbums — see lumen/FIREBASE_RULES.md."
+                ? "Could not save to Shared with me. In Firebase Console → Firestore → Rules, publish the rules in lumen/firestore.rules (see lumen/FIREBASE_RULES.md)."
                 : "Could not save to Shared with me. Try again.";
         setAuthStatus(message, "error");
     } finally {

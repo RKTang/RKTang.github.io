@@ -2,7 +2,15 @@
 
 Use these as starting rules and adapt to your production requirements.
 
+## Fix “Save to shared” / `permission-denied`
+
+That feature writes to `users/{your-uid}/sharedAlbums/{albumId}`. A rule that only matches **`/users/{uid}`** applies to the **single user document**, not subcollections under it, so Firestore denies those writes until you publish updated rules.
+
+**Do this once in Firebase Console:** Firebase project → **Build** → **Firestore Database** → **Rules** → replace the editor contents with the rules below (or copy from `lumen/firestore.rules` in this repo) → **Publish**.
+
 ## Firestore Rules
+
+Canonical copy for deploy: **`lumen/firestore.rules`**.
 
 ```txt
 rules_version = '2';
@@ -16,12 +24,8 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == ownerUid;
     }
 
-    match /users/{uid} {
-      allow read, write: if isOwner(uid);
-    }
-
-    // Bookmarks for albums opened via shared/public links (not covered by the parent `users/{uid}` rule).
-    match /users/{uid}/sharedAlbums/{docId} {
+    // Covers `users/{uid}` AND every subcollection (e.g. `sharedAlbums/{albumId}`).
+    match /users/{uid}/{document=**} {
       allow read, write: if isOwner(uid);
     }
 
