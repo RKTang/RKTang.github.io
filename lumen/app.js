@@ -33,6 +33,7 @@ import {
     uploadBytes
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 import * as exifr from "https://cdn.jsdelivr.net/npm/exifr/dist/full.esm.mjs";
+import Sortable from "https://esm.sh/sortablejs@1.15.6";
 
 const firebaseConfig = window.LUMEN_FIREBASE_CONFIG || null;
 const hasFirebaseConfig = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "REPLACE_ME";
@@ -106,8 +107,7 @@ let albumSettingsSaveTimer = null;
 let albumSettingsStatusTimer = null;
 const entryAutoSaveTimers = new Map();
 const SAVE_SHARED_BTN_DEFAULT = "+ Save to shared";
-let editorDnDBound = false;
-let draggedEditorCard = null;
+let editorSortableInstance = null;
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -190,7 +190,6 @@ function initialize() {
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
     setupViewerModalInteractions();
-    setupEditorEntryDragAndDrop();
 
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
@@ -737,44 +736,11 @@ function handleBackToList() {
     history.replaceState(null, "", window.location.pathname);
 }
 
-function setupEditorEntryDragAndDrop() {
-    if (editorDnDBound || !dom.entryGridEditor) {
-        return;
+function destroyEditorSortable() {
+    if (editorSortableInstance) {
+        editorSortableInstance.destroy();
+        editorSortableInstance = null;
     }
-    editorDnDBound = true;
-    dom.entryGridEditor.addEventListener("dragover", (e) => {
-        if (!dom.entryGridEditor.classList.contains("is-custom-sort")) {
-            return;
-        }
-        const card = e.target.closest(".entry-editor-card");
-        if (!card) {
-            return;
-        }
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-    });
-    dom.entryGridEditor.addEventListener("drop", async (e) => {
-        if (!dom.entryGridEditor.classList.contains("is-custom-sort") || !activeAlbum?.id || !isOwnerViewing) {
-            return;
-        }
-        const targetCard = e.target.closest(".entry-editor-card");
-        if (!targetCard || !draggedEditorCard || targetCard === draggedEditorCard) {
-            return;
-        }
-        e.preventDefault();
-        const rect = targetCard.getBoundingClientRect();
-        const insertBefore = e.clientY < rect.top + rect.height / 2;
-        if (insertBefore) {
-            dom.entryGridEditor.insertBefore(draggedEditorCard, targetCard);
-        } else {
-            dom.entryGridEditor.insertBefore(draggedEditorCard, targetCard.nextSibling);
-        }
-        try {
-            await persistEntryOrderFromEditorDom();
-        } catch (_err) {
-            setAuthStatus("Could not save photo order. Try again.", "error");
-        }
-    });
 }
 
 async function persistEntryOrderFromEditorDom() {
@@ -808,6 +774,7 @@ function subscribeEntries(albumId) {
 }
 
 function renderEntries(entries) {
+    destroyEditorSortable();
     const sortMode = activeAlbum?.entrySortMode || "latest-first";
     const sortedEntries = sortEntriesForViewer(entries, sortMode);
     const customSort = sortMode === "custom" && isOwnerViewing;
@@ -870,20 +837,7 @@ function renderEntries(entries) {
         const dragHandle = node.querySelector(".entry-drag-handle");
         delBtn.innerHTML = iconSvgTrash();
         if (dragHandle) {
-            dragHandle.draggable = customSort;
             dragHandle.tabIndex = customSort ? 0 : -1;
-            if (customSort) {
-                dragHandle.addEventListener("dragstart", (e) => {
-                    draggedEditorCard = node;
-                    e.dataTransfer.setData("text/plain", entry.id);
-                    e.dataTransfer.effectAllowed = "move";
-                    node.classList.add("is-entry-dragging");
-                });
-                dragHandle.addEventListener("dragend", () => {
-                    node.classList.remove("is-entry-dragging");
-                    draggedEditorCard = null;
-                });
-            }
         }
 
         img.src = entry.photoUrl;
@@ -967,6 +921,31 @@ function renderEntries(entries) {
 
         dom.entryGridEditor.appendChild(node);
     });
+
+    if (customSort && sortedEntries.length > 0 && dom.entryGridEditor && isOwnerViewing) {
+        const sortAnim =
+            typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? 0
+                : 180;
+        editorSortableInstance = Sortable.create(dom.entryGridEditor, {
+            handle: ".entry-drag-handle",
+            draggable: ".entry-editor-card",
+            animation: sortAnim,
+            ghostClass: "entry-sortable-ghost",
+            chosenClass: "entry-sortable-chosen",
+            dragClass: "entry-sortable-drag",
+            onEnd: async (evt) => {
+                if (evt.oldIndex === evt.newIndex) {
+                    return;
+                }
+                try {
+                    await persistEntryOrderFromEditorDom();
+                } catch (_err) {
+                    setAuthStatus("Could not save photo order. Try again.", "error");
+                }
+            }
+        });
+    }
 }
 
 function setupViewerModalInteractions() {
@@ -1335,6 +1314,7 @@ function clearAlbumView() {
     dom.saveSharedBtn.hidden = true;
     dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
     dom.ownerEditorSection.hidden = true;
+    destroyEditorSortable();
     dom.entryGridViewer.innerHTML = "";
     dom.entryGridEditor.innerHTML = "";
     document.body.classList.remove("viewer-only");
