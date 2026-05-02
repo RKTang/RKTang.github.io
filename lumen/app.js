@@ -52,8 +52,9 @@ const dom = {
     guestSignInBtn: document.getElementById("guest-sign-in-btn"),
     linkAccountBtn: document.getElementById("link-account-btn"),
     signOutBtn: document.getElementById("sign-out-btn"),
-    authBanner: document.getElementById("auth-banner"),
-    authStatus: document.getElementById("auth-status"),
+    guestHint: document.getElementById("guest-hint"),
+    guestHintText: document.getElementById("guest-hint-text"),
+    toastStack: document.getElementById("toast-stack"),
     pageSubtitle: document.getElementById("page-subtitle"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
@@ -104,6 +105,51 @@ const dom = {
     viewerModalDate: document.getElementById("viewer-modal-date")
 };
 
+function showToast(message, type = "info", durationMs = null) {
+    const text = (message || "").trim();
+    if (!text || !dom.toastStack) {
+        return;
+    }
+    const defaultMs = type === "error" ? 5500 : type === "success" ? 4500 : 4000;
+    const duration = durationMs ?? defaultMs;
+    const el = document.createElement("div");
+    el.className =
+        type === "error"
+            ? "toast toast--error"
+            : type === "success"
+              ? "toast toast--success"
+              : "toast toast--info";
+    el.setAttribute("role", "status");
+    el.textContent = text;
+    dom.toastStack.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("toast--visible"));
+    const dismiss = () => {
+        el.classList.remove("toast--visible");
+        el.classList.add("toast--hiding");
+        const removeEl = () => el.remove();
+        const motionMs =
+            typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? 0
+                : 280;
+        setTimeout(removeEl, motionMs);
+    };
+    setTimeout(dismiss, duration);
+}
+
+function updateGuestHint(visible, message = "") {
+    if (!dom.guestHint) {
+        return;
+    }
+    if (!visible) {
+        dom.guestHint.hidden = true;
+        return;
+    }
+    dom.guestHint.hidden = false;
+    if (dom.guestHintText) {
+        dom.guestHintText.textContent = message;
+    }
+}
+
 let app = null;
 let auth = null;
 let db = null;
@@ -132,7 +178,7 @@ const UPLOAD_MAX_EDGE_PX = 2560;
 const UPLOAD_JPEG_QUALITY = 0.82;
 
 if (!hasFirebaseConfig) {
-    setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
+    showToast("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error", 14000);
     dom.signInBtn.disabled = true;
 } else {
     app = initializeApp(firebaseConfig);
@@ -244,7 +290,7 @@ async function handleSignIn() {
     } catch (error) {
         const friendly = getAuthErrorMessage(error, "sign-in");
         if (friendly) {
-            setAuthStatus(friendly.message, friendly.type);
+            showToast(friendly.message, friendly.type);
         }
     }
 }
@@ -264,12 +310,12 @@ async function handleGuestSignIn() {
         if (anonDisabled) {
             isGuestSignInAvailable = false;
             updateAuthUI();
-            setAuthStatus("Guest mode is disabled in Firebase Auth. Use Google sign-in.", "error");
+            showToast("Guest mode is disabled in Firebase Auth. Use Google sign-in.", "error");
             return;
         }
         const friendly = getAuthErrorMessage(error, "guest-sign-in");
         if (friendly) {
-            setAuthStatus(friendly.message, friendly.type);
+            showToast(friendly.message, friendly.type);
         }
     }
 }
@@ -289,13 +335,13 @@ async function linkAnonymousAccountWithGoogle(options = {}) {
             await backfillOwnerDisplayName(linkedUser.uid, preferredName);
         }
         if (!quiet) {
-            setAuthStatus("Guest account linked to Google.", "success");
+            showToast("Guest account linked to Google.", "success");
         }
         return true;
     } catch (error) {
         const friendly = getAuthErrorMessage(error, "link-account");
         if (friendly) {
-            setAuthStatus(friendly.message, friendly.type);
+            showToast(friendly.message, friendly.type);
         }
         return false;
     }
@@ -306,16 +352,6 @@ async function handleLinkAccount() {
         return;
     }
     await linkAnonymousAccountWithGoogle({ quiet: false });
-}
-
-function setAuthStatus(message, type = "info") {
-    const text = (message || "").trim();
-    dom.authStatus.textContent = text;
-    dom.authStatus.classList.remove("is-error", "is-success", "is-info");
-    dom.authStatus.classList.add(
-        type === "error" ? "is-error" : type === "success" ? "is-success" : "is-info"
-    );
-    dom.authBanner.hidden = !text;
 }
 
 function getAuthErrorMessage(error, action) {
@@ -391,18 +427,21 @@ function updateAuthUI() {
     dom.linkAccountBtn.hidden = !isGuest;
     updateSubtitleVisibility(loggedIn);
     if (!loggedIn) {
-        setAuthStatus("", "info");
+        updateGuestHint(false);
         refreshSaveSharedButtonVisibility();
         return;
     }
 
     if (isGuest) {
-        setAuthStatus("You are viewing as a Guest. Use Link Account to keep long-term access.", "info");
+        updateGuestHint(
+            true,
+            "You are viewing as a Guest. Use Link Account to keep long-term access."
+        );
         refreshSaveSharedButtonVisibility();
         return;
     }
 
-    setAuthStatus("", "info");
+    updateGuestHint(false);
     refreshSaveSharedButtonVisibility();
 }
 
@@ -629,7 +668,7 @@ async function handleRemoveSharedAlbum(albumId) {
         }
     } catch (error) {
         console.warn("Remove shared album failed", error);
-        setAuthStatus("Could not remove this album from your sidebar. Try again.", "error");
+        showToast("Could not remove this album from your sidebar. Try again.", "error");
     }
 }
 
@@ -738,9 +777,9 @@ async function handleImportExampleAlbum() {
         await batch.commit();
         await touchAlbumUpdatedAt(albumRef.id);
         await openAlbum(albumRef.id);
-        setAuthStatus("Imported Creative Example album.", "info");
+        showToast("Imported Creative Example album.", "info");
     } catch (_error) {
-        setAuthStatus("Could not import example album. Try again.", "error");
+        showToast("Could not import example album. Try again.", "error");
     } finally {
         btn.disabled = false;
         btn.textContent = oldText;
@@ -926,7 +965,7 @@ async function handleSaveSharedAlbum() {
             } catch (error) {
                 const friendly = getAuthErrorMessage(error, "sign-in");
                 if (friendly) {
-                    setAuthStatus(friendly.message, friendly.type);
+                    showToast(friendly.message, friendly.type);
                 }
                 return;
             }
@@ -948,7 +987,6 @@ async function handleSaveSharedAlbum() {
             return;
         }
 
-        setAuthStatus("", "info");
         await persistSharedAlbumBookmark(user);
         dom.saveSharedBtn.textContent = "Saved";
         refreshSaveSharedButtonVisibility();
@@ -964,7 +1002,7 @@ async function handleSaveSharedAlbum() {
             code === "permission-denied"
                 ? "Could not save to Shared with me. In Firebase Console → Firestore → Rules, publish the rules in lumen/firestore.rules (see lumen/FIREBASE_RULES.md)."
                 : "Could not save to Shared with me. Try again.";
-        setAuthStatus(message, "error");
+        showToast(message, "error", code === "permission-denied" ? 10000 : undefined);
     } finally {
         dom.saveSharedBtn.disabled = false;
     }
@@ -1220,14 +1258,14 @@ function renderEntries(entries) {
                 try {
                     await persistEntryOrderFromEditorDom();
                 } catch (_err) {
-                    setAuthStatus("Could not save photo order. Try again.", "error");
+                    showToast("Could not save photo order. Try again.", "error");
                     return;
                 }
                 try {
                     await promoteEntrySortToCustomIfNeeded();
                 } catch (err) {
                     console.warn("Could not switch entry sort to Custom", err);
-                    setAuthStatus("Order saved; could not update sort mode to Custom.", "error");
+                    showToast("Order saved; could not update sort mode to Custom.", "error");
                 }
             }
         });

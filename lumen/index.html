@@ -20,9 +20,9 @@
             </div>
         </div>
         <p id="page-subtitle" class="page-subtitle">Create your own metadata-aware photo journal.</p>
-        <div id="auth-banner" class="auth-banner" hidden>
-            <p id="auth-status" class="auth-status"></p>
-            <button id="link-account-btn" type="button" class="auth-banner-link" hidden>Link Account</button>
+        <div id="guest-hint" class="guest-hint" hidden>
+            <p id="guest-hint-text" class="guest-hint-text"></p>
+            <button id="link-account-btn" type="button" class="guest-hint-link-btn" hidden>Link Account</button>
         </div>
     </header>
 
@@ -225,6 +225,8 @@
             </div>
         </article>
     </dialog>
+
+    <div id="toast-stack" class="toast-stack" aria-live="polite" aria-relevant="additions text"></div>
 
     <script src="firebase-config.js"></script>
     <script type="module" src="app.js"></script>
