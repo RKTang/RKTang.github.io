@@ -32,8 +32,20 @@ export function looksLikeGpsCoordinate(value) {
     return /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(value.trim());
 }
 
+/**
+ * Editor may show "YYYY-MM-DD / HH:MM..."; storage and parsers use a single space between date and time.
+ */
+export function normalizeCaptureDateForStorage(value) {
+    const t = (value || "").trim();
+    const slashBetween = t.match(/^(\d{4}-\d{2}-\d{2})\s*\/\s*(.+)$/);
+    if (slashBetween) {
+        return `${slashBetween[1]} ${slashBetween[2].trim().replace(/\s+/g, " ")}`;
+    }
+    return t;
+}
+
 export function canonicalizeStoredCaptureDate(raw) {
-    const s = toDisplayText(raw, "").trim();
+    let s = normalizeCaptureDateForStorage(toDisplayText(raw, "").trim());
     if (!s) {
         return "";
     }
@@ -74,7 +86,7 @@ export function mergeCaptureDateFromEditor(editorValue, dateMode, previousCanoni
     if (!v) {
         return "";
     }
-    return v;
+    return normalizeCaptureDateForStorage(v);
 }
 
 export function buildEntryLocationUpdate(trimmed, locationMode, coordsStored, cityStored) {
@@ -96,7 +108,7 @@ export function buildEntryLocationUpdate(trimmed, locationMode, coordsStored, ci
 }
 
 export function getEntrySortTimestamp(entry) {
-    const captureRaw = toDisplayText(entry?.captureDate, "").trim();
+    const captureRaw = normalizeCaptureDateForStorage(toDisplayText(entry?.captureDate, "").trim());
     if (captureRaw) {
         const normalized = captureRaw.includes("T") ? captureRaw : captureRaw.replace(" ", "T");
         const parsedMs = Date.parse(normalized);
