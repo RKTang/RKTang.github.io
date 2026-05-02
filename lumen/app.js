@@ -34,6 +34,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 import * as exifr from "https://cdn.jsdelivr.net/npm/exifr/dist/full.esm.mjs";
 import Sortable from "https://esm.sh/sortablejs@1.15.6";
+import {
+    toDisplayText,
+    looksLikeGpsCoordinate,
+    canonicalizeStoredCaptureDate,
+    mergeCaptureDateFromEditor,
+    buildEntryLocationUpdate,
+    sortEntriesForViewer
+} from "./journal-logic.js";
 
 const firebaseConfig = window.LUMEN_FIREBASE_CONFIG || null;
 const hasFirebaseConfig = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "REPLACE_ME";
@@ -84,6 +92,8 @@ const dom = {
     viewerModal: document.getElementById("viewer-modal"),
     viewerModalCard: document.getElementById("viewer-modal-card"),
     viewerModalFlip: document.querySelector("#viewer-modal-card .modal-flip"),
+    viewerModalCloseBtn: document.getElementById("viewer-modal-close-btn"),
+    viewerModalFlipBtn: document.getElementById("viewer-modal-flip-btn"),
     viewerModalTitle: document.getElementById("viewer-modal-title"),
     viewerModalBackTitle: document.getElementById("viewer-modal-back-title"),
     viewerModalImage: document.getElementById("viewer-modal-image"),
@@ -99,6 +109,10 @@ let storage = null;
 let currentUser = null;
 let activeAlbum = null;
 let unsubscribeEntries = null;
+/** Album id currently bound to `unsubscribeEntries`; avoids duplicate listeners when reopening the same album. */
+let entriesListenerAlbumId = null;
+/** Last entry list from Firestore snapshot; used to re-render after album display settings change without resubscribing. */
+let cachedEntriesList = [];
 let unsubscribeAlbums = null;
 let unsubscribeSharedAlbums = null;
 let isOwnerViewing = false;
@@ -109,6 +123,11 @@ let albumSettingsStatusTimer = null;
 const entryAutoSaveTimers = new Map();
 const SAVE_SHARED_BTN_DEFAULT = "+ Save to shared";
 let editorSortableInstance = null;
+/** Element to restore focus after closing the photo viewer. */
+let viewerModalReturnFocus = null;
+
+const UPLOAD_MAX_EDGE_PX = 2560;
+const UPLOAD_JPEG_QUALITY = 0.82;
 
 if (!hasFirebaseConfig) {
     setAuthStatus("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error");
@@ -163,15 +182,24 @@ function initialize() {
         queueAlbumSettingsAutoSave();
     });
     dom.albumLocationDisplay.addEventListener("change", () => {
+        if (activeAlbum) {
+            activeAlbum.locationDisplayMode = dom.albumLocationDisplay.value;
+        }
+        rerenderCachedEntries();
         queueAlbumSettingsAutoSave();
     });
     dom.albumDateDisplay.addEventListener("change", () => {
+        if (activeAlbum) {
+            activeAlbum.dateDisplayMode = dom.albumDateDisplay.value;
+        }
+        rerenderCachedEntries();
         queueAlbumSettingsAutoSave();
     });
     dom.albumEntrySort.addEventListener("change", () => {
-        if (activeAlbum?.id) {
-            subscribeEntries(activeAlbum.id);
+        if (activeAlbum) {
+            activeAlbum.entrySortMode = dom.albumEntrySort.value;
         }
+        rerenderCachedEntries();
         queueAlbumSettingsAutoSave();
     });
     dom.albumViewerColumns.addEventListener("change", () => {
@@ -687,8 +715,6 @@ async function openAlbum(albumId) {
     history.replaceState(null, "", `?album=${album.id}`);
 
     subscribeEntries(album.id);
-    subscribeAlbumList();
-    subscribeSharedAlbumList();
 
     await maybeAutoBookmarkSharedAlbum();
     refreshSaveSharedButtonVisibility();
@@ -857,13 +883,29 @@ async function persistEntryOrderFromEditorDom() {
 }
 
 function subscribeEntries(albumId) {
+    if (!albumId || !db) {
+        return;
+    }
+    if (entriesListenerAlbumId === albumId && typeof unsubscribeEntries === "function") {
+        return;
+    }
     if (unsubscribeEntries) {
         unsubscribeEntries();
+        unsubscribeEntries = null;
     }
+    entriesListenerAlbumId = albumId;
     const entriesRef = collection(db, "albums", albumId, "entries");
     unsubscribeEntries = onSnapshot(query(entriesRef, orderBy("orderIndex", "asc")), (snapshot) => {
-        renderEntries(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
+        cachedEntriesList = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        renderEntries(cachedEntriesList);
     });
+}
+
+function rerenderCachedEntries() {
+    if (!activeAlbum?.id || entriesListenerAlbumId !== activeAlbum.id) {
+        return;
+    }
+    renderEntries(cachedEntriesList);
 }
 
 function renderEntries(entries) {
@@ -911,6 +953,7 @@ function renderEntries(entries) {
         const viewerNode = document.createElement("button");
         viewerNode.type = "button";
         viewerNode.className = "polaroid-card";
+        viewerNode.setAttribute("aria-haspopup", "dialog");
         viewerNode.dataset.fullSrc = entry.photoUrl;
         viewerNode.dataset.alt = storyText ? `Album entry: ${storyText}` : "Album entry";
         const albumTitle = activeAlbum?.title || "Untitled album";
@@ -1071,6 +1114,47 @@ function renderEntries(entries) {
     }
 }
 
+const VIEWER_MODAL_FOCUSABLE =
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function viewerModalFocusableFilter(el) {
+    if (el.hasAttribute("disabled") || el.getAttribute("aria-hidden") === "true") {
+        return false;
+    }
+    return Boolean(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
+
+function getViewerModalFocusables() {
+    if (!dom.viewerModal) {
+        return [];
+    }
+    return [...dom.viewerModal.querySelectorAll(VIEWER_MODAL_FOCUSABLE)].filter(viewerModalFocusableFilter);
+}
+
+function syncViewerModalFlipState(flipped) {
+    if (!dom.viewerModalCard) {
+        return;
+    }
+    dom.viewerModalCard.classList.toggle("is-flipped", Boolean(flipped));
+    if (dom.viewerModalFlipBtn) {
+        dom.viewerModalFlipBtn.setAttribute("aria-pressed", flipped ? "true" : "false");
+        dom.viewerModalFlipBtn.textContent = flipped ? "Show photo" : "Details";
+        dom.viewerModalFlipBtn.setAttribute("aria-label", flipped ? "Show front of photo" : "Show photo details");
+    }
+}
+
+function toggleViewerModalFlip() {
+    if (!dom.viewerModal?.open || !dom.viewerModalCard) {
+        return;
+    }
+    dom.viewerModalCard.style.setProperty("--card-tilt-x", "0deg");
+    dom.viewerModalCard.style.setProperty("--card-tilt-y", "0deg");
+    dom.viewerModalCard.style.setProperty("--card-move-x", "0px");
+    dom.viewerModalCard.style.setProperty("--card-move-y", "0px");
+    const flipped = !dom.viewerModalCard.classList.contains("is-flipped");
+    syncViewerModalFlipState(flipped);
+}
+
 function setupViewerModalInteractions() {
     if (!dom.entryGridViewer || !dom.viewerModal || !dom.viewerModalCard || !dom.viewerModalImage) {
         return;
@@ -1086,19 +1170,49 @@ function setupViewerModalInteractions() {
         openViewerCard(card);
     });
 
+    if (dom.viewerModalCloseBtn) {
+        dom.viewerModalCloseBtn.addEventListener("click", () => {
+            if (dom.viewerModal.open) {
+                dom.viewerModal.close();
+            }
+        });
+    }
+
+    if (dom.viewerModalFlipBtn) {
+        dom.viewerModalFlipBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleViewerModalFlip();
+        });
+    }
+
     if (dom.viewerModalFlip) {
         dom.viewerModalFlip.addEventListener("click", (event) => {
             if (!dom.viewerModal.open) {
                 return;
             }
             event.stopPropagation();
-            dom.viewerModalCard.style.setProperty("--card-tilt-x", "0deg");
-            dom.viewerModalCard.style.setProperty("--card-tilt-y", "0deg");
-            dom.viewerModalCard.style.setProperty("--card-move-x", "0px");
-            dom.viewerModalCard.style.setProperty("--card-move-y", "0px");
-            dom.viewerModalCard.classList.toggle("is-flipped");
+            toggleViewerModalFlip();
         });
     }
+
+    dom.viewerModal.addEventListener("keydown", (event) => {
+        if (!dom.viewerModal.open || event.key !== "Tab") {
+            return;
+        }
+        const nodes = getViewerModalFocusables();
+        if (nodes.length === 0) {
+            return;
+        }
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
 
     if (!prefersReducedMotion) {
         dom.viewerModal.addEventListener("pointermove", (event) => {
@@ -1140,6 +1254,14 @@ function setupViewerModalInteractions() {
     dom.viewerModal.addEventListener("close", () => {
         document.body.classList.remove("modal-open");
         resetViewerModalCard();
+        if (viewerModalReturnFocus && typeof viewerModalReturnFocus.focus === "function") {
+            try {
+                viewerModalReturnFocus.focus({ preventScroll: true });
+            } catch (_err) {
+                viewerModalReturnFocus.focus();
+            }
+        }
+        viewerModalReturnFocus = null;
     });
 }
 
@@ -1169,7 +1291,7 @@ function openViewerCard(card) {
     dom.viewerModalDate.textContent = `Date: ${formattedDate}`;
     dom.viewerModalImage.src = fullSrc;
     dom.viewerModalImage.alt = card.dataset.alt || "Journal entry image";
-    dom.viewerModalCard.classList.remove("is-flipped");
+    syncViewerModalFlipState(false);
 
     if (dom.viewerModalFlip && thumbImage && thumbImage.naturalWidth && thumbImage.naturalHeight) {
         dom.viewerModalFlip.style.setProperty("--photo-ratio", `${thumbImage.naturalWidth} / ${thumbImage.naturalHeight}`);
@@ -1189,15 +1311,22 @@ function openViewerCard(card) {
         dom.viewerModalImage.addEventListener("load", applyPhotoRatio, { once: true });
     }
 
+    viewerModalReturnFocus = document.activeElement;
     dom.viewerModal.showModal();
     document.body.classList.add("modal-open");
+    requestAnimationFrame(() => {
+        const nodes = getViewerModalFocusables();
+        const closeBtn = dom.viewerModalCloseBtn;
+        const target = (closeBtn && nodes.includes(closeBtn) ? closeBtn : nodes[0]) || closeBtn;
+        target?.focus();
+    });
 }
 
 function resetViewerModalCard() {
     if (!dom.viewerModalCard) {
         return;
     }
-    dom.viewerModalCard.classList.remove("is-flipped");
+    syncViewerModalFlipState(false);
     dom.viewerModalCard.style.setProperty("--card-tilt-x", "0deg");
     dom.viewerModalCard.style.setProperty("--card-tilt-y", "0deg");
     dom.viewerModalCard.style.setProperty("--card-move-x", "0px");
@@ -1234,9 +1363,7 @@ async function handleSaveAlbumSettings() {
     setShareLinkVisibility(visibility, isOwnerViewing);
     applyAlbumBackground(pageBackground);
     applyViewerColumns(viewerColumns);
-    if (unsubscribeEntries && activeAlbum?.id) {
-        subscribeEntries(activeAlbum.id);
-    }
+    rerenderCachedEntries();
 }
 
 function queueAlbumSettingsAutoSave() {
@@ -1311,6 +1438,40 @@ async function handleDeleteAlbum(albumId) {
     subscribeAlbumList();
 }
 
+async function compressImageForStorage(file) {
+    if (!file?.type?.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") {
+        return file;
+    }
+    try {
+        const bitmap = await createImageBitmap(file);
+        const maxEdge = Math.max(bitmap.width, bitmap.height);
+        const scale = maxEdge > UPLOAD_MAX_EDGE_PX ? UPLOAD_MAX_EDGE_PX / maxEdge : 1;
+        const w = Math.round(bitmap.width * scale);
+        const h = Math.round(bitmap.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(bitmap, 0, 0, w, h);
+        if (typeof bitmap.close === "function") {
+            bitmap.close();
+        }
+        const blob = await new Promise((resolve) => {
+            canvas.toBlob(resolve, "image/jpeg", UPLOAD_JPEG_QUALITY);
+        });
+        if (!blob) {
+            return file;
+        }
+        if (blob.size >= file.size * 0.97 && scale >= 1) {
+            return file;
+        }
+        const base = file.name.replace(/\.[^/.]+$/, "") || "photo";
+        return new File([blob], `${base}.jpg`, { type: "image/jpeg", lastModified: Date.now() });
+    } catch (_err) {
+        return file;
+    }
+}
+
 async function handleUploadPhotos(event) {
     if (!activeAlbum || !isOwnerViewing || !currentUser) {
         return;
@@ -1325,10 +1486,11 @@ async function handleUploadPhotos(event) {
 
     for (const file of files) {
         const metadata = await extractMetadata(file);
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const uploadFile = await compressImageForStorage(file);
+        const safeName = uploadFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const storagePath = `users/${currentUser.uid}/albums/${activeAlbum.id}/${Date.now()}-${safeName}`;
         const storageRef = ref(storage, storagePath);
-        await uploadBytes(storageRef, file);
+        await uploadBytes(storageRef, uploadFile);
         const photoUrl = await getDownloadURL(storageRef);
 
         await addDoc(collection(db, "albums", activeAlbum.id, "entries"), {
@@ -1421,6 +1583,8 @@ function clearAlbumView() {
         unsubscribeEntries();
         unsubscribeEntries = null;
     }
+    entriesListenerAlbumId = null;
+    cachedEntriesList = [];
     for (const { timer } of entryAutoSaveTimers.values()) {
         clearTimeout(timer);
     }
@@ -1481,106 +1645,6 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll("\"", "&quot;")
         .replaceAll("'", "&#39;");
-}
-
-function toDisplayText(value, fallback = "") {
-    if (value === null || value === undefined) {
-        return fallback;
-    }
-    if (typeof value === "string") {
-        return value;
-    }
-    if (typeof value === "number" || typeof value === "boolean") {
-        return String(value);
-    }
-    if (value instanceof Date) {
-        return value.toISOString().slice(0, 19).replace("T", " ");
-    }
-    if (typeof value === "object" && typeof value.toDate === "function") {
-        const date = value.toDate();
-        if (date instanceof Date && !Number.isNaN(date.getTime())) {
-            return date.toISOString().slice(0, 19).replace("T", " ");
-        }
-    }
-    return fallback;
-}
-
-function looksLikeGpsCoordinate(value) {
-    if (typeof value !== "string") {
-        return false;
-    }
-    return /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(value.trim());
-}
-
-/** Normalize stored capture date so date-only values get a consistent time for merging. */
-function canonicalizeStoredCaptureDate(raw) {
-    const s = toDisplayText(raw, "").trim();
-    if (!s) {
-        return "";
-    }
-    if (/^\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}/.test(s)) {
-        return s;
-    }
-    const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (m) {
-        return `${m[1]} 00:00:00`;
-    }
-    return s;
-}
-
-function extractTimeFromCanonical(canonical) {
-    const s = (canonical || "").trim();
-    const m = s.match(/^\d{4}-\d{2}-\d{2}\s+(.+)$/);
-    if (m) {
-        const t = m[1].trim();
-        return t || "00:00:00";
-    }
-    return "00:00:00";
-}
-
-/**
- * Persist full date/time in Firestore: in date-only UI, editing the day keeps the previous time.
- */
-function mergeCaptureDateFromEditor(editorValue, dateMode, previousCanonical) {
-    const prev = canonicalizeStoredCaptureDate(previousCanonical);
-    const v = (editorValue || "").trim();
-    if (dateMode === "date-only") {
-        if (!v) {
-            return "";
-        }
-        const dm = v.match(/^(\d{4}-\d{2}-\d{2})/);
-        if (!dm) {
-            return v;
-        }
-        const timePart = prev ? extractTimeFromCanonical(prev) : "00:00:00";
-        return `${dm[1]} ${timePart}`;
-    }
-    if (!v) {
-        return "";
-    }
-    return v;
-}
-
-/**
- * Update location fields without dropping GPS or city/state when the user edits freeform text
- * (e.g. "grandma's house") or switches display modes.
- */
-function buildEntryLocationUpdate(trimmed, locationMode, coordsStored, cityStored) {
-    const coords = toDisplayText(coordsStored, "").trim();
-    const citySt = toDisplayText(cityStored, "").trim();
-    if (locationMode === "gps") {
-        if (!trimmed) {
-            return { locationText: "", locationCoords: "", locationCityState: citySt };
-        }
-        if (looksLikeGpsCoordinate(trimmed)) {
-            return { locationText: trimmed, locationCoords: trimmed, locationCityState: citySt };
-        }
-        return { locationText: trimmed, locationCoords: coords, locationCityState: citySt };
-    }
-    if (!trimmed) {
-        return { locationText: "", locationCityState: "", locationCoords: coords };
-    }
-    return { locationText: trimmed, locationCityState: trimmed, locationCoords: coords };
 }
 
 function formatLocationForDisplay(rawLocation, rawCoords, rawCityState, mode) {
@@ -1667,47 +1731,6 @@ function formatCaptureDateForDisplay(rawDate, mode) {
     }
     const token = value.split(" ")[0];
     return token || value;
-}
-
-function getEntrySortTimestamp(entry) {
-    const captureRaw = toDisplayText(entry?.captureDate, "").trim();
-    if (captureRaw) {
-        const normalized = captureRaw.includes("T") ? captureRaw : captureRaw.replace(" ", "T");
-        const parsedMs = Date.parse(normalized);
-        if (Number.isFinite(parsedMs)) {
-            return parsedMs;
-        }
-    }
-    const createdAtSeconds = entry?.createdAt?.seconds;
-    if (Number.isFinite(createdAtSeconds)) {
-        return createdAtSeconds * 1000;
-    }
-    return Number(entry?.orderIndex) || 0;
-}
-
-function sortEntriesForViewer(entries, mode) {
-    if (mode === "custom") {
-        return [...entries].sort((a, b) => {
-            const orderA = Number(a?.orderIndex) || 0;
-            const orderB = Number(b?.orderIndex) || 0;
-            if (orderA !== orderB) {
-                return orderA - orderB;
-            }
-            return String(a.id).localeCompare(String(b.id));
-        });
-    }
-    const normalizedMode = mode === "earliest-first" ? "earliest-first" : "latest-first";
-    const sorted = [...entries].sort((a, b) => {
-        const tsA = getEntrySortTimestamp(a);
-        const tsB = getEntrySortTimestamp(b);
-        if (tsA === tsB) {
-            const orderA = Number(a?.orderIndex) || 0;
-            const orderB = Number(b?.orderIndex) || 0;
-            return orderA - orderB;
-        }
-        return normalizedMode === "earliest-first" ? tsA - tsB : tsB - tsA;
-    });
-    return sorted;
 }
 
 function applyAlbumBackground(color) {
