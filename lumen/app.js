@@ -461,6 +461,11 @@ function iconSvgTrash() {
     return `<svg class="icon-svg" viewBox="0 0 448 512" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M170.5 51.6L151.5 80H40c-22.1 0-40 17.9-40 40s17.9 40 40 40h16l21.2 339.4c1.3 20.6 18.4 36.6 39 36.6h215.6c20.6 0 37.7-16 39-36.6L392 160h16c22.1 0 40-17.9 40-40s-17.9-40-40-40H296.5l-19-28.4C269.9 40.3 257.2 32 243.6 32h-39.1c-13.6 0-26.3 8.3-34 19.6zM177.9 467c-10.7-.4-19.1-9.4-18.7-20.1l8-208c.4-10.7 9.4-19.1 20.1-18.7s19.1 9.4 18.7 20.1l-8 208c-.4 10.5-9 18.7-19.5 18.7zm92.2-208l8 208c.4 10.7-8 19.7-18.7 20.1-10.5 0-19.1-8.2-19.5-18.7l-8-208c-.4-10.7 8-19.7 18.7-20.1s19.7 8 20.1 18.7z"/></svg>`;
 }
 
+/** Remove shared bookmark (not delete album) — X icon, distinct from trash. */
+function iconSvgRemoveSharedBookmark() {
+    return `<svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+}
+
 function visibilityIconMarkup(visibility) {
     const isPublic = (visibility || "private").toLowerCase() === "public";
     const label = isPublic ? "Public album" : "Private album";
@@ -487,6 +492,14 @@ function syncAlbumListSelectionHighlight() {
 }
 
 function renderAlbumList(albums, ownedQuery) {
+    if (ownedQuery) {
+        const idsInSnapshot = new Set(albums.map((a) => a.id));
+        for (const id of albumMap.keys()) {
+            if (!idsInSnapshot.has(id)) {
+                albumMap.delete(id);
+            }
+        }
+    }
     for (const album of albums) {
         albumMap.set(album.id, {
             ...albumMap.get(album.id),
@@ -589,7 +602,7 @@ async function renderSharedAlbumList(sharedItems) {
                         </span>
                     </span>
                 </button>
-                <button type="button" class="album-item-delete album-item-remove-shared" aria-label="${removeLabel}" title="Remove from sidebar">${iconSvgTrash()}</button>
+                <button type="button" class="album-item-remove-shared" aria-label="${removeLabel}" title="Remove from sidebar">${iconSvgRemoveSharedBookmark()}</button>
             </div>
         `;
         card.querySelector(".album-item-open").addEventListener("click", () => openAlbum(album.id));
