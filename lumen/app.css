@@ -254,6 +254,12 @@ textarea {
     gap: 0.55rem;
 }
 
+.shared-sidebar-section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #efe8df;
+}
+
 .album-item {
     border: 1px solid #e6ddd0;
     border-radius: 0;

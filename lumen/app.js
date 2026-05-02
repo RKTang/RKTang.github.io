@@ -610,7 +610,6 @@ async function openAlbum(albumId) {
     isOwnerViewing = Boolean(isOwner);
     document.body.classList.toggle("viewer-only", !isOwnerViewing);
     updateSubtitleVisibility(Boolean(currentUser));
-    dom.backToListBtn.hidden = false;
     dom.saveSharedBtn.textContent = SAVE_SHARED_BTN_DEFAULT;
     dom.saveSharedBtn.hidden = isOwnerViewing;
 
@@ -640,6 +639,7 @@ async function openAlbum(albumId) {
     } else {
         document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
     }
+    updateBackButtonVisibility();
     dom.albumVisibilitySelect.value = album.visibility || "private";
     dom.albumLocationDisplay.value = album.locationDisplayMode || "city-state";
     dom.albumDateDisplay.value = album.dateDisplayMode || "date-time";
@@ -1594,6 +1594,21 @@ async function resolveAlbumOwnerName(album, isOwner) {
     }
 
     return "Album owner";
+}
+
+function updateBackButtonVisibility() {
+    if (!dom.backToListBtn) {
+        return;
+    }
+    if (!activeAlbum) {
+        dom.backToListBtn.hidden = true;
+        return;
+    }
+    if (isOwnerViewing) {
+        dom.backToListBtn.hidden = true;
+        return;
+    }
+    dom.backToListBtn.hidden = false;
 }
 
 function setOwnerViewMode(mode) {
