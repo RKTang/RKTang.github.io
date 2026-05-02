@@ -491,11 +491,30 @@ textarea {
 }
 
 .album-settings-row {
+    max-width: 100%;
+}
+
+.album-settings-row--controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.7rem;
     align-items: end;
+}
+
+.album-settings-row--background {
+    display: block;
+}
+
+.album-setting-background--full {
+    width: 100%;
     max-width: 100%;
+}
+
+.album-settings-row--display {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+    align-items: end;
 }
 
 .album-setting-field {
@@ -1199,7 +1218,8 @@ dialog::backdrop {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .album-settings-row {
+    .album-settings-row--controls,
+    .album-settings-row--display {
         grid-template-columns: 1fr;
     }
 
