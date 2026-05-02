@@ -57,6 +57,7 @@ const dom = {
     pageSubtitle: document.getElementById("page-subtitle"),
     newAlbumForm: document.getElementById("new-album-form"),
     newAlbumTitle: document.getElementById("new-album-title"),
+    importExampleBtn: document.getElementById("import-example-btn"),
     albumListEmpty: document.getElementById("album-list-empty"),
     albumList: document.getElementById("album-list"),
     sharedSidebarSection: document.getElementById("shared-sidebar-section"),
@@ -147,6 +148,7 @@ function initialize() {
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
+    dom.importExampleBtn.addEventListener("click", handleImportExampleAlbum);
     dom.backToListBtn.addEventListener("click", handleBackToList);
     dom.saveSharedBtn.addEventListener("click", handleSaveSharedAlbum);
     dom.copyShareUrlBtn.addEventListener("click", handleCopyShareUrl);
@@ -385,6 +387,7 @@ function updateAuthUI() {
     dom.guestSignInBtn.hidden = loggedIn || !isGuestSignInAvailable;
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
+    dom.importExampleBtn.hidden = !loggedIn;
     dom.linkAccountBtn.hidden = !isGuest;
     updateSubtitleVisibility(loggedIn);
     if (!loggedIn) {
@@ -641,6 +644,94 @@ async function handleCreateAlbum(event) {
     });
     dom.newAlbumForm.reset();
     await openAlbum(albumRef.id);
+}
+
+async function fetchCreativeExampleEntries() {
+    const creativeUrl = new URL("../creative/", window.location.href);
+    const response = await fetch(creativeUrl.toString(), {
+        headers: {
+            Accept: "text/html"
+        }
+    });
+    if (!response.ok) {
+        throw new Error("Could not fetch creative example page.");
+    }
+    const html = await response.text();
+    const parsed = new DOMParser().parseFromString(html, "text/html");
+    const nodes = [...parsed.querySelectorAll(".polaroid-card[data-full-src]")];
+    return nodes
+        .map((node) => {
+            const fullSrc = toDisplayText(node.getAttribute("data-full-src"), "").trim();
+            if (!fullSrc) {
+                return null;
+            }
+            const photoUrl = new URL(fullSrc, creativeUrl).toString();
+            const storyText = toDisplayText(node.getAttribute("data-story"), "").trim();
+            const location = toDisplayText(node.getAttribute("data-location"), "").trim();
+            const captureDateRaw = toDisplayText(node.getAttribute("data-date"), "").trim();
+            return {
+                photoUrl,
+                storyText,
+                locationText: location,
+                locationCityState: location,
+                captureDate: normalizeCaptureDateForStorage(captureDateRaw)
+            };
+        })
+        .filter(Boolean);
+}
+
+async function handleImportExampleAlbum() {
+    if (!currentUser || !db) {
+        return;
+    }
+    const btn = dom.importExampleBtn;
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Importing example...";
+    try {
+        const entries = await fetchCreativeExampleEntries();
+        if (!entries.length) {
+            throw new Error("No entries found.");
+        }
+        const albumRef = await addDoc(collection(db, "albums"), {
+            ownerUid: currentUser.uid,
+            ownerDisplayName: currentUser.displayName || currentUser.email || "",
+            title: "Creative Example",
+            visibility: "private",
+            viewerColumns: 3,
+            locationDisplayMode: "city-state",
+            dateDisplayMode: "date-time",
+            entrySortMode: "latest-first",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+        const batch = writeBatch(db);
+        entries.forEach((entry, index) => {
+            const entryRef = doc(collection(db, "albums", albumRef.id, "entries"));
+            batch.set(entryRef, {
+                ownerUid: currentUser.uid,
+                photoUrl: entry.photoUrl,
+                storagePath: "",
+                storyText: entry.storyText,
+                locationText: entry.locationText,
+                locationCoords: "",
+                locationCityState: entry.locationCityState,
+                captureDate: entry.captureDate,
+                orderIndex: index,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
+        });
+        await batch.commit();
+        await touchAlbumUpdatedAt(albumRef.id);
+        await openAlbum(albumRef.id);
+        setAuthStatus("Imported Creative Example album.", "info");
+    } catch (_error) {
+        setAuthStatus("Could not import example album. Try again.", "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = oldText;
+    }
 }
 
 function handleAlbumBackgroundInput() {
