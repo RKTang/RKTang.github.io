@@ -54,6 +54,7 @@ const dom = {
     signOutBtn: document.getElementById("sign-out-btn"),
     guestHint: document.getElementById("guest-hint"),
     guestHintText: document.getElementById("guest-hint-text"),
+    guestHintDismissBtn: document.getElementById("guest-hint-dismiss"),
     toastStack: document.getElementById("toast-stack"),
     pageSubtitle: document.getElementById("page-subtitle"),
     newAlbumForm: document.getElementById("new-album-form"),
@@ -176,6 +177,24 @@ let viewerModalReturnFocus = null;
 
 const UPLOAD_MAX_EDGE_PX = 2560;
 const UPLOAD_JPEG_QUALITY = 0.82;
+const GUEST_HINT_DISMISS_SESSION_KEY = "lumen_guest_hint_dismissed";
+
+function isGuestHintDismissedThisSession() {
+    try {
+        return sessionStorage.getItem(GUEST_HINT_DISMISS_SESSION_KEY) === "1";
+    } catch (_e) {
+        return false;
+    }
+}
+
+function dismissGuestHintForSession() {
+    try {
+        sessionStorage.setItem(GUEST_HINT_DISMISS_SESSION_KEY, "1");
+    } catch (_e) {
+        // ignore (e.g. storage disabled)
+    }
+    updateAuthUI();
+}
 
 if (!hasFirebaseConfig) {
     showToast("Firebase is not configured yet. Update lumen/firebase-config.js to start.", "error", 14000);
@@ -192,6 +211,7 @@ function initialize() {
     dom.signInBtn.addEventListener("click", handleSignIn);
     dom.guestSignInBtn.addEventListener("click", handleGuestSignIn);
     dom.linkAccountBtn.addEventListener("click", handleLinkAccount);
+    dom.guestHintDismissBtn?.addEventListener("click", dismissGuestHintForSession);
     dom.signOutBtn.addEventListener("click", handleSignOut);
     dom.newAlbumForm.addEventListener("submit", handleCreateAlbum);
     dom.importExampleBtn.addEventListener("click", handleImportExampleAlbum);
@@ -424,7 +444,7 @@ function updateAuthUI() {
     dom.signOutBtn.hidden = !loggedIn;
     dom.newAlbumForm.hidden = !loggedIn;
     dom.importExampleBtn.hidden = !loggedIn;
-    dom.linkAccountBtn.hidden = !isGuest;
+    dom.linkAccountBtn.hidden = !isGuest || (isGuest && isGuestHintDismissedThisSession());
     updateSubtitleVisibility(loggedIn);
     if (!loggedIn) {
         updateGuestHint(false);
@@ -433,10 +453,14 @@ function updateAuthUI() {
     }
 
     if (isGuest) {
-        updateGuestHint(
-            true,
-            "You are viewing as a Guest. Use Link Account to keep long-term access."
-        );
+        if (isGuestHintDismissedThisSession()) {
+            updateGuestHint(false);
+        } else {
+            updateGuestHint(
+                true,
+                "You are viewing as a Guest. Use Link Account to keep long-term access."
+            );
+        }
         refreshSaveSharedButtonVisibility();
         return;
     }
