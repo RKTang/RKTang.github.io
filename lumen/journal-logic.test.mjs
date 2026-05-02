@@ -5,7 +5,8 @@ import {
     mergeCaptureDateFromEditor,
     buildEntryLocationUpdate,
     sortEntriesForViewer,
-    getEntrySortTimestamp
+    getEntrySortTimestamp,
+    normalizeCaptureDateForStorage
 } from "./journal-logic.js";
 
 test("canonicalizeStoredCaptureDate adds midnight for date-only ISO", () => {
@@ -22,6 +23,18 @@ test("mergeCaptureDateFromEditor keeps prior time in date-only mode", () => {
 test("mergeCaptureDateFromEditor uses full string in date-time mode", () => {
     assert.equal(
         mergeCaptureDateFromEditor("2025-01-15 09:00:01", "date-time", "2024-06-01 00:00:00"),
+        "2025-01-15 09:00:01"
+    );
+});
+
+test("normalizeCaptureDateForStorage converts display slash to space", () => {
+    assert.equal(normalizeCaptureDateForStorage("2025-07-19 / 18:21:04"), "2025-07-19 18:21:04");
+    assert.equal(normalizeCaptureDateForStorage("2025-07-19  18:21:04"), "2025-07-19  18:21:04");
+});
+
+test("mergeCaptureDateFromEditor normalizes slash in date-time mode", () => {
+    assert.equal(
+        mergeCaptureDateFromEditor("2025-01-15 / 09:00:01", "date-time", ""),
         "2025-01-15 09:00:01"
     );
 });

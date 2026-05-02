@@ -40,7 +40,8 @@ import {
     canonicalizeStoredCaptureDate,
     mergeCaptureDateFromEditor,
     buildEntryLocationUpdate,
-    sortEntriesForViewer
+    sortEntriesForViewer,
+    normalizeCaptureDateForStorage
 } from "./journal-logic.js";
 
 const firebaseConfig = window.LUMEN_FIREBASE_CONFIG || null;
@@ -470,6 +471,18 @@ function setActiveAlbumVisibilityPill(visibility) {
     dom.activeAlbumVisibility.setAttribute("aria-label", isPublic ? "Public album" : "Private album");
 }
 
+function syncAlbumListSelectionHighlight() {
+    const activeId = activeAlbum?.id || "";
+    dom.albumList.querySelectorAll(".album-item").forEach((li) => {
+        const id = li.dataset.albumId || "";
+        li.classList.toggle("active", Boolean(activeId && id === activeId));
+    });
+    dom.sharedAlbumList.querySelectorAll(".album-item").forEach((li) => {
+        const id = li.dataset.albumId || "";
+        li.classList.toggle("active", Boolean(activeId && id === activeId));
+    });
+}
+
 function renderAlbumList(albums, ownedQuery) {
     for (const album of albums) {
         albumMap.set(album.id, {
@@ -493,6 +506,7 @@ function renderAlbumList(albums, ownedQuery) {
     merged.forEach((album) => {
         const card = document.createElement("li");
         card.className = "album-item";
+        card.dataset.albumId = album.id;
         if (activeAlbum?.id === album.id) {
             card.classList.add("active");
         }
@@ -554,6 +568,7 @@ async function renderSharedAlbumList(sharedItems) {
     albums.forEach((album) => {
         const card = document.createElement("li");
         card.className = "album-item";
+        card.dataset.albumId = album.id;
         if (activeAlbum?.id === album.id) {
             card.classList.add("active");
         }
@@ -718,6 +733,7 @@ async function openAlbum(albumId) {
 
     await maybeAutoBookmarkSharedAlbum();
     refreshSaveSharedButtonVisibility();
+    syncAlbumListSelectionHighlight();
 }
 
 function refreshSaveSharedButtonVisibility() {
@@ -1624,6 +1640,7 @@ function clearAlbumView() {
         dom.albumEntrySort.value = "latest-first";
     }
     updateSubtitleVisibility(Boolean(currentUser));
+    syncAlbumListSelectionHighlight();
 }
 
 function updateSubtitleVisibility(loggedIn) {
@@ -1719,6 +1736,11 @@ function formatCaptureDateForDisplay(rawDate, mode) {
         return "Not set";
     }
     if (mode !== "date-only") {
+        const norm = normalizeCaptureDateForStorage(value);
+        const m = norm.match(/^(\d{4}-\d{2}-\d{2})\s+(.+)$/);
+        if (m) {
+            return `${m[1]} / ${m[2]}`;
+        }
         return value;
     }
     const isoLikeMatch = value.match(/^(\d{4}-\d{2}-\d{2})/);
