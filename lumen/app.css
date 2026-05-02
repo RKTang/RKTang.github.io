@@ -494,20 +494,11 @@ textarea {
     max-width: 100%;
 }
 
-.album-settings-row--controls {
+.album-settings-row--top {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.7rem;
     align-items: end;
-}
-
-.album-settings-row--background {
-    display: block;
-}
-
-.album-setting-background--full {
-    width: 100%;
-    max-width: 100%;
 }
 
 .album-settings-row--display {
@@ -565,7 +556,7 @@ textarea {
 
 .album-bg-swatches {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.35rem;
     align-items: center;
 }
@@ -1218,13 +1209,14 @@ dialog::backdrop {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .album-settings-row--controls,
+    .album-settings-row--top,
     .album-settings-row--display {
         grid-template-columns: 1fr;
     }
 
     .album-setting-background .album-bg-picker {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         align-items: flex-start;
     }
 }
