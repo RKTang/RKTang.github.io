@@ -528,8 +528,10 @@ async function renderSharedAlbumList(sharedItems) {
         if (activeAlbum?.id === album.id) {
             card.classList.add("active");
         }
-        const titleHtml = escapeHtml(album.title || "Untitled album");
+        const rawTitle = album.title || "Untitled album";
+        const titleHtml = escapeHtml(rawTitle);
         const visHtml = visibilityIconMarkup(album.visibility);
+        const removeLabel = escapeHtml(`Remove ${rawTitle} from Shared with me`);
         card.innerHTML = `
             <div class="album-item-inner">
                 <button type="button" class="album-item-open">
@@ -540,11 +542,35 @@ async function renderSharedAlbumList(sharedItems) {
                         </span>
                     </span>
                 </button>
+                <button type="button" class="album-item-delete album-item-remove-shared" aria-label="${removeLabel}" title="Remove from sidebar">${iconSvgTrash()}</button>
             </div>
         `;
         card.querySelector(".album-item-open").addEventListener("click", () => openAlbum(album.id));
+        card.querySelector(".album-item-remove-shared").addEventListener("click", (event) => {
+            event.stopPropagation();
+            handleRemoveSharedAlbum(album.id);
+        });
         dom.sharedAlbumList.appendChild(card);
     });
+}
+
+async function handleRemoveSharedAlbum(albumId) {
+    if (!currentUser || !albumId || !db) {
+        return;
+    }
+    if (!confirm("Remove this album from Shared with me? You can add it again from the share link.")) {
+        return;
+    }
+    try {
+        await deleteDoc(doc(db, "users", currentUser.uid, "sharedAlbums", albumId));
+        if (activeAlbum?.id === albumId && !isOwnerViewing) {
+            clearAlbumView();
+            history.replaceState(null, "", window.location.pathname);
+        }
+    } catch (error) {
+        console.warn("Remove shared album failed", error);
+        setAuthStatus("Could not remove this album from your sidebar. Try again.", "error");
+    }
 }
 
 
