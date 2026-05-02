@@ -105,6 +105,7 @@ let isOwnerViewing = false;
 let isGuestSignInAvailable = true;
 let albumSettingsSaveTimer = null;
 let albumSettingsStatusTimer = null;
+/** entryId -> { timer, runSave }; runSave flushes pending edits before editor DOM teardown. */
 const entryAutoSaveTimers = new Map();
 const SAVE_SHARED_BTN_DEFAULT = "+ Save to shared";
 let editorSortableInstance = null;
@@ -867,6 +868,14 @@ function subscribeEntries(albumId) {
 
 function renderEntries(entries) {
     destroyEditorSortable();
+    const pendingSaves = [...entryAutoSaveTimers.values()];
+    for (const { timer } of pendingSaves) {
+        clearTimeout(timer);
+    }
+    entryAutoSaveTimers.clear();
+    for (const { runSave } of pendingSaves) {
+        runSave();
+    }
     const sortMode = activeAlbum?.entrySortMode || "latest-first";
     const sortedEntries = sortEntriesForViewer(entries, sortMode);
     const editorReorderEnabled = isOwnerViewing && sortedEntries.length > 0;
@@ -938,6 +947,10 @@ function renderEntries(entries) {
         locEl.value = formattedLocation === "Not set" ? "" : formattedLocation;
         dateEl.value = formattedDate === "Not set" ? "" : formattedDate;
 
+        let entryCaptureCanonical = canonicalizeStoredCaptureDate(captureDate);
+        let entryLocationCoordsRef = locationCoords;
+        let entryLocationCityRef = locationCityState;
+
         const setEntrySaveStatus = (text, kind = "") => {
             saveStatusEl.textContent = text;
             saveStatusEl.classList.remove("is-saving", "is-saved", "is-error");
@@ -948,10 +961,21 @@ function renderEntries(entries) {
 
         const saveEntryChanges = async () => {
             try {
+                const dateMode = activeAlbum?.dateDisplayMode || "date-time";
+                const locMode = activeAlbum?.locationDisplayMode || "city-state";
+                entryCaptureCanonical = mergeCaptureDateFromEditor(dateEl.value, dateMode, entryCaptureCanonical);
+                const locPayload = buildEntryLocationUpdate(
+                    locEl.value.trim(),
+                    locMode,
+                    entryLocationCoordsRef,
+                    entryLocationCityRef
+                );
+                entryLocationCoordsRef = locPayload.locationCoords;
+                entryLocationCityRef = locPayload.locationCityState;
                 await updateDoc(doc(db, "albums", activeAlbum.id, "entries", entry.id), {
                     storyText: storyEl.value.trim(),
-                    locationText: locEl.value.trim(),
-                    captureDate: dateEl.value.trim(),
+                    captureDate: entryCaptureCanonical,
+                    ...locPayload,
                     updatedAt: serverTimestamp()
                 });
                 await touchAlbumUpdatedAt(activeAlbum.id);
@@ -966,27 +990,27 @@ function renderEntries(entries) {
             }
         };
 
+        const flushPendingEntrySave = () => {
+            const existing = entryAutoSaveTimers.get(entry.id);
+            if (!existing) {
+                return;
+            }
+            clearTimeout(existing.timer);
+            entryAutoSaveTimers.delete(entry.id);
+            saveEntryChanges();
+        };
+
         const queueEntryAutoSave = () => {
-            const existingTimer = entryAutoSaveTimers.get(entry.id);
-            if (existingTimer) {
-                clearTimeout(existingTimer);
+            const existing = entryAutoSaveTimers.get(entry.id);
+            if (existing) {
+                clearTimeout(existing.timer);
             }
             setEntrySaveStatus("Saving…", "saving");
             const timer = setTimeout(async () => {
                 entryAutoSaveTimers.delete(entry.id);
                 await saveEntryChanges();
             }, 450);
-            entryAutoSaveTimers.set(entry.id, timer);
-        };
-
-        const flushPendingEntrySave = () => {
-            const existingTimer = entryAutoSaveTimers.get(entry.id);
-            if (!existingTimer) {
-                return;
-            }
-            clearTimeout(existingTimer);
-            entryAutoSaveTimers.delete(entry.id);
-            saveEntryChanges();
+            entryAutoSaveTimers.set(entry.id, { timer, flush: flushPendingEntrySave, runSave: saveEntryChanges });
         };
 
         storyEl.addEventListener("input", queueEntryAutoSave);
@@ -1397,7 +1421,7 @@ function clearAlbumView() {
         unsubscribeEntries();
         unsubscribeEntries = null;
     }
-    for (const timer of entryAutoSaveTimers.values()) {
+    for (const { timer } of entryAutoSaveTimers.values()) {
         clearTimeout(timer);
     }
     entryAutoSaveTimers.clear();
@@ -1486,6 +1510,77 @@ function looksLikeGpsCoordinate(value) {
         return false;
     }
     return /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(value.trim());
+}
+
+/** Normalize stored capture date so date-only values get a consistent time for merging. */
+function canonicalizeStoredCaptureDate(raw) {
+    const s = toDisplayText(raw, "").trim();
+    if (!s) {
+        return "";
+    }
+    if (/^\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2}/.test(s)) {
+        return s;
+    }
+    const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (m) {
+        return `${m[1]} 00:00:00`;
+    }
+    return s;
+}
+
+function extractTimeFromCanonical(canonical) {
+    const s = (canonical || "").trim();
+    const m = s.match(/^\d{4}-\d{2}-\d{2}\s+(.+)$/);
+    if (m) {
+        const t = m[1].trim();
+        return t || "00:00:00";
+    }
+    return "00:00:00";
+}
+
+/**
+ * Persist full date/time in Firestore: in date-only UI, editing the day keeps the previous time.
+ */
+function mergeCaptureDateFromEditor(editorValue, dateMode, previousCanonical) {
+    const prev = canonicalizeStoredCaptureDate(previousCanonical);
+    const v = (editorValue || "").trim();
+    if (dateMode === "date-only") {
+        if (!v) {
+            return "";
+        }
+        const dm = v.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (!dm) {
+            return v;
+        }
+        const timePart = prev ? extractTimeFromCanonical(prev) : "00:00:00";
+        return `${dm[1]} ${timePart}`;
+    }
+    if (!v) {
+        return "";
+    }
+    return v;
+}
+
+/**
+ * Update location fields without dropping GPS or city/state when the user edits freeform text
+ * (e.g. "grandma's house") or switches display modes.
+ */
+function buildEntryLocationUpdate(trimmed, locationMode, coordsStored, cityStored) {
+    const coords = toDisplayText(coordsStored, "").trim();
+    const citySt = toDisplayText(cityStored, "").trim();
+    if (locationMode === "gps") {
+        if (!trimmed) {
+            return { locationText: "", locationCoords: "", locationCityState: citySt };
+        }
+        if (looksLikeGpsCoordinate(trimmed)) {
+            return { locationText: trimmed, locationCoords: trimmed, locationCityState: citySt };
+        }
+        return { locationText: trimmed, locationCoords: coords, locationCityState: citySt };
+    }
+    if (!trimmed) {
+        return { locationText: "", locationCityState: "", locationCoords: coords };
+    }
+    return { locationText: trimmed, locationCityState: trimmed, locationCoords: coords };
 }
 
 function formatLocationForDisplay(rawLocation, rawCoords, rawCityState, mode) {
