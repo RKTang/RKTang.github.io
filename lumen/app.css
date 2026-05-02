@@ -486,19 +486,30 @@ textarea {
     display: grid;
     gap: 0.7rem;
     margin-top: 0.7rem;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .album-settings-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 0.7rem;
     align-items: end;
+    max-width: 100%;
 }
 
 .album-setting-field {
     margin: 0;
     min-width: 0;
-    white-space: nowrap;
+    max-width: 100%;
+    white-space: normal;
+}
+
+.album-setting-field select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .album-setting-visibility {
@@ -527,9 +538,10 @@ textarea {
 
 .album-bg-picker {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.55rem;
+    max-width: 100%;
 }
 
 .album-bg-swatches {
@@ -1130,7 +1142,7 @@ dialog::backdrop {
     cursor: grabbing;
 }
 
-.editor-grid.is-custom-sort .entry-drag-handle {
+.editor-grid.is-reorder-enabled .entry-drag-handle {
     display: grid;
 }
 
@@ -1147,10 +1159,17 @@ dialog::backdrop {
     opacity: 0.85;
 }
 
-.entry-editor-card.is-entry-dragging {
-    opacity: 0.72;
-    outline: 2px dashed rgba(44, 62, 80, 0.35);
-    outline-offset: 2px;
+.entry-sortable-ghost {
+    opacity: 0.5;
+    background: #f5f1eb !important;
+}
+
+.entry-sortable-chosen {
+    cursor: grabbing;
+}
+
+.entry-sortable-drag {
+    opacity: 0.92;
 }
 
 .entry-delete-corner {
