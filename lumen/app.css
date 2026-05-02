@@ -110,6 +110,7 @@ body.viewer-only #owner-view-mode-toggle {
     border-radius: 0;
     padding: 1.1rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    min-width: 0;
 }
 
 .panel h2 {
@@ -487,7 +488,6 @@ textarea {
     gap: 0.7rem;
     margin-top: 0.7rem;
     max-width: 100%;
-    overflow-x: hidden;
 }
 
 .album-settings-row {
@@ -1209,15 +1209,18 @@ dialog::backdrop {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .album-settings-row--top,
-    .album-settings-row--display {
-        grid-template-columns: 1fr;
-    }
-
     .album-setting-background .album-bg-picker {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: flex-start;
+    }
+}
+
+/* Keep album settings as two rows of three until very narrow viewports. */
+@media (max-width: 640px) {
+    .album-settings-row--top,
+    .album-settings-row--display {
+        grid-template-columns: 1fr;
     }
 }
 
