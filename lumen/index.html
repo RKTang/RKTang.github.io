@@ -130,6 +130,7 @@
                                 <select id="album-entry-sort">
                                     <option value="latest-first" selected>Latest to earliest</option>
                                     <option value="earliest-first">Earliest to latest</option>
+                                    <option value="custom">Custom (drag to reorder in editor)</option>
                                 </select>
                             </label>
                         </div>
@@ -165,6 +166,9 @@
 
     <template id="entry-editor-template">
         <article class="entry-editor-card">
+            <button type="button" class="entry-drag-handle" aria-label="Drag to reorder" title="Drag to reorder">
+                <span class="entry-drag-grip" aria-hidden="true"></span>
+            </button>
             <button class="entry-delete entry-delete-corner" type="button" aria-label="Delete entry" title="Delete entry">🗑</button>
             <img class="entry-editor-image" alt="">
             <div class="entry-editor-fields stack">

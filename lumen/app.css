@@ -254,6 +254,12 @@ textarea {
     gap: 0.55rem;
 }
 
+.shared-sidebar-section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #efe8df;
+}
+
 .album-item {
     border: 1px solid #e6ddd0;
     border-radius: 0;
@@ -1099,6 +1105,52 @@ dialog::backdrop {
 .entry-delete:hover {
     background: rgba(138, 45, 45, 0.08) !important;
     color: #6f2121 !important;
+}
+
+.entry-drag-handle {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    z-index: 2;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 999px;
+    display: none;
+    place-items: center;
+    padding: 0;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(44, 62, 80, 0.18) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    color: #3d4f61;
+    cursor: grab;
+}
+
+.entry-drag-handle:active {
+    cursor: grabbing;
+}
+
+.editor-grid.is-custom-sort .entry-drag-handle {
+    display: grid;
+}
+
+.entry-drag-grip {
+    width: 0.42rem;
+    height: 0.78rem;
+    background: linear-gradient(
+        90deg,
+        #64748b 0 35%,
+        transparent 35% 65%,
+        #64748b 65% 100%
+    );
+    border-radius: 1px;
+    opacity: 0.85;
+}
+
+.entry-editor-card.is-entry-dragging {
+    opacity: 0.72;
+    outline: 2px dashed rgba(44, 62, 80, 0.35);
+    outline-offset: 2px;
 }
 
 .entry-delete-corner {
