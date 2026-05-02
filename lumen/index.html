@@ -168,7 +168,7 @@
 
     <template id="entry-editor-template">
         <article class="entry-editor-card">
-            <button type="button" class="entry-drag-handle" aria-label="Drag to reorder" title="Drag to reorder">
+            <button type="button" class="entry-drag-handle" aria-label="Reorder photo in journal" title="Drag to reorder photos">
                 <span class="entry-drag-grip" aria-hidden="true"></span>
             </button>
             <button class="entry-delete entry-delete-corner" type="button" aria-label="Delete entry" title="Delete entry">🗑</button>
@@ -193,10 +193,21 @@
         </article>
     </template>
 
-    <dialog id="viewer-modal" aria-labelledby="viewer-modal-title">
+    <dialog id="viewer-modal" aria-labelledby="viewer-modal-title" aria-describedby="viewer-modal-help">
+        <p id="viewer-modal-help" class="sr-only">Tab moves between controls. Escape closes the viewer.</p>
+        <div class="viewer-modal-toolbar">
+            <h2 id="viewer-modal-title" class="viewer-modal-toolbar-title"></h2>
+            <div class="viewer-modal-toolbar-actions">
+                <button type="button" id="viewer-modal-flip-btn" class="modal-toolbar-btn" aria-pressed="false" aria-label="Show photo details">
+                    Details
+                </button>
+                <button type="button" id="viewer-modal-close-btn" class="modal-toolbar-btn" aria-label="Close photo viewer">
+                    Close
+                </button>
+            </div>
+        </div>
         <article id="viewer-modal-card" class="modal-content">
-            <h2 id="viewer-modal-title"></h2>
-            <div class="modal-flip">
+            <div class="modal-flip" role="presentation">
                 <section class="modal-face modal-front">
                     <div class="modal-photo">
                         <img id="viewer-modal-image" src="" alt="">
