@@ -988,15 +988,76 @@
 
             <article>
                 <header>
-                    <h3>Lumen</h3>
-                    <p class="subtitle">Web Application | User-generated Photo Journals</p>
+                    <h3>Lumen Journal</h3>
+                    <p class="subtitle">Web Application | Creative showcase & Firebase photo journals</p>
                 </header>
                 <p>
-                    A Firebase-powered photo journal app where users sign in with Google, upload albums, and auto-fill date/location from photo metadata.
+                    A photo-journal project in two parts: the <strong>Creative</strong> page is a fast, static polaroid gallery;
+                    the <strong>Lumen</strong> app adds Firebase (Firestore &amp; Storage), Google sign-in and guest mode, albums with visibility,
+                    EXIF-aware uploads, public share links, and owner Viewer vs.&nbsp;Editor modes for reading vs.&nbsp;editing.
                 </p>
-                <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://rktang.github.io/lumen/" target="_blank" style="text-decoration:none;">
-                        <button>Launch Lumen</button>
+
+                <div id="wrapper">
+                    <div class="slideshow">
+                        <div class="display-container">
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-01.png" width="100%" alt="Lumen app — editor mode with album settings and upload">
+                                <div class="numbertext">1 / 6</div>
+                                <div class="text">Editor — album settings, upload, and journal</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-02.png" width="100%" alt="Lumen app — editing journal entry cards">
+                                <div class="numbertext">2 / 6</div>
+                                <div class="text">Editing Journal — story, location, and date</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-03.png" width="100%" alt="Lumen app — owner viewer mode and polaroid grid">
+                                <div class="numbertext">3 / 6</div>
+                                <div class="text">Owner Viewer — clean grid, no author tools</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-04.png" width="100%" alt="Lumen app — public or link-based guest view">
+                                <div class="numbertext">4 / 6</div>
+                                <div class="text">Public / link view — read-only journal</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-05.png" width="100%" alt="Lumen app — entry details modal">
+                                <div class="numbertext">5 / 6</div>
+                                <div class="text">Entry modal — metadata and story</div>
+                            </div>
+                            <div class="mySlides">
+                                <img src="Asset/lumen-slide-06.png" width="100%" alt="Lumen app — full-screen photo lightbox">
+                                <div class="numbertext">6 / 6</div>
+                                <div class="text">Lightbox — full photo with Details</div>
+                            </div>
+                            <a class="prev" onclick="plusDivs(-1, 15)">&#10094;</a>
+                            <a class="next" onclick="plusDivs(1, 15)">&#10095;</a>
+                        </div>
+                        <br>
+                        <div style="text-align:center">
+                            <span class="dot" onclick="currentDiv(1, 15)"></span>
+                            <span class="dot" onclick="currentDiv(2, 15)"></span>
+                            <span class="dot" onclick="currentDiv(3, 15)"></span>
+                            <span class="dot" onclick="currentDiv(4, 15)"></span>
+                            <span class="dot" onclick="currentDiv(5, 15)"></span>
+                            <span class="dot" onclick="currentDiv(6, 15)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <details>
+                    <summary>Expand for details</summary>
+                    <p><strong>Creative (<code>/creative/</code>):</strong> Static showcase built to preview the journal aesthetic—responsive polaroid grid, hosted on GitHub Pages.</p>
+                    <p><strong>Lumen app (<code>/lumen/</code>):</strong> Client-side Firebase SDK; users create albums, upload photos with metadata-derived dates/locations, reorder entries, copy public links, and bookmark shared albums. Owners switch Viewer (clean journal) vs.&nbsp;Editor (settings + uploads).</p>
+                    <p><strong>Stack:</strong> HTML/CSS/JS modules, Firebase Auth &amp; Firestore &amp; Storage, hosted on GitHub Pages.</p>
+                </details>
+
+                <div style="margin-top:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center;">
+                    <a href="https://rktang.github.io/creative/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+                        <button type="button">View Creative showcase</button>
+                    </a>
+                    <a href="https://rktang.github.io/lumen/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+                        <button type="button">Open Lumen app</button>
                     </a>
                 </div>
             </article>
