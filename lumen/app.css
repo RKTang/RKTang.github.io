@@ -559,6 +559,8 @@ textarea {
 .panel-heading-text {
     display: grid;
     gap: 0.12rem;
+    min-width: 0;
+    flex: 1;
 }
 
 .panel-heading-title-row {
@@ -566,6 +568,8 @@ textarea {
     align-items: center;
     gap: 0.45rem;
     flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .panel-heading-text h2.album-title-heading {
@@ -576,13 +580,13 @@ textarea {
     letter-spacing: 0.01em;
     line-height: 1.15;
     min-width: 0;
+    max-width: 100%;
 }
 
 .album-title-editable-host {
-    display: inline-block;
+    display: block;
     max-width: 100%;
     min-width: 0;
-    vertical-align: bottom;
     outline: none;
     cursor: default;
 }
@@ -596,16 +600,22 @@ textarea {
     border-radius: 6px;
 }
 
+.album-title-editable-host .album-title-display {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
 .album-title-editable-host.album-title-editable .album-title-display {
     position: relative;
-    display: inline-block;
-    max-width: 100%;
     padding: 0.08em 1.1em 0.08em 0.32em;
     margin: -0.08em -0.32em;
     border-radius: 6px;
     transition: background-color 0.15s ease;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
 }
 
 .album-title-editable-host.album-title-editable:hover .album-title-display {
@@ -645,8 +655,11 @@ h2 .album-title-input {
     color: inherit;
     min-width: 6rem;
     max-width: 100%;
-    width: min(100%, 32rem);
+    width: 100%;
     box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 h2 .album-title-input:focus {
