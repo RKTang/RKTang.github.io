@@ -113,7 +113,6 @@ const dom = {
     viewerModalCloseBtn: document.getElementById("viewer-modal-close-btn"),
     viewerModalFlipBtn: document.getElementById("viewer-modal-flip-btn"),
     viewerModalTitle: document.getElementById("viewer-modal-title"),
-    viewerModalBackTitle: document.getElementById("viewer-modal-back-title"),
     viewerModalImage: document.getElementById("viewer-modal-image"),
     viewerModalStory: document.getElementById("viewer-modal-story"),
     viewerModalLocation: document.getElementById("viewer-modal-location"),
@@ -1761,7 +1760,6 @@ function openViewerCard(card) {
     }
 
     dom.viewerModalTitle.textContent = card.dataset.title || "Lumen Journal Entry";
-    dom.viewerModalBackTitle.textContent = card.dataset.title || "Lumen Journal Entry";
     const locationMode = activeAlbum?.locationDisplayMode || "city-state";
     const dateMode = activeAlbum?.dateDisplayMode || "date-time";
     const formattedLocation = formatLocationForDisplay(
@@ -1771,9 +1769,9 @@ function openViewerCard(card) {
         locationMode
     );
     const formattedDate = formatCaptureDateForDisplay(card.dataset.date || "Not set", dateMode);
-    dom.viewerModalStory.textContent = `Story: ${card.dataset.story || "No story yet."}`;
-    dom.viewerModalLocation.textContent = `Location: ${formattedLocation}`;
-    dom.viewerModalDate.textContent = `Date: ${formattedDate}`;
+    dom.viewerModalStory.textContent = card.dataset.story || "No story yet.";
+    dom.viewerModalLocation.textContent = formattedLocation;
+    dom.viewerModalDate.textContent = formattedDate;
     dom.viewerModalImage.src = fullSrc;
     dom.viewerModalImage.alt = card.dataset.alt || "Journal entry image";
     syncViewerModalFlipState(false);

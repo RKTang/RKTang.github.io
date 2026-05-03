@@ -1179,13 +1179,13 @@ dialog[open] {
     justify-content: space-between;
     gap: 0.75rem;
     width: 100%;
-    max-width: min(94vw, 980px);
-    margin: 0 0 0.4rem;
+    max-width: none;
+    margin: 0;
     box-sizing: border-box;
-    padding: 0.5rem 0.65rem;
-    background: rgba(255, 253, 248, 0.98);
-    border: 1px solid rgba(44, 62, 80, 0.2);
-    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.12);
+    flex-shrink: 0;
+    padding: 0.55rem 0.75rem;
+    background: #faf8f5;
+    border-bottom: 1px solid rgba(44, 62, 80, 0.14);
 }
 
 .viewer-modal-toolbar-title {
@@ -1228,14 +1228,17 @@ dialog::backdrop {
 
 .modal-content {
     margin: 0;
-    padding: 1rem 0.7rem 4.8rem;
-    display: grid;
-    gap: 0.85rem;
+    padding: 0 0 4.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
     width: fit-content;
     max-width: min(94vw, 980px);
     position: relative;
     border-radius: 0;
     background: #fff;
+    border: 1px solid #e5ddd4;
     transform-origin: center center;
     transform-style: preserve-3d;
     transform: translate3d(var(--card-move-x, 0px), var(--card-move-y, 0px), 0)
@@ -1251,6 +1254,7 @@ dialog::backdrop {
     aspect-ratio: var(--photo-ratio, 4 / 5);
     transform-style: preserve-3d;
     transform: rotateY(0deg);
+    align-self: center;
 }
 
 .modal-content.is-flipped {
@@ -1279,12 +1283,40 @@ dialog::backdrop {
     transform: rotateY(180deg);
     background: #f5f2ee;
     border: 1px solid #dfd9d0;
-    padding: 1.1rem;
+    padding: 1rem 1.15rem 1.15rem;
     color: #2b2b2b;
     display: none;
     align-content: start;
-    gap: 0.7rem;
     overflow: auto;
+}
+
+.modal-detail-list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-detail-group {
+    margin: 0;
+}
+
+.modal-detail-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #6b7280;
+    line-height: 1.2;
+}
+
+.modal-detail-value {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 400;
+    line-height: 1.45;
+    color: #111827;
 }
 
 .modal-content.is-flipped .modal-front {
