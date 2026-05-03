@@ -1,8 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
     getAuth,
     GoogleAuthProvider,
     linkWithPopup,
+    signInWithCredential,
     signInWithPopup,
     signInAnonymously,
     signOut,
@@ -46,6 +47,19 @@ import {
 
 const firebaseConfig = window.LUMEN_FIREBASE_CONFIG || null;
 const hasFirebaseConfig = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "REPLACE_ME";
+
+const SECONDARY_APP_NAME = "lumen-link-secondary";
+
+function getSecondaryApp() {
+    if (!hasFirebaseConfig) {
+        throw new Error("Firebase not configured");
+    }
+    const existing = getApps().find((a) => a.name === SECONDARY_APP_NAME);
+    if (existing) {
+        return existing;
+    }
+    return initializeApp(firebaseConfig, SECONDARY_APP_NAME);
+}
 
 const dom = {
     signInBtn: document.getElementById("sign-in-btn"),
@@ -342,6 +356,134 @@ async function handleGuestSignIn() {
     }
 }
 
+async function transferOwnedAlbumsFromAnonToUser(anonUid, targetUid, ownerDisplayName) {
+    const albumsSnap = await getDocs(query(collection(db, "albums"), where("ownerUid", "==", anonUid)));
+    const ownerLabel = toDisplayText(ownerDisplayName, "").trim();
+    let batch = writeBatch(db);
+    let ops = 0;
+    const flush = async () => {
+        if (ops > 0) {
+            await batch.commit();
+            batch = writeBatch(db);
+            ops = 0;
+        }
+    };
+    for (const albumDoc of albumsSnap.docs) {
+        const albumId = albumDoc.id;
+        const prev = albumDoc.data() || {};
+        const mergedOwnerName =
+            ownerLabel || toDisplayText(prev.ownerDisplayName, "").trim() || "Guest";
+        batch.update(doc(db, "albums", albumId), {
+            ownerUid: targetUid,
+            ownerDisplayName: mergedOwnerName,
+            updatedAt: serverTimestamp()
+        });
+        ops++;
+        if (ops >= 450) {
+            await flush();
+        }
+        const entriesSnap = await getDocs(collection(db, "albums", albumId, "entries"));
+        for (const entryDoc of entriesSnap.docs) {
+            batch.update(doc(db, "albums", albumId, "entries", entryDoc.id), {
+                ownerUid: targetUid,
+                updatedAt: serverTimestamp()
+            });
+            ops++;
+            if (ops >= 450) {
+                await flush();
+            }
+        }
+    }
+    await flush();
+}
+
+async function mergeAnonymousIntoExistingGoogleAccount(credential, provider, options = {}) {
+    const { quiet = false } = options;
+    const anonUser = auth.currentUser;
+    if (!anonUser?.isAnonymous || !credential) {
+        return false;
+    }
+    const anonUid = anonUser.uid;
+
+    let sharedBookmarks = [];
+    try {
+        const sharedSnap = await getDocs(collection(db, "users", anonUid, "sharedAlbums"));
+        sharedBookmarks = sharedSnap.docs.map((d) => ({ id: d.id, data: d.data() }));
+    } catch (_e) {
+        // ignore
+    }
+
+    const secondaryAuth = getAuth(getSecondaryApp());
+    let targetUid = "";
+    let preferredName = "";
+    try {
+        const secondaryCred = await signInWithCredential(secondaryAuth, credential);
+        targetUid = secondaryCred.user.uid;
+        preferredName = getPreferredOwnerDisplayName(secondaryCred.user);
+        await signOut(secondaryAuth);
+    } catch (e) {
+        try {
+            await signOut(secondaryAuth);
+        } catch (_e2) {
+            // ignore
+        }
+        throw e;
+    }
+
+    try {
+        await transferOwnedAlbumsFromAnonToUser(anonUid, targetUid, preferredName);
+    } catch (e) {
+        console.warn("Album merge failed", e);
+        showToast("Could not move guest albums to your Google account. Try again.", "error");
+        return false;
+    }
+
+    if (activeAlbum?.ownerUid === anonUid) {
+        activeAlbum.ownerUid = targetUid;
+        const nm = toDisplayText(preferredName, "").trim();
+        if (nm) {
+            activeAlbum.ownerDisplayName = nm;
+        }
+    }
+
+    try {
+        await signInWithCredential(auth, credential);
+    } catch (_credErr) {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (popupErr) {
+            const friendly = getAuthErrorMessage(popupErr, "link-account");
+            if (friendly) {
+                showToast(friendly.message, friendly.type);
+            }
+            return false;
+        }
+    }
+
+    const signedIn = auth.currentUser;
+    if (!signedIn || signedIn.uid !== targetUid) {
+        showToast("Albums were merged, but sign-in did not complete. Refresh and sign in with Google.", "error");
+        return false;
+    }
+
+    try {
+        for (const { id, data } of sharedBookmarks) {
+            await setDoc(doc(db, "users", targetUid, "sharedAlbums", id), data, { merge: true });
+        }
+    } catch (_e) {
+        // non-fatal
+    }
+
+    await ensureUserDoc(signedIn);
+    if (preferredName) {
+        await backfillOwnerDisplayName(signedIn.uid, preferredName);
+    }
+    if (!quiet) {
+        showToast("Guest albums merged into your Google account.", "success");
+    }
+    return true;
+}
+
 async function linkAnonymousAccountWithGoogle(options = {}) {
     const { quiet = false } = options;
     const user = auth.currentUser;
@@ -361,6 +503,19 @@ async function linkAnonymousAccountWithGoogle(options = {}) {
         }
         return true;
     } catch (error) {
+        const code = error?.code || "";
+        if (code === "auth/credential-already-in-use") {
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            if (credential) {
+                try {
+                    return await mergeAnonymousIntoExistingGoogleAccount(credential, provider, { quiet });
+                } catch (mergeErr) {
+                    console.warn("Merge into existing Google account failed", mergeErr);
+                    showToast("Could not merge guest data into your Google account. Try again.", "error");
+                    return false;
+                }
+            }
+        }
         const friendly = getAuthErrorMessage(error, "link-account");
         if (friendly) {
             showToast(friendly.message, friendly.type);
