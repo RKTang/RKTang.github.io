@@ -1235,7 +1235,7 @@ dialog::backdrop {
 
 .modal-content {
     margin: 0;
-    padding: 0 0 4.8rem;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -1269,6 +1269,24 @@ dialog::backdrop {
 
 .modal-content.is-flipped {
     --flip-rot: 180deg;
+}
+
+/* Polaroid lip (replaces padding-bottom): aligns with .modal-flip width */
+.modal-content::after {
+    content: "";
+    flex: 0 0 4.8rem;
+    min-height: 4.8rem;
+    width: min(84vw, 920px, calc(76vh * var(--photo-ratio-num, 0.8)));
+    max-width: 100%;
+    align-self: center;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+/* Continue .modal-back side borders through the white lip on Details */
+.modal-content.is-flipped::after {
+    border-left: 1px solid #dfd9d0;
+    border-right: 1px solid #dfd9d0;
 }
 
 .modal-face {
