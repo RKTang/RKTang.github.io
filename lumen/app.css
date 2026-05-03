@@ -564,15 +564,20 @@ textarea {
 }
 
 .panel-heading-title-row {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.45rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-width: 0;
-    max-width: 100%;
+    width: 100%;
+}
+
+.panel-heading-title-row > :not(.album-title-heading) {
+    flex-shrink: 0;
 }
 
 .panel-heading-text h2.album-title-heading {
+    flex: 1;
     margin: 0;
     font-size: clamp(1.9rem, 3.6vw, 2.8rem);
     font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
@@ -580,7 +585,6 @@ textarea {
     letter-spacing: 0.01em;
     line-height: 1.15;
     min-width: 0;
-    max-width: 100%;
 }
 
 .album-title-editable-host {
@@ -1052,6 +1056,10 @@ body.owner-mode-editor .entries-section:first-of-type {
 
 body.owner-mode-viewer #owner-editor-section {
     display: none;
+}
+
+body.owner-mode-viewer .entries-section:first-of-type {
+    margin-top: 0.25rem;
 }
 
 .pill {
