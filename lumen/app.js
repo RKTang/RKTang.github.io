@@ -2295,6 +2295,9 @@ function setOwnerViewMode(mode) {
     document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
     dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
     dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
+    if (dom.albumControls && isOwnerViewing) {
+        dom.albumControls.hidden = normalized === "viewer";
+    }
     if (dom.viewerSectionTitle) {
         dom.viewerSectionTitle.textContent = "Viewing Journal";
     }
