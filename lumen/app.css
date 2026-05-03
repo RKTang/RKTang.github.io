@@ -403,7 +403,7 @@ textarea {
 .album-item-open {
     flex: 1;
     min-width: 0;
-    display: inline-block;
+    display: block;
     margin: 0;
     padding: 0.2rem 0.15rem;
     border: 0;
@@ -426,19 +426,22 @@ textarea {
 .album-item-text {
     display: block;
     min-width: 0;
+    max-width: 100%;
 }
 
 .album-item-title-row {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.4rem;
+    flex-wrap: nowrap;
     min-width: 0;
+    width: 100%;
 }
 
 .album-item-title {
     margin: 0;
     font-weight: 700;
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
