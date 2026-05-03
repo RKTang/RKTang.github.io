@@ -165,7 +165,7 @@
         }
 
         /* Button and Link Styling */
-        button, summary, .download-btn {
+        button, .download-btn {
             background-color: var(--accent);
             color: white;
             border: none;
@@ -178,9 +178,47 @@
             text-decoration: none;
         }
 
-        button:hover, summary:hover, .download-btn:hover {
+        button:hover, .download-btn:hover {
             background-color: var(--accent-light);
             color: white;
+        }
+
+        /* Disclosure: light touch — no second card, no full-width button */
+        summary {
+            background: transparent !important;
+            color: var(--accent) !important;
+            border: none !important;
+            border-radius: 0;
+            padding: 0.4rem 0 !important;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            list-style: none;
+            display: inline-block;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: " \203A";
+            display: inline-block;
+            margin-left: 0.15em;
+            transition: transform 0.2s ease;
+            color: #718096;
+        }
+
+        details[open] > summary::after {
+            transform: rotate(90deg);
+        }
+
+        summary:hover {
+            color: var(--accent-light) !important;
+            background: transparent !important;
         }
 
         a {
@@ -238,17 +276,33 @@
             transform: translateX(-50%);     
         }
 
-        details {
+        main details {
             margin-top: 1rem;
-            background-color: #ffffff !important;
+            margin-bottom: 0;
+            background: transparent !important;
             color: #333333 !important;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
+            border: none !important;
+            border-top: 1px solid #e8eaed;
+            padding: 0.85rem 0 0;
+            border-radius: 0;
         }
 
-        details p, details ul, details li, details strong {
+        main details p,
+        main details ul,
+        main details li,
+        main details strong {
             color: #333333 !important;
+        }
+
+        main details p {
+            margin: 0 0 0.65rem;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: #4a5568 !important;
+        }
+
+        main details p:last-child {
+            margin-bottom: 0;
         }
         
         footer {
@@ -464,7 +518,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         I'm working on the fuel tanks (pressure vessels) for our liquid-propellant rocket. 
                         We need these tanks to be extremely light but strong enough to hold fuel under massive pressure.
@@ -503,7 +557,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>Designed components and manufacturing processes for an annual production run of 20,000 units of an RC car. Covered aluminum wheels, thermoformed shell body, and composite chassis.</p>
                 </details>
             </article>
@@ -532,7 +586,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>Led a multidisciplinary team to build a "Semi-Autonomous Modular Indoor" farm prototype using Arduino. Integrated hardware sensors with a mobile app UI created in Figma.</p>
                 </details>
             </article>
@@ -581,7 +635,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         For my Additive Manufacturing Design project, our team built a workflow to visualize climate change data physically. 
                         The goal was to take abstract data and turn it into a tangible 3D model that anyone could hold.
@@ -619,7 +673,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>Designed a custom laptop stand to improve ergonomics and thermal dissipation. The innovative design raises the laptop, promoting better airflow and significantly lowering operating temperatures.</p>
                 </details>
             </article>
@@ -645,7 +699,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>Developed a practical 3D printed utility blade holder to assist with shop tasks such as opening boxes and deburring materials.</p>
                 </details>
             </article>
@@ -672,7 +726,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>Developed a 2D platformer using Unity and C#. Published the final build to itch.io, achieving 3,000+ unique player downloads.</p>
                 </details>
                 <div style="margin-top:1rem;">
@@ -698,7 +752,7 @@
                     </div>
                 </div>
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>A passion project exploring incremental game mechanics. Collaborated with a digital artist to design custom assets and implemented game logic in C#.</p>
                 </details>
                 <div style="margin-top:1rem;">
@@ -730,7 +784,7 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         This project was an experiment to test the capabilities of Generative AI in full-stack web development and branding.
                     </p>
@@ -786,7 +840,7 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         I wanted to apply an engineering mindset to personal finance. Most investment calculators just assume a flat return rate (e.g., 7% every year), which ignores the reality of market risk.
                     </p>
@@ -840,7 +894,7 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         SPOOL. is an interactive web experiment that merges typography with 3D geometry. I wanted to build a tool that allows designers to break free from 2D constraints and treat text as a physical, malleable texture.
                     </p>
@@ -908,7 +962,7 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
                         Most incremental games are just spreadsheets in disguise. I wanted to build something where you actually <em>see</em> the progress. 
                         I programmed the logic to construct every project block-by-block in real-time—from garages to space stations. 
@@ -964,18 +1018,9 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
+                    <summary>Details</summary>
                     <p>
-                        A lightweight web application designed to help users efficiently organize, filter, and clean up their Gmail inboxes. 
-                    </p>
-                    <p>
-                        <strong>Key Features:</strong>
-                    </p>
-                    <p>
-                        <strong>Inbox Management:</strong> Streamlines the sorting and filtering of large volumes of emails.
-                    </p>
-                    <p>
-                        <strong>Secure Integration:</strong> Leverages official API endpoints for secure data handling and user authentication.
+                        A small web app to sort, filter, and tidy a Gmail inbox. Uses the official Gmail API for sign-in and data access.
                     </p>
                 </details>
 
@@ -991,11 +1036,6 @@
                     <h3>Lumen Journal</h3>
                     <p class="subtitle">Web Application | Creative showcase & Firebase photo journals</p>
                 </header>
-                <p>
-                    A photo-journal project in two parts: the <strong>Creative</strong> page is a fast, static polaroid gallery;
-                    the <strong>Lumen</strong> app adds Firebase (Firestore &amp; Storage), Google sign-in and guest mode, albums with visibility,
-                    EXIF-aware uploads, public share links, and owner Viewer vs.&nbsp;Editor modes for reading vs.&nbsp;editing.
-                </p>
 
                 <div id="wrapper">
                     <div class="slideshow">
@@ -1046,10 +1086,10 @@
                 </div>
 
                 <details>
-                    <summary>Expand for details</summary>
-                    <p><strong>Creative (<code>/creative/</code>):</strong> Static showcase built to preview the journal aesthetic—responsive polaroid grid, hosted on GitHub Pages.</p>
-                    <p><strong>Lumen app (<code>/lumen/</code>):</strong> Client-side Firebase SDK; users create albums, upload photos with metadata-derived dates/locations, reorder entries, copy public links, and bookmark shared albums. Owners switch Viewer (clean journal) vs.&nbsp;Editor (settings + uploads).</p>
-                    <p><strong>Stack:</strong> HTML/CSS/JS modules, Firebase Auth &amp; Firestore &amp; Storage, hosted on GitHub Pages.</p>
+                    <summary>Details</summary>
+                    <p>
+                        Two GitHub Pages surfaces: a static polaroid gallery at <code>/creative/</code>, and the Lumen app at <code>/lumen/</code> with Firebase (Auth, Firestore, Storage), albums and share links, EXIF-aware uploads, and owner viewer vs. editor modes. Built with vanilla HTML/CSS/JS modules.
+                    </p>
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center;">
