@@ -1271,13 +1271,13 @@ dialog::backdrop {
     --flip-rot: 180deg;
 }
 
-/* Polaroid lip (replaces padding-bottom): aligns with .modal-flip width */
+/* Polaroid lip (replaces padding-bottom): width matches inset photo/beige panel (0.8rem gutters) */
 .modal-content::after {
     content: "";
     flex: 0 0 4.8rem;
     min-height: 4.8rem;
-    width: min(84vw, 920px, calc(76vh * var(--photo-ratio-num, 0.8)));
-    max-width: 100%;
+    width: calc(min(84vw, 920px, calc(76vh * var(--photo-ratio-num, 0.8))) - 1.6rem);
+    max-width: calc(100% - 1.6rem);
     align-self: center;
     box-sizing: border-box;
     background: #fff;
@@ -1312,9 +1312,11 @@ dialog::backdrop {
 
 .modal-back {
     transform: rotateY(180deg);
-    background: #f5f2ee;
-    border: 1px solid #dfd9d0;
-    padding: 1rem 1.15rem 1.15rem;
+    /* Same white frame as .modal-front (0.8rem gutters around inner content) */
+    background: #fff;
+    border: none;
+    padding: 0.8rem;
+    box-sizing: border-box;
     color: #2b2b2b;
     display: none;
     align-content: start;
@@ -1326,6 +1328,15 @@ dialog::backdrop {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+.modal-back .modal-detail-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: #f5f2ee;
+    border: 1px solid #dfd9d0;
+    padding: 1rem 1.15rem 1.15rem;
+    box-sizing: border-box;
 }
 
 .modal-detail-group {
@@ -1356,6 +1367,7 @@ dialog::backdrop {
 
 .modal-content.is-flipped .modal-back {
     display: grid;
+    grid-template-rows: minmax(0, 1fr);
     transform: rotateY(180deg);
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
