@@ -1245,7 +1245,10 @@ dialog::backdrop {
     position: relative;
     border-radius: 0;
     background: #fff;
-    border: 1px solid #e5ddd4;
+    border: 1px solid #9ca3af;
+    box-shadow:
+        inset 1px 0 0 rgba(255, 255, 255, 0.35),
+        inset -1px 0 0 rgba(255, 255, 255, 0.35);
     transform-origin: center center;
     transform-style: preserve-3d;
     transform: translate3d(var(--card-move-x, 0px), var(--card-move-y, 0px), 0)
@@ -1284,6 +1287,9 @@ dialog::backdrop {
     align-items: center;
     justify-content: center;
     z-index: 2;
+    /* Polaroid-style white margin around the photo (match grid cards ~0.8rem) */
+    padding: 0.8rem 0.8rem 0.8rem;
+    box-sizing: border-box;
 }
 
 .modal-back {
@@ -1375,6 +1381,14 @@ dialog::backdrop {
     height: 100%;
     margin: 0 auto;
     aspect-ratio: var(--photo-ratio, 4 / 5);
+}
+
+/* Viewer: padded front face — let image scale inside the guttered area */
+.modal-content .modal-front .modal-photo {
+    aspect-ratio: unset;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
 }
 
 .modal-photo::after {
