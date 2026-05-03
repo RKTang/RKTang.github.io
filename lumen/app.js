@@ -192,6 +192,16 @@ let viewerModalReturnFocus = null;
 const UPLOAD_MAX_EDGE_PX = 2560;
 const UPLOAD_JPEG_QUALITY = 0.82;
 const GUEST_HINT_DISMISS_SESSION_KEY = "lumen_guest_hint_dismissed";
+const OWNER_ALBUM_VIEW_MODE_KEY = "lumen_owner_album_view_mode";
+
+function getStoredOwnerAlbumViewMode() {
+    try {
+        const v = sessionStorage.getItem(OWNER_ALBUM_VIEW_MODE_KEY);
+        return v === "viewer" || v === "editor" ? v : null;
+    } catch (_e) {
+        return null;
+    }
+}
 
 function isGuestHintDismissedThisSession() {
     try {
@@ -1165,9 +1175,10 @@ async function openAlbum(albumId) {
     dom.ownerEditorSection.hidden = !isOwnerViewing;
     dom.ownerViewModeToggle.hidden = !isOwnerViewing;
     if (isOwnerViewing) {
-        setOwnerViewMode("editor");
+        const storedMode = getStoredOwnerAlbumViewMode();
+        setOwnerViewMode(storedMode === "viewer" ? "viewer" : "editor");
         if (dom.albumSettingsDropdown) {
-            dom.albumSettingsDropdown.open = true;
+            dom.albumSettingsDropdown.open = storedMode !== "viewer";
         }
     } else {
         document.body.classList.remove("owner-mode-editor", "owner-mode-viewer");
@@ -2295,6 +2306,11 @@ function setOwnerViewMode(mode) {
     document.body.classList.toggle("owner-mode-viewer", normalized === "viewer");
     dom.showViewerModeBtn.classList.toggle("is-active", normalized === "viewer");
     dom.showEditorModeBtn.classList.toggle("is-active", normalized === "editor");
+    try {
+        sessionStorage.setItem(OWNER_ALBUM_VIEW_MODE_KEY, normalized);
+    } catch (_e) {
+        // ignore
+    }
     if (dom.albumControls && isOwnerViewing) {
         dom.albumControls.hidden = normalized === "viewer";
     }

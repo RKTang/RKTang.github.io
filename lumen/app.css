@@ -716,6 +716,15 @@ h2 .album-title-input:focus {
     gap: 0;
 }
 
+/* `.stack` sets `display: grid` and wins over the [hidden] attribute in the cascade, so the panel stayed visible. */
+#album-controls[hidden] {
+    display: none !important;
+}
+
+body.owner-mode-viewer #album-controls {
+    display: none !important;
+}
+
 #album-controls label {
     font-size: 0.95rem;
 }
