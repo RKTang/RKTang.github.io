@@ -568,12 +568,91 @@ textarea {
     flex-wrap: wrap;
 }
 
-.panel-heading-text h2 {
+.panel-heading-text h2.album-title-heading {
     margin: 0;
     font-size: clamp(1.9rem, 3.6vw, 2.8rem);
     font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
     font-weight: 700;
     letter-spacing: 0.01em;
+    line-height: 1.15;
+    min-width: 0;
+}
+
+.album-title-editable-host {
+    display: inline-block;
+    max-width: 100%;
+    min-width: 0;
+    vertical-align: bottom;
+    outline: none;
+    cursor: default;
+}
+
+.album-title-editable-host.album-title-editable {
+    cursor: text;
+}
+
+.album-title-editable-host.album-title-editable:focus-visible .album-title-display {
+    box-shadow: 0 0 0 2px #fffdf8, 0 0 0 4px #2c3e50;
+    border-radius: 6px;
+}
+
+.album-title-editable-host.album-title-editable .album-title-display {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    padding: 0.08em 1.1em 0.08em 0.32em;
+    margin: -0.08em -0.32em;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.album-title-editable-host.album-title-editable:hover .album-title-display {
+    background-color: rgba(44, 62, 80, 0.09);
+}
+
+.album-title-editable-host.album-title-editable .album-title-display::after {
+    content: "";
+    position: absolute;
+    right: 0.12em;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.72em;
+    height: 0.72em;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    background: center / contain no-repeat
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a6570' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z'/%3E%3C/svg%3E");
+}
+
+.album-title-editable-host.album-title-editable:hover .album-title-display::after {
+    opacity: 0.55;
+}
+
+h2 .album-title-input {
+    font: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    margin: 0;
+    padding: 0.06em 0.35em;
+    border: 1px solid #c5bdb0;
+    border-radius: 6px;
+    background: #fffdf8;
+    color: inherit;
+    min-width: 6rem;
+    max-width: 100%;
+    width: min(100%, 32rem);
+    box-sizing: border-box;
+}
+
+h2 .album-title-input:focus {
+    outline: none;
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 1px #2c3e50;
 }
 
 .active-album-owner-inline {

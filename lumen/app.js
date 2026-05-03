@@ -287,6 +287,8 @@ function initialize() {
     });
     dom.showViewerModeBtn.addEventListener("click", () => setOwnerViewMode("viewer"));
     dom.showEditorModeBtn.addEventListener("click", () => setOwnerViewMode("editor"));
+    dom.activeAlbumTitle?.addEventListener("click", handleAlbumTitleHostClick);
+    dom.activeAlbumTitle?.addEventListener("keydown", handleAlbumTitleHostKeydown);
     setupViewerModalInteractions();
 
     onAuthStateChanged(auth, async (user) => {
@@ -834,6 +836,140 @@ async function tryOpenAlbumFromUrl() {
     }
 }
 
+function cancelAlbumTitleEditSilently() {
+    const host = dom.activeAlbumTitle;
+    if (!host) {
+        return;
+    }
+    const input = host.querySelector(".album-title-input");
+    if (!input) {
+        return;
+    }
+    input.removeEventListener("keydown", onAlbumTitleInputKeydown);
+    input.removeEventListener("blur", onAlbumTitleInputBlur);
+    const display = document.createElement("span");
+    display.className = "album-title-display";
+    display.textContent = activeAlbum ? (activeAlbum.title || "").trim() || "Untitled album" : "Open an album";
+    input.replaceWith(display);
+}
+
+function setActiveAlbumTitleText(text) {
+    cancelAlbumTitleEditSilently();
+    const display = dom.activeAlbumTitle?.querySelector(".album-title-display");
+    if (display) {
+        display.textContent = text;
+    }
+}
+
+function syncAlbumTitleInlineEditability() {
+    const host = dom.activeAlbumTitle;
+    if (!host) {
+        return;
+    }
+    const editable = Boolean(isOwnerViewing && activeAlbum?.id && db);
+    host.classList.toggle("album-title-editable", editable);
+    host.tabIndex = editable ? 0 : -1;
+    if (editable) {
+        const t = (activeAlbum?.title || "").trim() || "Untitled album";
+        host.setAttribute("aria-label", `Album title: ${t}. Activate to edit.`);
+    } else {
+        host.removeAttribute("aria-label");
+    }
+}
+
+function handleAlbumTitleHostClick(event) {
+    if (!dom.activeAlbumTitle?.classList.contains("album-title-editable")) {
+        return;
+    }
+    if (dom.activeAlbumTitle.querySelector(".album-title-input")) {
+        return;
+    }
+    event.preventDefault();
+    beginAlbumTitleEdit();
+}
+
+function handleAlbumTitleHostKeydown(event) {
+    if (!dom.activeAlbumTitle?.classList.contains("album-title-editable")) {
+        return;
+    }
+    if (dom.activeAlbumTitle.querySelector(".album-title-input")) {
+        return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        beginAlbumTitleEdit();
+    }
+}
+
+function beginAlbumTitleEdit() {
+    if (!isOwnerViewing || !activeAlbum?.id || !db) {
+        return;
+    }
+    const host = dom.activeAlbumTitle;
+    const display = host?.querySelector(".album-title-display");
+    if (!display || host?.querySelector(".album-title-input")) {
+        return;
+    }
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "album-title-input";
+    input.maxLength = 120;
+    input.value = (activeAlbum.title || "").trim();
+    display.replaceWith(input);
+    input.focus();
+    input.select();
+    input.addEventListener("keydown", onAlbumTitleInputKeydown);
+    input.addEventListener("blur", onAlbumTitleInputBlur);
+}
+
+function onAlbumTitleInputKeydown(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        event.target.blur();
+    }
+    if (event.key === "Escape") {
+        event.preventDefault();
+        const input = event.target;
+        input.removeEventListener("keydown", onAlbumTitleInputKeydown);
+        input.removeEventListener("blur", onAlbumTitleInputBlur);
+        const display = document.createElement("span");
+        display.className = "album-title-display";
+        display.textContent = (activeAlbum?.title || "").trim() || "Untitled album";
+        input.replaceWith(display);
+    }
+}
+
+async function onAlbumTitleInputBlur(event) {
+    const input = event.target;
+    if (!input.classList.contains("album-title-input")) {
+        return;
+    }
+    input.removeEventListener("keydown", onAlbumTitleInputKeydown);
+    input.removeEventListener("blur", onAlbumTitleInputBlur);
+    const newTitle = input.value.trim() || "Untitled album";
+    const oldTitle = (activeAlbum?.title || "").trim() || "Untitled album";
+    const display = document.createElement("span");
+    display.className = "album-title-display";
+    display.textContent = newTitle;
+    input.replaceWith(display);
+    syncAlbumTitleInlineEditability();
+    if (newTitle === oldTitle || !activeAlbum?.id) {
+        return;
+    }
+    try {
+        await updateDoc(doc(db, "albums", activeAlbum.id), {
+            title: newTitle,
+            updatedAt: serverTimestamp()
+        });
+        activeAlbum.title = newTitle;
+        showAlbumSettingsSavedStatus();
+    } catch (err) {
+        console.warn("Album title save failed", err);
+        display.textContent = oldTitle;
+        showToast("Could not save album title. Try again.", "error");
+    }
+}
+
 async function openAlbum(albumId) {
     const albumRef = doc(db, "albums", albumId);
     const albumSnap = await getDoc(albumRef);
@@ -864,7 +1000,7 @@ async function openAlbum(albumId) {
             album.ownerDisplayName = normalizedOwnerLabel;
         }
     }
-    dom.activeAlbumTitle.textContent = album.title || "Untitled album";
+    setActiveAlbumTitleText(album.title || "Untitled album");
     dom.activeAlbumOwner.hidden = false;
     dom.activeAlbumOwner.textContent = `\u00b7 By ${ownerName}`;
     dom.activeAlbumVisibility.hidden = false;
@@ -901,6 +1037,7 @@ async function openAlbum(albumId) {
     await maybeAutoBookmarkSharedAlbum();
     refreshSaveSharedButtonVisibility();
     syncAlbumListSelectionHighlight();
+    syncAlbumTitleInlineEditability();
 }
 
 function refreshSaveSharedButtonVisibility() {
@@ -1771,7 +1908,8 @@ function clearAlbumView() {
         clearTimeout(timer);
     }
     entryAutoSaveTimers.clear();
-    dom.activeAlbumTitle.textContent = "Open an album";
+    setActiveAlbumTitleText("Open an album");
+    syncAlbumTitleInlineEditability();
     dom.activeAlbumOwner.hidden = true;
     dom.activeAlbumOwner.textContent = "";
     dom.activeAlbumVisibility.hidden = true;
