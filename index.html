@@ -4,8 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="description" content="Richard Tang — Manufacturing Engineer (UBC). Portfolio: MDA Space co-op, CAD/CAM, additive manufacturing, and full-stack web projects.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Richard Tang | Manufacturing Engineer">
+    <meta property="og:description" content="Manufacturing engineer bridging digital design and fabrication. Experience at MDA Space; projects in CAD, FEA, automation, and web apps.">
+    <meta property="og:url" content="https://rktang.github.io/">
+    <meta property="og:image" content="https://rktang.github.io/Asset/Podcast-MDA-banner-1920x600-1.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://rktang.github.io/">
     <link rel="shortcut icon" type="image/x-icon" href="Asset/hologram(2).ico">
-    <title>Richard Tang | Manufacturing Engineering Student</title>
+    <title>Richard Tang | Manufacturing Engineer</title>
     
     <link rel="stylesheet" href="simple.css">
 
@@ -25,6 +34,16 @@
             line-height: 1.6;
         }
 
+        /* Keep media vivid when OS prefers dark (simple.css dims images in dark mode) */
+        @media (prefers-color-scheme: dark) {
+            .mySlides img,
+            .mySlides video,
+            article img,
+            article video {
+                opacity: 1;
+            }
+        }
+
         /* Header Navigation Styling */
         body > header {
             background-color: var(--accent);
@@ -33,6 +52,10 @@
             margin-bottom: 2rem;
             border-radius: 0 0 10px 10px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
         }
         
         body > header h1 {
@@ -165,7 +188,9 @@
         }
 
         /* Button and Link Styling */
-        button, .download-btn {
+        button,
+        .download-btn,
+        a.btn-cta {
             background-color: var(--accent);
             color: white;
             border: none;
@@ -176,9 +201,18 @@
             font-size: 1rem;
             display: inline-block;
             text-decoration: none;
+            font-family: inherit;
+            text-align: center;
+            box-sizing: border-box;
         }
 
-        button:hover, .download-btn:hover {
+        a.btn-cta:hover {
+            color: white;
+        }
+
+        button:hover,
+        .download-btn:hover,
+        a.btn-cta:hover {
             background-color: var(--accent-light);
             color: white;
         }
@@ -317,13 +351,14 @@
 <body id="top">
     <header>
         <h1>Richard Tang</h1>
-        <p class="header-subtitle">Manufacturing Engineering Student</p>
+        <p class="header-subtitle">Manufacturing Engineer</p>
         <nav>
             <ul>
                 <li><a href="#about">About</a></li>
                 <li><a href="#work">Experience</a></li>
                 <li><a href="#projects">Projects</a></li>
-                <li><a href="https://linkedin.com/in/richardktang/" target="_blank">LinkedIn</a></li>
+                <li><a href="https://github.com/RKTang" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                <li><a href="https://linkedin.com/in/richardktang/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
                 <li><a href="#resume">Resume</a></li>
             </ul>
         </nav>
@@ -369,7 +404,7 @@
                     <p class="date">May 2024 - Aug 2025</p>
                 </div>
                 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow"> 
                         <div class="display-container">
                             <div class="mySlides">
@@ -392,15 +427,15 @@
                                 <div class="numbertext">4 / 4</div>
                                 <div class="text">Skymaker Prototype</div>
                             </div>
-                            <a class="prev" onclick="plusDivs(-1, 0)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 0)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 0)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 0)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 0)"></span>
-                            <span class="dot" onclick="currentDiv(2, 0)"></span>
-                            <span class="dot" onclick="currentDiv(3, 0)"></span>
-                            <span class="dot" onclick="currentDiv(4, 0)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 0)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 0)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 0)"></button>
+                            <button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 0)"></button>
                         </div>
                     </div>
                 </div>
@@ -443,7 +478,7 @@
                     <p class="date">June 2021 - Aug 2021</p>
                 </div>
 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow"> 
                         <div class="display-container">
                             <div class="mySlides">
@@ -461,14 +496,14 @@
                                 <div class="numbertext">3 / 3</div>
                                 <div class="text">Process Line Descriptions</div>
                             </div>
-                            <a class="prev" onclick="plusDivs(-1, 1)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 1)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 1)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 1)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 1)"></span>
-                            <span class="dot" onclick="currentDiv(2, 1)"></span>
-                            <span class="dot" onclick="currentDiv(3, 1)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 1)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 1)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 1)"></button>
                         </div>
                     </div>
                 </div>
@@ -500,21 +535,21 @@
                     <h3>UBC Rocket</h3>
                     <p class="subtitle">Composite Pressure Vessel | Filament Winder Design</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                             <div class="display-container">
-                            <div class="mySlides"><img src="Asset/Screenshot 2023-08-01 022618.jpg" width="100%"><div class="numbertext">1 / 7</div><div class="text">Filament Winder CAD</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1073.JPG" width="100%"><div class="numbertext">2 / 7</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1262.JPG" width="100%"><div class="numbertext">3 / 7</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1265.JPG" width="100%"><div class="numbertext">4 / 7</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1302.JPG" width="100%"><div class="numbertext">5 / 7</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1304.JPG" width="100%"><div class="numbertext">6 / 7</div></div>
-                            <div class="mySlides"><img src="Asset/IMG_1343.JPG" width="100%"><div class="numbertext">7 / 7</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 2)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 2)">&#10095;</a>
+                            <div class="mySlides"><img src="Asset/Screenshot 2023-08-01 022618.jpg" width="100%" alt="Filament winder CAD model"><div class="numbertext">1 / 7</div><div class="text">Filament Winder CAD</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1073.JPG" width="100%" alt="Composite pressure vessel fabrication"><div class="numbertext">2 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1262.JPG" width="100%" alt="Rocket tank layup work in progress"><div class="numbertext">3 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1265.JPG" width="100%" alt="Carbon fiber layup on pressure vessel"><div class="numbertext">4 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1302.JPG" width="100%" alt="Filament winding setup"><div class="numbertext">5 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1304.JPG" width="100%" alt="Wound composite tank detail"><div class="numbertext">6 / 7</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_1343.JPG" width="100%" alt="Completed composite tank prototype"><div class="numbertext">7 / 7</div></div>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 2)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 2)">&#10095;</button>
                             </div>
                             <br>
-                            <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 2)"></span><span class="dot" onclick="currentDiv(2, 2)"></span><span class="dot" onclick="currentDiv(3, 2)"></span><span class="dot" onclick="currentDiv(4, 2)"></span><span class="dot" onclick="currentDiv(5, 2)"></span><span class="dot" onclick="currentDiv(6, 2)"></span><span class="dot" onclick="currentDiv(7, 2)"></span></div>
+                            <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 2)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 2)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 2)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 2)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 2)"></button><button type="button" class="dot" aria-label="Slide 6" onclick="currentDiv(6, 2)"></button><button type="button" class="dot" aria-label="Slide 7" onclick="currentDiv(7, 2)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -536,24 +571,24 @@
                     <h3>MANU 330 RC Car</h3>
                     <p class="subtitle">Design for Manufacturing (Injection Molding & Thermoforming)</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
-                            <div class="mySlides"><img src="Asset/IMG_5741.jpg" width="100%"><div class="numbertext">1 / 10</div><div class="text">RC Car Prototype</div></div>
-                            <div class="mySlides"><img src="Asset/RC Car Concept.png" width="100%"><div class="numbertext">2 / 10</div><div class="text">RC Car Concept</div></div>
+                            <div class="mySlides"><img src="Asset/IMG_5741.jpg" width="100%" alt="RC car physical prototype"><div class="numbertext">1 / 10</div><div class="text">RC Car Prototype</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Concept.png" width="100%" alt="RC car concept render"><div class="numbertext">2 / 10</div><div class="text">RC Car Concept</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/2023_aston_martin_db11_v8_main.mp4" type="video/mp4"></video><div class="numbertext">3 / 10</div><div class="text">RC Car Animation</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/RC Car Injection Moulding.mp4" type="video/mp4"></video><div class="numbertext">4 / 10</div><div class="text">Injection Moulding Simulations</div></div>
-                            <div class="mySlides"><img src="Asset/RC Car Injection Moulding 3D Print.png" width="100%"><div class="numbertext">5 / 10</div><div class="text">Injection Moulding Parts</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Injection Moulding 3D Print.png" width="100%" alt="Injection molded RC car parts and 3D prints"><div class="numbertext">5 / 10</div><div class="text">Injection Moulding Parts</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/CAM_Simulation_Cropped_400.mp4" type="video/mp4"></video><div class="numbertext">6 / 10</div><div class="text">CAM of Wheel</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/RC Car Wheel Simulation.mp4" type="video/mp4"></video><div class="numbertext">7 / 10</div><div class="text">Wheel Simulations</div></div>
-                            <div class="mySlides"><img src="Asset/Wheel 3D Print.jpg" width="100%"><div class="numbertext">8 / 10</div><div class="text">Wheel 3D Print</div></div>
-                            <div class="mySlides"><img src="Asset/RC Car Thermoforming.jpg" width="100%"><div class="numbertext">9 / 10</div><div class="text">Thermoforming</div></div>
-                            <div class="mySlides"><img src="Asset/RC Car Heat Analysis.png" width="100%"><div class="numbertext">10 / 10</div><div class="text">Heat Analysis of Motor</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 3)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 3)">&#10095;</a>
+                            <div class="mySlides"><img src="Asset/Wheel 3D Print.jpg" width="100%" alt="Machined and 3D-printed aluminum RC wheel"><div class="numbertext">8 / 10</div><div class="text">Wheel 3D Print</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Thermoforming.jpg" width="100%" alt="Thermoformed RC car body shell"><div class="numbertext">9 / 10</div><div class="text">Thermoforming</div></div>
+                            <div class="mySlides"><img src="Asset/RC Car Heat Analysis.png" width="100%" alt="Motor heat analysis plot for RC car"><div class="numbertext">10 / 10</div><div class="text">Heat Analysis of Motor</div></div>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 3)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 3)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 3)"></span><span class="dot" onclick="currentDiv(2, 3)"></span><span class="dot" onclick="currentDiv(3, 3)"></span><span class="dot" onclick="currentDiv(4, 3)"></span><span class="dot" onclick="currentDiv(5, 3)"></span><span class="dot" onclick="currentDiv(6, 3)"></span><span class="dot" onclick="currentDiv(7, 3)"></span><span class="dot" onclick="currentDiv(8, 3)"></span><span class="dot" onclick="currentDiv(9, 3)"></span><span class="dot" onclick="currentDiv(10, 3)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 3)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 3)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 3)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 3)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 3)"></button><button type="button" class="dot" aria-label="Slide 6" onclick="currentDiv(6, 3)"></button><button type="button" class="dot" aria-label="Slide 7" onclick="currentDiv(7, 3)"></button><button type="button" class="dot" aria-label="Slide 8" onclick="currentDiv(8, 3)"></button><button type="button" class="dot" aria-label="Slide 9" onclick="currentDiv(9, 3)"></button><button type="button" class="dot" aria-label="Slide 10" onclick="currentDiv(10, 3)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -567,22 +602,22 @@
                     <h3>InnoVent</h3>
                     <p class="subtitle">S.A.M.I Vertical Farm</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
-                                <div class="mySlides"><img src="Asset/image (2).jpg" width="100%"><div class="numbertext">1 / 8</div><div class="text">SOLIDWORKS File</div></div>
-                                <div class="mySlides"><img src="Asset/image.jpg" width="100%"><div class="numbertext">2 / 8</div><div class="text">SOLIDWORKS File</div></div>
-                                <div class="mySlides"><img src="Asset/image (1).jpg" width="100%"><div class="numbertext">3 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><img src="Asset/image (2).jpg" width="100%" alt="InnoVent vertical farm — SOLIDWORKS CAD view 1"><div class="numbertext">1 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><img src="Asset/image.jpg" width="100%" alt="InnoVent vertical farm — SOLIDWORKS CAD view 2"><div class="numbertext">2 / 8</div><div class="text">SOLIDWORKS File</div></div>
+                                <div class="mySlides"><img src="Asset/image (1).jpg" width="100%" alt="InnoVent vertical farm — SOLIDWORKS CAD view 3"><div class="numbertext">3 / 8</div><div class="text">SOLIDWORKS File</div></div>
                                 <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/Innovent Prototype.mp4" type="video/mp4"></video><div class="numbertext">4 / 8</div></div>
-                                <div class="mySlides"><img src="Asset/IMG_1475.JPG" width="100%"><div class="numbertext">5 / 8</div><div class="text">Physical Prototype</div></div>
-                                <div class="mySlides"><img src="Asset/Screenshot 2023-07-29 212722.jpg" width="100%"><div class="numbertext">6 / 8</div><div class="text">Presentation</div></div>
-                                <div class="mySlides"><img src="Asset/Screenshot 2023-08-03 005933.jpg" width="100%"><div class="numbertext">7 / 8</div><div class="text">Figma Wire frame for App</div></div>
-                                <div class="mySlides"><img src="Asset/IMG_2945.jpg" width="100%"><div class="numbertext">8 / 8</div><div class="text">Team Photo</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 4)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 4)">&#10095;</a>
+                                <div class="mySlides"><img src="Asset/IMG_1475.JPG" width="100%" alt="InnoVent SAMI vertical farm physical prototype"><div class="numbertext">5 / 8</div><div class="text">Physical Prototype</div></div>
+                                <div class="mySlides"><img src="Asset/Screenshot 2023-07-29 212722.jpg" width="100%" alt="InnoVent project presentation slide"><div class="numbertext">6 / 8</div><div class="text">Presentation</div></div>
+                                <div class="mySlides"><img src="Asset/Screenshot 2023-08-03 005933.jpg" width="100%" alt="Figma wireframes for InnoVent mobile app"><div class="numbertext">7 / 8</div><div class="text">Figma Wire frame for App</div></div>
+                                <div class="mySlides"><img src="Asset/IMG_2945.jpg" width="100%" alt="InnoVent team photo"><div class="numbertext">8 / 8</div><div class="text">Team Photo</div></div>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 4)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 4)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 4)"></span><span class="dot" onclick="currentDiv(2, 4)"></span><span class="dot" onclick="currentDiv(3, 4)"></span><span class="dot" onclick="currentDiv(4, 4)"></span><span class="dot" onclick="currentDiv(5, 4)"></span><span class="dot" onclick="currentDiv(6, 4)"></span><span class="dot" onclick="currentDiv(7, 4)"></span><span class="dot" onclick="currentDiv(8, 4)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 4)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 4)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 4)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 4)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 4)"></button><button type="button" class="dot" aria-label="Slide 6" onclick="currentDiv(6, 4)"></button><button type="button" class="dot" aria-label="Slide 7" onclick="currentDiv(7, 4)"></button><button type="button" class="dot" aria-label="Slide 8" onclick="currentDiv(8, 4)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -598,7 +633,7 @@
                     <h3>3D Sea Level Rise Visualization</h3>
                     <p class="subtitle">Automated GIS to STL Workflow (MANU 453)</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -622,15 +657,15 @@
                                 <div class="text">Automated Script Workflow</div>
                             </div>
                             
-                            <a class="prev" onclick="plusDivs(-1, 5)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 5)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 5)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 5)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 5)"></span>
-                            <span class="dot" onclick="currentDiv(2, 5)"></span>
-                            <span class="dot" onclick="currentDiv(3, 5)"></span>
-                            <span class="dot" onclick="currentDiv(4, 5)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 5)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 5)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 5)"></button>
+                            <button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 5)"></button>
                         </div>
                     </div>
                 </div>
@@ -657,7 +692,7 @@
                     <h3>Compact Laptop Stand</h3>
                     <p class="subtitle">Functional 3D Printing</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-28 180322.jpg" width="100%"><div class="numbertext">1 / 5</div><div class="text">SOLIDWORKS file</div></div>
@@ -665,11 +700,11 @@
                             <div class="mySlides"><img src="Asset/325020424_541963054657412_2220710117138790717_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">Underside</div></div>
                             <div class="mySlides"><img src="Asset/325211024_892323165552225_8414979510067406734_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Post Processing</div></div>
                             <div class="mySlides"><img src="Asset/322779581_702182148018563_6618183657453898901_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">In Use</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 6)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 6)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 6)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 6)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 6)"></span><span class="dot" onclick="currentDiv(2, 6)"></span><span class="dot" onclick="currentDiv(3, 6)"></span><span class="dot" onclick="currentDiv(4, 6)"></span><span class="dot" onclick="currentDiv(5, 6)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 6)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 6)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 6)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 6)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 6)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -683,7 +718,7 @@
                     <h3>Utility Blade Holder</h3>
                     <p class="subtitle">Shop Tool Design</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides"><img src="Asset/IMG_2296.jpg" width="100%"><div class="numbertext">1 / 5</div><div class="text">Post Processing</div></div>
@@ -691,11 +726,11 @@
                             <div class="mySlides"><img src="Asset/326814349_548129457263452_1295491445531893620_n.jpg" width="100%"><div class="numbertext">3 / 5</div><div class="text">3D Printing</div></div>
                             <div class="mySlides"><img src="Asset/322657566_1050700309666528_4748723159243016704_n.jpg" width="100%"><div class="numbertext">4 / 5</div><div class="text">Semi-finished 3D model</div></div>
                             <div class="mySlides"><img src="Asset/322661332_1300532087183658_8962088131499657860_n.jpg" width="100%"><div class="numbertext">5 / 5</div><div class="text">Post Processing</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 7)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 7)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 7)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 7)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 7)"></span><span class="dot" onclick="currentDiv(2, 7)"></span><span class="dot" onclick="currentDiv(3, 7)"></span><span class="dot" onclick="currentDiv(4, 7)"></span><span class="dot" onclick="currentDiv(5, 7)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 7)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 7)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 7)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 7)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 7)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -711,18 +746,18 @@
                     <h3>Everline</h3>
                     <p class="subtitle">Unity | C#</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/Everline_video.mp4" type="video/mp4"></video><div class="numbertext">1 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineDungeon.mp4" type="video/mp4"></video><div class="numbertext">2 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineStore.mp4" type="video/mp4"></video><div class="numbertext">3 / 4</div></div>
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/EverlineTitle.mp4" type="video/mp4"></video><div class="numbertext">4 / 4</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 8)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 8)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 8)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 8)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 8)"></span><span class="dot" onclick="currentDiv(2, 8)"></span><span class="dot" onclick="currentDiv(3, 8)"></span><span class="dot" onclick="currentDiv(4, 8)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 8)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 8)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 8)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 8)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -730,7 +765,7 @@
                     <p>Developed a 2D platformer using Unity and C#. Published the final build to itch.io, achieving 3,000+ unique player downloads.</p>
                 </details>
                 <div style="margin-top:1rem;">
-                    <iframe frameborder="0" src="https://itch.io/embed/2186093?bg_color=422835&amp;fg_color=ffffff&amp;link_color=b16389&amp;border_color=333333" width="208" height="167"><a href="https://rktang.itch.io/everline">Everline by RKTang</a></iframe>
+                    <iframe title="Everline on itch.io" frameborder="0" src="https://itch.io/embed/2186093?bg_color=422835&amp;fg_color=ffffff&amp;link_color=b16389&amp;border_color=333333" width="208" height="167"><a href="https://rktang.itch.io/everline">Everline by RKTang</a></iframe>
                 </div>
             </article>
 
@@ -738,17 +773,17 @@
                 <header>
                     <h3>Donut Clicker</h3>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides"><video style="width:100%" autoplay muted loop><source src="Asset/DonutClickerVideo.mp4" type="video/mp4"></video><div class="numbertext">1 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161614.jpg" width="100%"><div class="numbertext">2 / 3</div></div>
                             <div class="mySlides"><img src="Asset/Screenshot 2023-07-30 161646.jpg" width="100%"><div class="numbertext">3 / 3</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 9)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 9)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 9)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 9)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 9)"></span><span class="dot" onclick="currentDiv(2, 9)"></span><span class="dot" onclick="currentDiv(3, 9)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 9)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 9)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 9)"></button></div>
                     </div>
                 </div>
                 <details>
@@ -756,7 +791,7 @@
                     <p>A passion project exploring incremental game mechanics. Collaborated with a digital artist to design custom assets and implemented game logic in C#.</p>
                 </details>
                 <div style="margin-top:1rem;">
-                    <iframe frameborder="0" src="https://itch.io/embed/1351630?bg_color=ffffff&amp;fg_color=222222&amp;link_color=fa5c5c&amp;border_color=cccccc" width="208" height="167"><a href="https://rktang.itch.io/donut-clicker">Donut Clicker by RKTang</a></iframe>
+                    <iframe title="Donut Clicker on itch.io" frameborder="0" src="https://itch.io/embed/1351630?bg_color=ffffff&amp;fg_color=222222&amp;link_color=fa5c5c&amp;border_color=cccccc" width="208" height="167"><a href="https://rktang.itch.io/donut-clicker">Donut Clicker by RKTang</a></iframe>
                 </div>
             </article>
 
@@ -765,7 +800,7 @@
                     <h3>Generative AI Web Development</h3>
                     <p class="subtitle">Prompt Engineering & AI Tools</p>
                 </header>
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides"><img src="Asset/Screenshot 2023-12-29 at 00-41-33 Blackburn Bracelets.png" width="100%"><div class="numbertext">1 / 7</div><div class="text">Website</div></div>
@@ -775,11 +810,11 @@
                             <div class="mySlides"><img src="Asset/avatar-gen11b89387c3ad5f3009f2fbafb0a2e1ff.jpg" width="100%"><div class="numbertext">5 / 7</div><div class="text">AI Generated Persona</div></div>
                             <div class="mySlides"><img src="Asset/aCAsxgn9.jpg" width="100%"><div class="numbertext">6 / 7</div><div class="text">AI Persona Alt</div></div>
                             <div class="mySlides"><img src="Asset/logo.png" width="100%"><div class="numbertext">7 / 7</div><div class="text">AI Logo</div></div>
-                            <a class="prev" onclick="plusDivs(-1, 10)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 10)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 10)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 10)">&#10095;</button>
                         </div>
                         <br>
-                        <div style="text-align:center"><span class="dot" onclick="currentDiv(1, 10)"></span><span class="dot" onclick="currentDiv(2, 10)"></span><span class="dot" onclick="currentDiv(3, 10)"></span><span class="dot" onclick="currentDiv(4, 10)"></span><span class="dot" onclick="currentDiv(5, 10)"></span><span class="dot" onclick="currentDiv(6, 10)"></span><span class="dot" onclick="currentDiv(7, 10)"></span></div>
+                        <div style="text-align:center"><button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 10)"></button><button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 10)"></button><button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 10)"></button><button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 10)"></button><button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 10)"></button><button type="button" class="dot" aria-label="Slide 6" onclick="currentDiv(6, 10)"></button><button type="button" class="dot" aria-label="Slide 7" onclick="currentDiv(7, 10)"></button></div>
                     </div>
                 </div>
 
@@ -796,9 +831,7 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://blackburnbracelets.github.io/" target="_blank" style="text-decoration:none;">
-                        <button>Visit Website</button>
-                    </a>
+                    <a class="btn-cta" href="https://blackburnbracelets.github.io/" target="_blank" rel="noopener noreferrer">Visit Website</a>
                 </div>
             </article>
 
@@ -808,7 +841,7 @@
                     <p class="subtitle">Web Application | Streamlit & Python</p>
                 </header>
                 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -827,14 +860,14 @@
                                 <div class="text">Monte Carlo Wealth Projection Feature</div>
                             </div>
                             
-                            <a class="prev" onclick="plusDivs(-1, 11)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 11)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 11)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 11)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 11)"></span>
-                            <span class="dot" onclick="currentDiv(2, 11)"></span>
-                            <span class="dot" onclick="currentDiv(3, 11)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 11)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 11)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 11)"></button>
                         </div>
                     </div>
                 </div>
@@ -853,9 +886,7 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://stacked.streamlit.app/" target="_blank" style="text-decoration:none;">
-                        <button>Launch Live App</button>
-                    </a>
+                    <a class="btn-cta" href="https://stacked.streamlit.app/" target="_blank" rel="noopener noreferrer">Launch Live App</a>
                 </div>
             </article>
 
@@ -865,7 +896,7 @@
                     <p class="subtitle">Kinetic Typography Engine | WebGL & JavaScript</p>
                 </header>
                 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -882,13 +913,13 @@
                                 <div class="text">Wireframe & Animation Demo</div>
                             </div>
                             
-                            <a class="prev" onclick="plusDivs(-1, 12)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 12)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 12)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 12)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 12)"></span>
-                            <span class="dot" onclick="currentDiv(2, 12)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 12)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 12)"></button>
                         </div>
                     </div>
                 </div>
@@ -907,9 +938,7 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://rktang.github.io/spool/" target="_blank" style="text-decoration:none;">
-                        <button>Launch Live App</button>
-                    </a>
+                    <a class="btn-cta" href="https://rktang.github.io/spool/" target="_blank" rel="noopener noreferrer">Launch Live App</a>
                 </div>
             </article>
             
@@ -919,7 +948,7 @@
                     <p class="subtitle">HTML5 | Incremental Strategy</p>
                 </header>
                 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -948,15 +977,15 @@
                                 <div class="text">Gameplay Demo</div>
                             </div>
                             
-                            <a class="prev" onclick="plusDivs(-1, 13)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 13)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 13)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 13)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 13)"></span>
-                            <span class="dot" onclick="currentDiv(2, 13)"></span>
-                            <span class="dot" onclick="currentDiv(3, 13)"></span>
-                            <span class="dot" onclick="currentDiv(4, 13)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 13)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 13)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 13)"></button>
+                            <button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 13)"></button>
                         </div>
                     </div>
                 </div>
@@ -979,9 +1008,7 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://rktang.itch.io/construction-tycoon" target="_blank" style="text-decoration:none;">
-                        <button>Play on Itch.io</button>
-                    </a>
+                    <a class="btn-cta" href="https://rktang.itch.io/construction-tycoon" target="_blank" rel="noopener noreferrer">Play on Itch.io</a>
                 </div>
             </article>
 
@@ -991,7 +1018,7 @@
                     <p class="subtitle">Web Application | Productivity Tool</p>
                 </header>
                 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -1006,13 +1033,13 @@
                                 <div class="text">Inbox Management Features</div>
                             </div>
                             
-                            <a class="prev" onclick="plusDivs(-1, 14)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 14)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 14)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 14)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 14)"></span>
-                            <span class="dot" onclick="currentDiv(2, 14)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 14)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 14)"></button>
                         </div>
                     </div>
                 </div>
@@ -1025,9 +1052,7 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center;">
-                    <a href="https://rktang.github.io/gmail_organizer/" target="_blank" style="text-decoration:none;">
-                        <button>Launch Live App</button>
-                    </a>
+                    <a class="btn-cta" href="https://rktang.github.io/gmail_organizer/" target="_blank" rel="noopener noreferrer">Launch Live App</a>
                 </div>
             </article>
 
@@ -1037,7 +1062,7 @@
                     <p class="subtitle">Web Application | Creative showcase & Firebase photo journals</p>
                 </header>
 
-                <div id="wrapper">
+                <div class="slideshow-wrapper">
                     <div class="slideshow">
                         <div class="display-container">
                             <div class="mySlides">
@@ -1070,17 +1095,17 @@
                                 <div class="numbertext">6 / 6</div>
                                 <div class="text">Lightbox — full photo with Details</div>
                             </div>
-                            <a class="prev" onclick="plusDivs(-1, 15)">&#10094;</a>
-                            <a class="next" onclick="plusDivs(1, 15)">&#10095;</a>
+                            <button type="button" class="prev" aria-label="Previous slide" onclick="plusDivs(-1, 15)">&#10094;</button>
+                            <button type="button" class="next" aria-label="Next slide" onclick="plusDivs(1, 15)">&#10095;</button>
                         </div>
                         <br>
                         <div style="text-align:center">
-                            <span class="dot" onclick="currentDiv(1, 15)"></span>
-                            <span class="dot" onclick="currentDiv(2, 15)"></span>
-                            <span class="dot" onclick="currentDiv(3, 15)"></span>
-                            <span class="dot" onclick="currentDiv(4, 15)"></span>
-                            <span class="dot" onclick="currentDiv(5, 15)"></span>
-                            <span class="dot" onclick="currentDiv(6, 15)"></span>
+                            <button type="button" class="dot" aria-label="Slide 1" onclick="currentDiv(1, 15)"></button>
+                            <button type="button" class="dot" aria-label="Slide 2" onclick="currentDiv(2, 15)"></button>
+                            <button type="button" class="dot" aria-label="Slide 3" onclick="currentDiv(3, 15)"></button>
+                            <button type="button" class="dot" aria-label="Slide 4" onclick="currentDiv(4, 15)"></button>
+                            <button type="button" class="dot" aria-label="Slide 5" onclick="currentDiv(5, 15)"></button>
+                            <button type="button" class="dot" aria-label="Slide 6" onclick="currentDiv(6, 15)"></button>
                         </div>
                     </div>
                 </div>
@@ -1093,12 +1118,8 @@
                 </details>
 
                 <div style="margin-top:1.5rem; text-align:center; display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:center;">
-                    <a href="https://rktang.github.io/creative/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
-                        <button type="button">View Creative showcase</button>
-                    </a>
-                    <a href="https://rktang.github.io/lumen/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
-                        <button type="button">Open Lumen app</button>
-                    </a>
+                    <a class="btn-cta" href="https://rktang.github.io/creative/" target="_blank" rel="noopener noreferrer">View Creative showcase</a>
+                    <a class="btn-cta" href="https://rktang.github.io/lumen/" target="_blank" rel="noopener noreferrer">Open Lumen app</a>
                 </div>
             </article>
 
@@ -1110,9 +1131,7 @@
             </header>
             <article id="resume__download" style="text-align:center;">
                 <p>View or download my full resume below.</p>
-                <a href="https://drive.google.com/drive/u/1/folders/1630RvOGabO5v-kKwd-RSJsPJHQmgW8gX" target="_blank" rel="noopener noreferrer">
-                    <button class="download-btn">Download PDF</button>
-                </a>
+                <a class="download-btn" href="https://drive.google.com/drive/u/1/folders/1630RvOGabO5v-kKwd-RSJsPJHQmgW8gX" target="_blank" rel="noopener noreferrer">Download PDF</a>
                 <br><br>
                 <object data="Asset/Resume_13.pdf" type="application/pdf" style="min-height:800px; width:100%; border-radius:8px; border:1px solid #ccc;"></object>
             </article>
@@ -1122,7 +1141,7 @@
         <p>This website was programmed by me using <a href="https://simplecss.org">Simple.css</a>.</p>
     </footer>
     
-    <button id="scrollToTopBtn" onclick="scrollToTop()">Top</button>
+    <button type="button" id="scrollToTopBtn" onclick="scrollToTop()" aria-label="Back to top">Top</button>
     <script src="scroll.js"></script>
 </body>
 </html>
