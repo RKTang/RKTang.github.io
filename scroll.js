@@ -12,6 +12,8 @@ if (document.readyState === "loading") {
     syncHeaderLayout();
 }
 
+window.addEventListener("load", syncHeaderLayout);
+
 function onScroll() {
     showScrollButton();
     handleHeaderOnScroll();
@@ -26,7 +28,7 @@ function syncHeaderLayout() {
     if (mobileHeaderQuery.matches) {
         document.documentElement.style.setProperty(
             "--site-header-height",
-            header.offsetHeight + "px"
+            Math.ceil(header.getBoundingClientRect().height) + "px"
         );
     } else {
         document.documentElement.style.removeProperty("--site-header-height");
