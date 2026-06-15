@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="description" content="Connect with Richard Tang — save contact card or send a text.">
+    <meta property="og:title" content="Connect | Richard Tang">
+    <meta property="og:description" content="Save Richard Tang's contact or send a quick text from your phone.">
+    <meta property="og:url" content="https://rktang.github.io/connect.html">
+    <link rel="canonical" href="https://rktang.github.io/connect.html">
+    <link rel="shortcut icon" type="image/x-icon" href="Asset/hologram(2).ico">
+    <title>Connect | Richard Tang</title>
+
+    <link rel="stylesheet" href="simple.css">
+
+    <style>
+        :root {
+            --accent: #2c3e50;
+            --accent-light: #34495e;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        body > header {
+            background-color: var(--accent);
+            color: white;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        body > header h1 {
+            color: white;
+            margin-bottom: 0.2rem;
+            font-size: 2.5rem;
+        }
+
+        .header-subtitle {
+            color: #cbd5e0;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        nav ul {
+            padding: 0;
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        nav ul li a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        nav ul li a:hover,
+        nav ul li a[aria-current="page"] {
+            background-color: white;
+            color: var(--accent);
+            border-color: white;
+        }
+
+        section article {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e1e1;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        .connect-lead {
+            color: #4a5568;
+            max-width: 28rem;
+            margin: 0 auto 2rem;
+        }
+
+        .connect-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            max-width: 20rem;
+            margin: 0 auto;
+        }
+
+        a.btn-cta {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.85rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1.05rem;
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            font-family: inherit;
+            text-align: center;
+            box-sizing: border-box;
+            font-weight: 600;
+        }
+
+        a.btn-cta:hover,
+        a.btn-cta:visited {
+            background-color: var(--accent-light);
+            color: #fff;
+        }
+
+        a.btn-cta--secondary {
+            background-color: #fff;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        a.btn-cta--secondary:hover,
+        a.btn-cta--secondary:visited {
+            background-color: #e3e8ee;
+            color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body id="top">
+    <header>
+        <h1>Richard Tang</h1>
+        <p class="header-subtitle">Manufacturing Engineer In Training</p>
+        <nav>
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#work">Experience</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="https://github.com/RKTang" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                <li><a href="https://linkedin.com/in/richardktang/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                <li><a href="index.html#resume">Resume</a></li>
+                <li><a href="connect.html" aria-current="page">Connect</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="connect">
+            <header>
+                <h1>Connect</h1>
+            </header>
+            <article>
+                <p class="connect-lead">
+                    Save my contact to your phone or send a quick text — great when we meet in person or at an event.
+                </p>
+                <div class="connect-actions">
+                    <a class="btn-cta" href="Asset/Richard-Tang.vcf" download="Richard-Tang.vcf">Save Contact</a>
+                    <a class="btn-cta btn-cta--secondary" href="sms:+17788389586?body=Hello,%20it%27s%20[Name]%20from%20[Company]!">Text Me</a>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="index.html">Back to portfolio</a> · Built with <a href="https://simplecss.org">Simple.css</a></p>
+    </footer>
+</body>
+
+</html>
