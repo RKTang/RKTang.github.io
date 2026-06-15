@@ -1,4 +1,14 @@
-/* Portfolio mobile layout — load after simple.css */
+/* Portfolio layout — load after simple.css */
+
+/* Hide site header when scrolling down; show when scrolling up or at top */
+body > header {
+    transition: transform 0.25s ease;
+    will-change: transform;
+}
+
+body > header.header-hidden {
+    transform: translateY(-100%);
+}
 
 @media (max-width: 720px) {
     /* Compact sticky header */
@@ -19,18 +29,28 @@
         padding: 0 0.25rem;
     }
 
-    /* Override simple.css mobile nav (underline, no border) */
+    /* Single-row nav; scroll horizontally if needed on narrow screens */
     nav ul {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.45rem;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 0.35rem;
         width: 100%;
-        max-width: 20rem;
+        max-width: none;
         margin: 0 auto;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.15rem;
+    }
+
+    nav ul::-webkit-scrollbar {
+        display: none;
     }
 
     nav ul li {
         margin: 0;
+        flex: 0 0 auto;
     }
 
     nav ul li a,
@@ -38,22 +58,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        min-height: 44px;
-        padding: 0.55rem 0.4rem !important;
+        width: auto;
+        min-height: 40px;
+        padding: 0.45rem 0.6rem !important;
         margin: 0 !important;
-        font-size: 0.88rem;
+        font-size: 0.78rem;
         line-height: 1.2;
         text-decoration: none !important;
         border: 1px solid rgba(255, 255, 255, 0.35) !important;
         border-radius: 6px;
         box-sizing: border-box;
+        white-space: nowrap;
         -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Fifth nav item (Connect) spans full width */
-    nav ul li:last-child:nth-child(odd) {
-        grid-column: 1 / -1;
     }
 
     main {
