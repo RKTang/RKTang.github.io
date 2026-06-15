@@ -1,0 +1,146 @@
+/* Portfolio mobile layout — load after simple.css */
+
+@media (max-width: 720px) {
+    /* Compact sticky header */
+    body > header {
+        padding: 1rem 0.75rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    body > header h1 {
+        font-size: 1.65rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .header-subtitle {
+        font-size: 0.9rem;
+        line-height: 1.35;
+        margin-bottom: 0.85rem;
+        padding: 0 0.25rem;
+    }
+
+    /* Override simple.css mobile nav (underline, no border) */
+    nav ul {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem;
+        width: 100%;
+        max-width: 20rem;
+        margin: 0 auto;
+    }
+
+    nav ul li {
+        margin: 0;
+    }
+
+    nav ul li a,
+    header > nav a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 44px;
+        padding: 0.55rem 0.4rem !important;
+        margin: 0 !important;
+        font-size: 0.88rem;
+        line-height: 1.2;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        border-radius: 6px;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Fifth nav item (Connect) spans full width */
+    nav ul li:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+
+    main {
+        padding-top: 0.25rem;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    main section > header h1 {
+        font-size: 1.65rem;
+        margin-top: 0;
+        margin-bottom: 0.65rem;
+    }
+
+    section article {
+        padding: 1.25rem 1rem;
+    }
+
+    section article:hover {
+        transform: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+        font-size: 1.35rem;
+        margin-top: 1.75rem;
+    }
+
+    .stat-card {
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+
+    .slideshow {
+        margin: 1rem 0;
+    }
+
+    button.prev,
+    button.next {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button.dot {
+        min-width: 13px;
+        min-height: 13px;
+    }
+
+    a.btn-cta,
+    a.download-btn {
+        min-height: 48px;
+        padding: 0.85rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .connect-lead {
+        margin-bottom: 1.25rem;
+        font-size: 1rem;
+        padding: 0 0.25rem;
+    }
+
+    .connect-actions {
+        max-width: none;
+        width: 100%;
+        gap: 0.75rem;
+    }
+
+    #resume__download object {
+        min-height: 55vh !important;
+    }
+
+    footer {
+        padding: 1.25rem 0.75rem;
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    #scrollToTopBtn {
+        bottom: max(14px, env(safe-area-inset-bottom, 0px));
+        right: max(14px, env(safe-area-inset-right, 0px));
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
