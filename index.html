@@ -266,6 +266,18 @@
             background: #eee;
         }
 
+        .slideshow .mySlides {
+            display: none;
+        }
+
+        .slideshow .mySlides.active-slide {
+            display: block;
+        }
+
+        .slideshow .display-container {
+            position: relative;
+        }
+
         /* Details & Lists */
         details ul {
             list-style-type: none;
@@ -1267,7 +1279,6 @@
                     <iframe frameborder="0" src="https://itch.io/embed/4608922?bg_color=1a1008&amp;fg_color=f5e6c8&amp;link_color=fa5c5c&amp;border_color=594b40" width="208" height="167"><a href="https://rktang.itch.io/crumb-empire">Crumb Empire by RKTang</a></iframe>
                 </div>
             </article>
-            <script src="slide.js"></script>
         </section>      
         <section id="resume">
             <header>
@@ -1291,6 +1302,7 @@
     </footer>
     
     <button type="button" id="scrollToTopBtn" onclick="scrollToTop()" aria-label="Back to top">Top</button>
+    <script src="slide.js"></script>
     <script src="scroll.js"></script>
 </body>
 </html>
