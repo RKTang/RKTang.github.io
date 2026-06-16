@@ -1,37 +1,65 @@
-var slideIndex = 1;
-var z = document.getElementsByClassName("slideshow");
-for (i = 0; i < z.length; i++) {
-    //set custom data attribute to first current image index
-    z[i].setAttribute("data-currentslide", 1);
-    showDivs(z[i].getAttribute("data-currentslide"), i);
+function getSlideshowIndex(el) {
+    var slideshow = el.closest(".slideshow");
+    if (!slideshow) {
+        return -1;
+    }
+    return Array.prototype.indexOf.call(
+        document.getElementsByClassName("slideshow"),
+        slideshow
+    );
 }
-function plusDivs(n, j) {
-    //get custom data attribute value of current image index to slideshow class index j
-    slideIndex = parseInt(z[j].getAttribute("data-currentslide"));
-    showDivs(slideIndex += n, j);
+
+function plusDivs(n, el) {
+    var j = getSlideshowIndex(el);
+    if (j < 0) {
+        return;
+    }
+    var slideshow = document.getElementsByClassName("slideshow")[j];
+    var current = parseInt(slideshow.getAttribute("data-currentslide"), 10) || 1;
+    showDivs(current + n, j);
 }
-function currentDiv(n, j) {
-    showDivs(slideIndex = n, j); /* showDivs Not showSlides*/
+
+function currentDiv(n, el) {
+    var j = getSlideshowIndex(el);
+    if (j < 0) {
+        return;
+    }
+    showDivs(n, j);
 }
+
 function showDivs(n, j) {
     var i;
-    var z = document.getElementsByClassName("slideshow")[j];
-    var x = z.getElementsByClassName("mySlides");
-    var dots = z.getElementsByClassName("dot");
-    if (n > x.length) {
-        slideIndex = 1
+    var slideshow = document.getElementsByClassName("slideshow")[j];
+    var slides = slideshow.getElementsByClassName("mySlides");
+    var dots = slideshow.getElementsByClassName("dot");
+    var index = n;
+
+    if (index > slides.length) {
+        index = 1;
     }
-    if (n < 1) {
-        slideIndex = x.length;
+    if (index < 1) {
+        index = slides.length;
     }
-    //set custom data attribute to current image index
-    z.setAttribute("data-currentslide", slideIndex);
-    for (i = 0; i < x.length; i++) {
-        x[i].style.display = "none";
+
+    slideshow.setAttribute("data-currentslide", index);
+
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
     }
     for (i = 0; i < dots.length; i++) {
         dots[i].className = dots[i].className.replace(" active", "");
     }
-    x[slideIndex - 1].style.display = "block";
-    dots[slideIndex - 1].className += " active";
+
+    slides[index - 1].style.display = "block";
+    if (dots[index - 1]) {
+        dots[index - 1].className += " active";
+    }
 }
+
+(function initSlideshows() {
+    var slideshows = document.getElementsByClassName("slideshow");
+    for (var i = 0; i < slideshows.length; i++) {
+        slideshows[i].setAttribute("data-currentslide", 1);
+        showDivs(1, i);
+    }
+})();
